@@ -108,7 +108,7 @@ int main(int argc,char *argv[])
 
 	ModelSelectorType modelSelector(mpsSolverParams.model);
 
-	ModelBaseType *model = modelSelector(mpsSolverParams,io,geometry,concurrency);
+	//	ModelBaseType *model = modelSelector(mpsSolverParams,io,geometry,concurrency);
 
 //	MatrixProductStateType psi; // initialize to something
 
