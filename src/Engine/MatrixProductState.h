@@ -42,29 +42,20 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef MODEL_BASE_H
-#define MODEL_BASE_H
-#include "MatrixProductOperator.h"
+#ifndef MATRIX_PRODUCT_STATE_H
+#define MATRIX_PRODUCT_STATE_H
 
 namespace Mpspp {
 
-template<typename ParametersSolverType_,
-		 typename InputValidatorType_,
-		 typename GeometryType_,
-		 typename ConcurrencyType_>
-class ModelBase {
+class MatrixProductState {
 
 public:
 
-	typedef ParametersSolverType_ ParametersSolverType;
-	typedef InputValidatorType_ InputValidatorType;
-	typedef GeometryType_ GeometryType;
-	typedef ConcurrencyType_ ConcurrencyType;
-	typedef MatrixProductOperator MatrixProductOperatorType;
-}; // ModelBase
+
+}; // MatrixProductState
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // MODEL_BASE_H
+#endif // MATRIX_PRODUCT_STATE_H
 

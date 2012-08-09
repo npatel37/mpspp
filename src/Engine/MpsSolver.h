@@ -42,29 +42,45 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef MODEL_BASE_H
-#define MODEL_BASE_H
-#include "MatrixProductOperator.h"
+#ifndef MPS_SOLVER_H
+#define MPS_SOLVER_H
 
 namespace Mpspp {
 
-template<typename ParametersSolverType_,
-		 typename InputValidatorType_,
-		 typename GeometryType_,
-		 typename ConcurrencyType_>
-class ModelBase {
+template<typename ModelBaseType>
+class MpsSolver {
+
+	typedef typename ModelBaseType::ParametersSolverType ParametersSolverType;
+	typedef typename ModelBaseType::InputValidatorType InputValidatorType;
+	typedef typename ModelBaseType::GeometryType GeometryType;
+	typedef typename ModelBaseType::ConcurrencyType ConcurrencyType;
+	typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
+	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 
 public:
 
-	typedef ParametersSolverType_ ParametersSolverType;
-	typedef InputValidatorType_ InputValidatorType;
-	typedef GeometryType_ GeometryType;
-	typedef ConcurrencyType_ ConcurrencyType;
-	typedef MatrixProductOperator MatrixProductOperatorType;
-}; // ModelBase
+	MpsSolver(const ParametersSolverType& solverParams,
+			  ModelBaseType& model,
+			  ConcurrencyType& concurrency)
+		: solverParams_(solverParams),
+		  model_(model),
+		  concurrency_(concurrency)
+	{}
+
+	void computeGroundState(MatrixProductStateType& psi)
+	{
+
+	}
+
+private:
+
+	const ParametersSolverType& solverParams_;
+	ModelBaseType& model_;
+	ConcurrencyType& concurrency_;
+}; // MpsSolver
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // MODEL_BASE_H
+#endif // MPS_SOLVER_H
 

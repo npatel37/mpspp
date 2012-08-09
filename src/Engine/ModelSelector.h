@@ -51,17 +51,26 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
-template<typename ParametersSolverType,
-		 typename InputValidatorType,
-		 typename GeometryType,
-		 typename ConcurrencyType>
+template<typename ModelType>
 class ModelSelector {
 
-	typedef HubbardOneOrbital<ParametersSolverType,InputValidatorType,GeometryType,ConcurrencyType> HubbardOneOrbitalType;
+	typedef typename ModelType::ParametersSolverType ParametersSolverType;
+	typedef typename ModelType::InputValidatorType InputValidatorType;
+	typedef typename ModelType::GeometryType GeometryType;
+	typedef typename ModelType::ConcurrencyType ConcurrencyType;
+	typedef typename ModelType::MatrixProductOperatorType MatrixProductOperatorType;
+
+	typedef HubbardOneOrbital<ParametersSolverType,
+							  InputValidatorType,
+							  GeometryType,
+							  ConcurrencyType> HubbardOneOrbitalType;
 
 public:
 
-	typedef ModelBase<ParametersSolverType,InputValidatorType,GeometryType,ConcurrencyType> ModelBaseType;
+	typedef ModelBase<ParametersSolverType,
+					  InputValidatorType,
+					  GeometryType,
+					  ConcurrencyType> ModelBaseType;
 
 	ModelSelector(const std::string& name)
 	: name_(name),model_(0)
