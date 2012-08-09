@@ -3,7 +3,8 @@
 # MPI: 0
 
 LDFLAGS =      /usr/lib64/liblapack.so.3 /usr/lib64/libblas.so.3      -lpthread 
-CPPFLAGS = -Werror -Wall  -IEngine -I../../PsimagLite/src -I../../PsimagLite/src/Geometry  
+CPPFLAGS = -Werror -Wall  -IEngine -I../../PsimagLite/src -I../../PsimagLite/src/Geometry  \
+ -IModels/HubbardOneOrbital
 #CXX = g++  -O3 -DNDEBUG
 #Comment out line below for debugging (COMMENT ALSO THE strip commands): 
 CXX = g++ -g3 #ALSO COMMENT OUT strip command below

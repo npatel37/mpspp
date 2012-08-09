@@ -51,12 +51,19 @@ const std::string license=
 #include "InputNg.h"
 #include "Geometry.h"
 #include "ParametersMpsSolver.h"
+#include "ModelSelector.h"
+//#include "IoSimple.h"
 
 typedef double RealType;
 typedef PsimagLite::ConcurrencySerial<RealType> ConcurrencyType;
 typedef PsimagLite::InputNg<Mpspp::InputCheck> InputNgType;
 typedef PsimagLite::Geometry<RealType,Mpspp::ProgramGlobals> GeometryType;
-typedef Mpspp::ParametersMpsSolver<RealType,InputNgType::Readable> ParametersMpsSolverType;
+typedef Mpspp::ParametersMpsSolver<RealType,InputNgType::Readable> ParametersSolverType;
+typedef PsimagLite::InputNg<Mpspp::InputCheck>::Readable InputValidatorType;
+typedef Mpspp::ModelSelector<ParametersSolverType,InputValidatorType,GeometryType,ConcurrencyType> ModelSelectorType;
+typedef typename ModelSelectorType::ModelBaseType ModelBaseType;
+
+// FIXME: make configurable at runtime:
 
 int main(int argc,char *argv[])
 {
@@ -97,13 +104,15 @@ int main(int argc,char *argv[])
 
 	GeometryType geometry(io);
 
-	ParametersMpsSolverType mpsSolverParams(io);
+	ParametersSolverType mpsSolverParams(io);
 
-//	ModelType model(mpsSolverParams,io,geometry,concurrency);
+	ModelSelectorType modelSelector(mpsSolverParams.model);
+
+	ModelBaseType *model = modelSelector(mpsSolverParams,io,geometry,concurrency);
 
 //	MatrixProductStateType psi; // initialize to something
 
-//	MpsSolverType mpsSolver(mpsParams,model,concurrency);
+//	Mpspp::MpsSolver<ModelType> mpsSolver(mpsParams,model,concurrency);
 
 //	mpsSolver.computeGroundState(psi);
 
