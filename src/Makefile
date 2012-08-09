@@ -7,10 +7,10 @@ CPPFLAGS = -Werror -Wall  -IEngine -I../../PsimagLite/src -I../../PsimagLite/src
 #CXX = g++  -O3 -DNDEBUG
 #Comment out line below for debugging (COMMENT ALSO THE strip commands): 
 CXX = g++ -g3 #ALSO COMMENT OUT strip command below
-EXENAME = dmrg
+EXENAME = mpspp 
 all: $(EXENAME)
 
-dmrg:  mpspp.o gitrev
+mpspp:  mpspp.o gitrev
 	$(CXX) -o mpspp mpspp.o $(LDFLAGS)  
 
 # dependencies brought about by Makefile.dep
