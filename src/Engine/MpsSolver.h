@@ -60,7 +60,7 @@ class MpsSolver {
 public:
 
 	MpsSolver(const ParametersSolverType& solverParams,
-			  ModelBaseType& model,
+			  const ModelBaseType& model,
 			  ConcurrencyType& concurrency)
 		: solverParams_(solverParams),
 		  model_(model),
@@ -75,7 +75,7 @@ public:
 private:
 
 	const ParametersSolverType& solverParams_;
-	ModelBaseType& model_;
+	const ModelBaseType& model_;
 	ConcurrencyType& concurrency_;
 }; // MpsSolver
 

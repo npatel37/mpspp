@@ -115,11 +115,11 @@ int main(int argc,char *argv[])
 
 	ModelSelectorType modelSelector(mpsSolverParams.model);
 
-	ModelBaseType *model = modelSelector(mpsSolverParams,io,geometry,concurrency);
+	const ModelBaseType& model = modelSelector(mpsSolverParams,io,geometry,concurrency);
 
 	MatrixProductStateType psi; // initialize to something
 
-	Mpspp::MpsSolver<ModelBaseType> mpsSolver(mpsSolverParams,*model,concurrency);
+	Mpspp::MpsSolver<ModelBaseType> mpsSolver(mpsSolverParams,model,concurrency);
 
 	mpsSolver.computeGroundState(psi);
 

@@ -81,7 +81,7 @@ public:
 		if (model_) delete model_;
 	}
 
-	ModelBaseType* operator()(const ParametersSolverType& solverParams,
+	const ModelBaseType& operator()(const ParametersSolverType& solverParams,
 						  InputValidatorType& io,
 						  const GeometryType& geometry,
 						  ConcurrencyType& concurrency)
@@ -94,7 +94,7 @@ public:
 			str += "Unknown model " + name_ + "\n";
 			throw std::runtime_error(str.c_str());
 		}
-		return model_;
+		return *model_;
 	}
 
 private:
