@@ -45,6 +45,11 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef MPS_SOLVER_H
 #define MPS_SOLVER_H
 
+#include "LeftRightSuper.h"
+#include "ProgramGlobals.h"
+#include "ProgressIndicator.h"
+#include "MemoryUsage.h"
+
 namespace Mpspp {
 
 template<typename ModelBaseType>
@@ -56,6 +61,13 @@ class MpsSolver {
 	typedef typename ModelBaseType::ConcurrencyType ConcurrencyType;
 	typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+	typedef typename ParametersSolverType::RealType RealType;
+	typedef LeftRightSuper<MatrixProductOperatorType> LeftRightSuperType;
+	typedef typename LeftRightSuperType::ContractedLeftPartType ContractedLeftPartType;
+	typedef typename LeftRightSuperType::ContractedRightPartType ContractedRightPartType;
+	typedef typename ParametersSolverType::FiniteLoopsType FiniteLoopsType;
+
+	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 public:
 
@@ -64,19 +76,137 @@ public:
 			  ConcurrencyType& concurrency)
 		: solverParams_(solverParams),
 		  model_(model),
-		  concurrency_(concurrency)
-	{}
-
-	void computeGroundState(MatrixProductStateType& psi)
+		  concurrency_(concurrency),
+		  progress_("MpsSolver",concurrency.rank()),
+		  stepCurrent_(0)
 	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to set sitesIndices_ here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
 
+	void computeGroundState(MatrixProductStateType& B)
+	{
+		ContractedRightPartType cR(B,model_.hamiltonian());
+		MatrixProductStateType A;
+		ContractedLeftPartType cL(A,model_.hamiltonian());
+		LeftRightSuperType lrs(A,B,cL,cR);
+		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
+
+		size_t direction = TO_THE_RIGHT;
+		if (finiteLoops[0].stepLength<0) direction=TO_THE_LEFT;
+
+		size_t siteToAdd(B.site(0)); // left-most site of B
+		if (direction==TO_THE_RIGHT) {
+			siteToAdd = A.site(A.sites()-1); // right-most site of A
+		}
+		// now stepCurrent_ is such that sitesIndices_[stepCurrent_] = siteToAdd
+		// so:
+		int sc = PsimagLite::isInVector(sitesIndices_,siteToAdd);
+		// FIXME: make line below an assert instead of a throw
+		if (sc<0) throw std::runtime_error("finiteDmrgLoops(...): internal error: siteIndices_\n");
+		stepCurrent_ = sc;
+
+		// ok, now we're ready to do the finite loops
+		for (size_t i=0;i<finiteLoops.size();i++)  {
+			std::ostringstream msg;
+			msg<<"Finite loop number "<<i<<" with l="<<finiteLoops[i].stepLength;
+			msg<<" keptStates="<<finiteLoops[i].keptStates;
+			progress_.printline(msg,std::cout);
+			if (i>0) {
+				int sign = finiteLoops[i].stepLength*finiteLoops[i-1].stepLength;
+				if (sign>0) {
+						if (finiteLoops[i].stepLength>0) stepCurrent_++;
+						if (finiteLoops[i].stepLength<0) stepCurrent_--;
+				}
+			}
+			finiteStep(lrs,i);
+		}
 	}
 
 private:
 
+	void finiteStep(LeftRightSuperType& lrs,size_t loopIndex)
+	{
+		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
+		int stepLength = finiteLoops[loopIndex].stepLength;
+//		size_t keptStates = finiteLoops[loopIndex].keptStates;
+//		int saveOption = (finiteLoops[loopIndex].saveOption & 1);
+//		RealType gsEnergy=0;
+
+		size_t direction=TO_THE_RIGHT;
+		if (stepLength<0) direction=TO_THE_LEFT;
+
+//		wft_.setStage(direction);
+
+		int stepFinal = stepCurrent_+stepLength;
+		while(true) {
+			// FIXME: make it an assert below
+			if (size_t(stepCurrent_)>=sitesIndices_.size())
+				throw std::runtime_error("stepCurrent_ too large!\n");
+
+			if (direction==TO_THE_RIGHT) {
+				lrs.moveRight();
+				//A.update(cL,cR);
+				//cL.update(A);
+			} else {
+				lrs.moveLeft();
+				//B.update(cL,cR);
+				//cR.update(B);
+			}
+
+			lrs.printReport(std::cout);
+
+			if (finalStep(stepLength,stepFinal)) break;
+			// FIXME: make it an assert below
+			if (stepCurrent_<0)
+				throw std::runtime_error("MpsSolver::finiteStep() currentStep_ is negative\n");
+
+			printMemoryUsage();
+
+		}
+	}
+
+	bool finalStep(int stepLength,int stepFinal)
+	{
+		if (stepLength<0) {
+			stepCurrent_--;
+			if (stepCurrent_<=stepFinal) {
+				stepCurrent_++; // revert
+				return true;
+			}
+			return false;
+		}
+		stepCurrent_++;
+		if (stepCurrent_>=stepFinal) {
+			stepCurrent_--; //revert
+			return true;
+
+		}
+		return false;
+	}
+
+	void printMemoryUsage() const
+	{
+		PsimagLite::MemoryUsage musage;
+		std::string vmPeak = musage.findEntry("VmPeak:");
+		std::string vmSize = musage.findEntry("VmSize:");
+		std::ostringstream msg;
+		msg<<"Current virtual memory is "<<vmSize<<" maximum was "<<vmPeak;
+		progress_.printline(msg,std::cout);
+		std::ostringstream msg2;
+		msg2<<"Amount of time scheduled (user plus system): "<<musage.time()<<" clock ticks";
+		progress_.printline(msg2,std::cout);
+	}
+
+
 	const ParametersSolverType& solverParams_;
 	const ModelBaseType& model_;
 	ConcurrencyType& concurrency_;
+	PsimagLite::ProgressIndicator progress_;
+	int stepCurrent_;
+	std::vector<size_t> sitesIndices_;
 }; // MpsSolver
 
 } // namespace Mpspp

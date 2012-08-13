@@ -61,6 +61,9 @@ public:
 	typedef GeometryType_ GeometryType;
 	typedef ConcurrencyType_ ConcurrencyType;
 	typedef MatrixProductOperator MatrixProductOperatorType;
+
+	virtual const MatrixProductOperatorType& hamiltonian() const=0;
+
 }; // ModelBase
 
 } // namespace Mpspp

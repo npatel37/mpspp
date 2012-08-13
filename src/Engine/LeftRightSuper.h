@@ -42,63 +42,56 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef MODEL_HUBBARD_ONE_ORBITAL_H
-#define MODEL_HUBBARD_ONE_ORBITAL_H
+#ifndef LEFT_RIGHT_SUPER_H
+#define LEFT_RIGHT_SUPER_H
 
-#include "ModelBase.h"
+#include "ContractedLeftPart.h"
+#include "ContractedRightPart.h"
 
 namespace Mpspp {
 
-template<typename ParametersSolverType,
-		 typename InputValidatorType,
-		 typename GeometryType,
-		 typename ConcurrencyType>
-class HubbardOneOrbital : public ModelBase<ParametersSolverType,
-										   InputValidatorType,
-										   GeometryType,
-										   ConcurrencyType> {
-
-	typedef ModelBase<ParametersSolverType,
-					  InputValidatorType,
-					  GeometryType,
-					  ConcurrencyType> ModelBaseType;
-
-	typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
+template<typename MatrixProductOperatorType>
+class LeftRightSuper {
 
 public:
 
-	HubbardOneOrbital(const ParametersSolverType& solverrParams,
-					  InputValidatorType& io,
-					  const GeometryType& geometry,
-					  ConcurrencyType& concurrency)
-	: solverrParams_(solverrParams),
-	  io_(io),
-	  geometry_(geometry),
-	  concurrency_(concurrency)
+	typedef ContractedLeftPart<MatrixProductOperatorType> ContractedLeftPartType;
+	typedef ContractedRightPart<MatrixProductOperatorType> ContractedRightPartType;
+
+	LeftRightSuper(MatrixProductState& A,
+				   MatrixProductState& B,
+				   ContractedLeftPartType& cL,
+				   ContractedRightPartType& cR)
+	{}
+
+	//! Moves the center of orthogonality by one to the right
+	void moveRight() const
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set Hamiltonian here. I cannot go further until this is implemented\n";
+		str += "Need to implement moveRight here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 	}
 
-	virtual const MatrixProductOperatorType& hamiltonian() const
+
+	//! Moves the center of orthogonality by one to the left
+	void moveLeft() const
 	{
-		return hamiltonian_;
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to implement moveLeft here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
 	}
 
-private:
+	void printReport(std::ostream& os) const
+	{
+		os<<"Nothing to report so far, except that I need a progress indicator\n";
+	}
 
-	const ParametersSolverType& solverrParams_;
-	InputValidatorType& io_;
-	const GeometryType& geometry_;
-	ConcurrencyType& concurrency_;
-	MatrixProductOperatorType hamiltonian_;
-
-}; // HubbardOneOrbital
+}; // LeftRightSuper
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // MODEL_HUBBARD_ONE_ORBITAL_H
+#endif // LEFT_RIGHT_SUPER_H
 

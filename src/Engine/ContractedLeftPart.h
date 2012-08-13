@@ -42,63 +42,27 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef MODEL_HUBBARD_ONE_ORBITAL_H
-#define MODEL_HUBBARD_ONE_ORBITAL_H
-
-#include "ModelBase.h"
+#ifndef CONTRACTED_LEFT_PART_H
+#define CONTRACTED_LEFT_PART_H
 
 namespace Mpspp {
 
-template<typename ParametersSolverType,
-		 typename InputValidatorType,
-		 typename GeometryType,
-		 typename ConcurrencyType>
-class HubbardOneOrbital : public ModelBase<ParametersSolverType,
-										   InputValidatorType,
-										   GeometryType,
-										   ConcurrencyType> {
+template<typename MatrixProductOperatorType>
+class ContractedLeftPart {
 
-	typedef ModelBase<ParametersSolverType,
-					  InputValidatorType,
-					  GeometryType,
-					  ConcurrencyType> ModelBaseType;
-
-	typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
+	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 
 public:
 
-	HubbardOneOrbital(const ParametersSolverType& solverrParams,
-					  InputValidatorType& io,
-					  const GeometryType& geometry,
-					  ConcurrencyType& concurrency)
-	: solverrParams_(solverrParams),
-	  io_(io),
-	  geometry_(geometry),
-	  concurrency_(concurrency)
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set Hamiltonian here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
+	ContractedLeftPart(const MatrixProductStateType& A,const MatrixProductOperatorType& W)
+	{}
 
-	virtual const MatrixProductOperatorType& hamiltonian() const
-	{
-		return hamiltonian_;
-	}
-
-private:
-
-	const ParametersSolverType& solverrParams_;
-	InputValidatorType& io_;
-	const GeometryType& geometry_;
-	ConcurrencyType& concurrency_;
-	MatrixProductOperatorType hamiltonian_;
-
-}; // HubbardOneOrbital
+}; // ContractedLeftPart
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // MODEL_HUBBARD_ONE_ORBITAL_H
+#endif // CONTRACTED_LEFT_PART_H
+
+
 

@@ -61,6 +61,7 @@ struct ProgramGlobals {
 	//		enum {SYSTEM_SYSTEM,SYSTEM_ENVIRON,ENVIRON_SYSTEM,ENVIRON_ENVIRON};
 	//		enum {SYSTEM,ENVIRON};
 	//		enum {FERMION,BOSON};
+	enum {TO_THE_RIGHT,TO_THE_LEFT};
 }; // ProgramGlobals
 
 //	double const ProgramGlobals::LanczosTolerance = 1e-12;

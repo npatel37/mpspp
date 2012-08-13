@@ -249,22 +249,25 @@ std::istream &operator>>(std::istream& is,DmrgCheckPoint& c)
  where $n_\\uparrow$, and $n_\\downarrow$ are the densities of up and down
  electrons respectively, and $j$ is twice the angular momentum divided by the number of sites.
  */
-template<typename FieldType,typename InputValidatorType>
+template<typename RealType_,typename InputValidatorType>
 struct ParametersMpsSolver {
+
+	typedef RealType_ RealType;
+	typedef std::vector<FiniteLoop> FiniteLoopsType;
 
 	std::string filename;
 	size_t keptStatesInfinite;
-	std::vector<FiniteLoop> finiteLoop;
+	FiniteLoopsType finiteLoops;
 	std::string version;
 	std::string options;
 	std::string model;
-	std::vector<FieldType> targetQuantumNumbers;
+	std::vector<RealType> targetQuantumNumbers;
 	size_t electronsUp,electronsDown;
-	FieldType tolerance;
-	DmrgCheckPoint checkpoint;
+//	RealType tolerance;
+//	DmrgCheckPoint checkpoint;
 	size_t nthreads;
-	int useReflectionSymmetry;
-	std::string fileForDensityMatrixEigs;
+//	int useReflectionSymmetry;
+//	std::string fileForDensityMatrixEigs;
 
 	//! Read Dmrg parameters from inp file
 	ParametersMpsSolver(InputValidatorType& io)
@@ -274,13 +277,13 @@ struct ParametersMpsSolver {
 		io.readline(version,"Version=");
 		io.readline(filename,"OutputFile=");
 		io.readline(keptStatesInfinite,"InfiniteLoopKeptStates=");
-		std::vector<FieldType> tmpVec;
+		std::vector<RealType> tmpVec;
 		io.read(tmpVec,"FiniteLoops");
 		for (size_t i=0;i<tmpVec.size();i+=3) {
 			std::vector<int> xTmp(3);
 			for (size_t j=0;j<xTmp.size();j++) xTmp[j]=int(tmpVec[i+j]);
 			FiniteLoop fl(xTmp[0],xTmp[1],xTmp[2]);
-			finiteLoop.push_back(fl);
+			finiteLoops.push_back(fl);
 		}
 
 		size_t repeat = 0;
@@ -294,15 +297,15 @@ struct ParametersMpsSolver {
 			io.read(fromFl,"RepeatFiniteLoopsFrom=");
 		}  catch (std::exception& e) {}
 
-		size_t upToFl = finiteLoop.size()-1;
+		size_t upToFl = finiteLoops.size()-1;
 		try {
 			io.read(upToFl,"RepeatFiniteLoopsTo=");
 		}  catch (std::exception& e) {}
 
-		if (upToFl>=finiteLoop.size()) {
+		if (upToFl>=finiteLoops.size()) {
 			std::string s (__FILE__);
 			s += "\nFATAL: RepeatFiniteLoopsTo=" + ttos(upToFl) + " is larger than current finite loops\n";
-			s += "\nMaximum is " + ttos(finiteLoop.size())+ "\n";
+			s += "\nMaximum is " + ttos(finiteLoops.size())+ "\n";
 			throw std::runtime_error(s.c_str());
 		}
 		if (fromFl>upToFl) {
@@ -315,8 +318,8 @@ struct ParametersMpsSolver {
 
 		for (size_t i=0;i<repeat;i++) {
 			for (size_t j=fromFl;j<upToFl;j++) {
-				FiniteLoop fl = finiteLoop[j];
-				finiteLoop.push_back(fl);
+				FiniteLoop fl = finiteLoops[j];
+				finiteLoops.push_back(fl);
 			}
 		}
 
@@ -356,15 +359,15 @@ struct ParametersMpsSolver {
 			throw std::runtime_error(s.c_str());
 		}
 
-		tolerance = -1.0;
-		try {
-			io.readline(tolerance,"TruncationTolerance=");
-		} catch (std::exception& e) {}
+//		tolerance = -1.0;
+//		try {
+//			io.readline(tolerance,"TruncationTolerance=");
+//		} catch (std::exception& e) {}
 
-		if (options.find("checkpoint")!=std::string::npos)
-			io.readline(checkpoint.filename,"CheckpointFilename=");
-		else if (options.find("restart")!=std::string::npos)
-			io.readline(checkpoint.filename,"RestartFilename=");
+//		if (options.find("checkpoint")!=std::string::npos)
+//			io.readline(checkpoint.filename,"CheckpointFilename=");
+//		else if (options.find("restart")!=std::string::npos)
+//			io.readline(checkpoint.filename,"RestartFilename=");
 
 		nthreads=1; // provide a default value
 		try {
@@ -376,16 +379,6 @@ struct ParametersMpsSolver {
 			s += "\nFATAL: nthreads cannot be zero\n";
 			throw std::runtime_error(s.c_str());
 		}
-
-		useReflectionSymmetry=0;
-		try {
-			io.readline(useReflectionSymmetry,"UseReflectionSymmetry=");
-		} catch (std::exception& e) {}
-		fileForDensityMatrixEigs="";
-		try {
-			io.readline(fileForDensityMatrixEigs,"FileForDensityMatrixEigs=");
-		} catch (std::exception& e) {}
-
 	}
 
 };

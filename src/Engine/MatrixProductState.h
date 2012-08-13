@@ -51,6 +51,23 @@ class MatrixProductState {
 
 public:
 
+	//! Returns the index-th site
+	size_t site(size_t index) const
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to set sites here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+
+	//! Returns the number of sites
+	size_t sites() const
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to set sites here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
 
 }; // MatrixProductState
 
