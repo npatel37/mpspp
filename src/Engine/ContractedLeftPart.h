@@ -57,6 +57,15 @@ public:
 	ContractedLeftPart(const MatrixProductStateType& A,const MatrixProductOperatorType& W)
 	{}
 
+	//! From As and Ws reconstruct *this
+	void update(const MatrixProductStateType& A)
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to update(...) here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+
 }; // ContractedLeftPart
 
 } // namespace Mpspp

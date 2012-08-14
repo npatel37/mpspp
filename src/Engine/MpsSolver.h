@@ -91,7 +91,7 @@ public:
 		ContractedRightPartType cR(B,model_.hamiltonian());
 		MatrixProductStateType A;
 		ContractedLeftPartType cL(A,model_.hamiltonian());
-		LeftRightSuperType lrs(A,B,cL,cR);
+		LeftRightSuperType lrs(A,cL,B,cR);
 		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
 
 		size_t direction = TO_THE_RIGHT;
@@ -148,12 +148,8 @@ private:
 
 			if (direction==TO_THE_RIGHT) {
 				lrs.moveRight();
-				//A.update(cL,cR);
-				//cL.update(A);
 			} else {
 				lrs.moveLeft();
-				//B.update(cL,cR);
-				//cR.update(B);
 			}
 
 			lrs.printReport(std::cout);

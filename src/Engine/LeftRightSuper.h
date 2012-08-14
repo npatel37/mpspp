@@ -47,6 +47,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 #include "ContractedLeftPart.h"
 #include "ContractedRightPart.h"
+#include "ProgressIndicator.h"
 
 namespace Mpspp {
 
@@ -59,28 +60,28 @@ public:
 	typedef ContractedRightPart<MatrixProductOperatorType> ContractedRightPartType;
 
 	LeftRightSuper(MatrixProductState& A,
-				   MatrixProductState& B,
-				   ContractedLeftPartType& cL,
-				   ContractedRightPartType& cR)
+	               ContractedLeftPartType& cL,
+	               MatrixProductState& B,
+	               ContractedRightPartType& cR)
+	: progress_("LeftRightSuper",0),
+	  A_(A),
+	  cL_(cL),
+	  B_(B),
+	  cR_(cR)
 	{}
 
 	//! Moves the center of orthogonality by one to the right
-	void moveRight() const
+	void moveRight()
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to implement moveRight here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		updateA();
+		cL_.update(A_);
 	}
 
-
 	//! Moves the center of orthogonality by one to the left
-	void moveLeft() const
+	void moveLeft()
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to implement moveLeft here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		updateB();
+		cR_.update(B_);
 	}
 
 	void printReport(std::ostream& os) const
@@ -88,6 +89,31 @@ public:
 		os<<"Nothing to report so far, except that I need a progress indicator\n";
 	}
 
+private:
+
+	//! From cL and cR construct a new A, only A changes here
+	void updateA()
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to updateA(...) here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+
+	//! From cL and cR construct a new B, only B changes here
+	void updateB()
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to updateB(...) here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+
+	PsimagLite::ProgressIndicator progress_;
+	MatrixProductState& A_;
+	ContractedLeftPartType& cL_;
+	MatrixProductState& B_;
+	ContractedRightPartType& cR_;
 }; // LeftRightSuper
 
 } // namespace Mpspp
