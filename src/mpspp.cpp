@@ -54,6 +54,10 @@ const std::string license=
 #include "ModelSelector.h"
 #include "MpsSolver.h"
 #include "MatrixProductOperator.h"
+#include "InternalProductStored.h"
+//#include "InternalProductKron.h"
+#include "InternalProductOnTheFly.h"
+
 
 typedef double RealType;
 typedef PsimagLite::ConcurrencySerial<RealType> ConcurrencyType;
@@ -71,6 +75,27 @@ typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorT
 typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 
 // FIXME: make configurable at runtime:
+
+template<typename ModelBaseType,
+template<typename,typename> class InternalProductTemplate,
+typename ConcurrencyType>
+void mainLoop(typename ModelBaseType::MatrixProductOperatorType::MatrixProductStateType& psi,
+const typename ModelBaseType::ParametersSolverType& mpsSolverParams,
+const ModelBaseType& model,
+ConcurrencyType& concurrency)
+{
+	Mpspp::MpsSolver<ModelBaseType,InternalProductTemplate> mpsSolver(mpsSolverParams,model,concurrency);
+
+	mpsSolver.computeGroundState(psi);
+
+//	const MatrixProductOperatorType& H = model.hamiltonian();
+
+//	MatrixProductStateType hpsi = H*psi;
+
+//	std::cout<<"Energy="<<scalarProduct(psi,hpsi)<<"\n";
+
+//	std::cout<<"That's all folks!\n";
+}
 
 int main(int argc,char *argv[])
 {
@@ -119,17 +144,16 @@ int main(int argc,char *argv[])
 
 	MatrixProductStateType psi; // initialize to something
 
-	Mpspp::MpsSolver<ModelBaseType> mpsSolver(mpsSolverParams,model,concurrency);
+	if (mpsSolverParams.options.find("InternalProductOnTheFly")!=std::string::npos) {
 
-	mpsSolver.computeGroundState(psi);
-
-//	const MatrixProductOperatorType& H = model.hamiltonian();
-
-//	MatrixProductStateType hpsi = H*psi;
-
-//	std::cout<<"Energy="<<scalarProduct(psi,hpsi)<<"\n";
-
-//	std::cout<<"That's all folks!\n";
+		if (mpsSolverParams.options.find("InternalProductStored")!=std::string::npos) {
+			mainLoop<ModelBaseType,Mpspp::InternalProductStored,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
+			//} else if (mpsSolverParams.options.find("InternalProductKron")!=std::string::npos) {
+			//	mainLoop<ModelBaseType,Mpspp::InternalProductKron,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
+		} else {
+			mainLoop<ModelBaseType,Mpspp::InternalProductOnTheFly,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
+		}
+	}
 }
 
 /*@}*/

@@ -52,7 +52,8 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
-template<typename ModelBaseType>
+template<typename ModelBaseType,
+template<typename,typename> class InternalProductTemplate>
 class MpsSolver {
 
 	typedef typename ModelBaseType::ParametersSolverType ParametersSolverType;
@@ -62,7 +63,7 @@ class MpsSolver {
 	typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 	typedef typename ParametersSolverType::RealType RealType;
-	typedef LeftRightSuper<MatrixProductOperatorType> LeftRightSuperType;
+	typedef LeftRightSuper<ModelBaseType,InternalProductTemplate> LeftRightSuperType;
 	typedef typename LeftRightSuperType::ContractedLeftPartType ContractedLeftPartType;
 	typedef typename LeftRightSuperType::ContractedRightPartType ContractedRightPartType;
 	typedef typename ParametersSolverType::FiniteLoopsType FiniteLoopsType;
@@ -91,7 +92,7 @@ public:
 		ContractedRightPartType cR(B,model_.hamiltonian());
 		MatrixProductStateType A;
 		ContractedLeftPartType cL(A,model_.hamiltonian());
-		LeftRightSuperType lrs(A,cL,B,cR);
+		LeftRightSuperType lrs(A,cL,B,cR,model_);
 		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
 
 		size_t direction = TO_THE_RIGHT;

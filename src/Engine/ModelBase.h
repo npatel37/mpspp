@@ -45,6 +45,8 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef MODEL_BASE_H
 #define MODEL_BASE_H
 #include "MatrixProductOperator.h"
+#include "ModelHelper.h"
+#include "ReflectionSymmetryEmpty.h"
 
 namespace Mpspp {
 
@@ -61,9 +63,19 @@ public:
 	typedef GeometryType_ GeometryType;
 	typedef ConcurrencyType_ ConcurrencyType;
 	typedef MatrixProductOperator MatrixProductOperatorType;
+	typedef typename ParametersSolverType::RealType RealType;
+	typedef ModelHelper<RealType,RealType> ModelHelperType;
+	typedef typename ModelHelperType::SparseMatrixType SparseMatrixType;
+	typedef ReflectionSymmetryEmpty<SparseMatrixType> ReflectionSymmetryType;
+	typedef std::vector<RealType> VectorType; // <-- FIXME: generalize
 
 	virtual const MatrixProductOperatorType& hamiltonian() const=0;
 
+	virtual const ParametersSolverType& solverParams() const=0;
+
+	virtual void fullHamiltonian(SparseMatrixType& matrix,const ModelHelperType& modelHelper) const=0;
+
+	virtual void matrixVectorProduct(VectorType& x,const VectorType& y,const ModelHelperType& modelHelper) const=0;
 }; // ModelBase
 
 } // namespace Mpspp

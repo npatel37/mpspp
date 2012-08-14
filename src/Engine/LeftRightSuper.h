@@ -48,26 +48,41 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "ContractedLeftPart.h"
 #include "ContractedRightPart.h"
 #include "ProgressIndicator.h"
+#include "ParametersForSolver.h"
+#include "LanczosOrDavidsonBase.h"
+#include "LanczosSolver.h"
+#include "DavidsonSolver.h"
+#include <vector>
 
 namespace Mpspp {
 
-template<typename MatrixProductOperatorType>
+template<typename ModelType,
+template<typename,typename> class InternalProductTemplate>
 class LeftRightSuper {
+
+	typedef typename ModelType::MatrixProductOperatorType MatrixProductOperatorType;
+	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+	typedef typename ModelType::ReflectionSymmetryType ReflectionSymmetryType;
+	typedef typename ModelType::ParametersSolverType ParametersSolverType;
+	typedef typename ParametersSolverType::RealType RealType;
+	typedef typename ModelType::VectorType VectorType;
 
 public:
 
 	typedef ContractedLeftPart<MatrixProductOperatorType> ContractedLeftPartType;
 	typedef ContractedRightPart<MatrixProductOperatorType> ContractedRightPartType;
 
-	LeftRightSuper(MatrixProductState& A,
+	LeftRightSuper(MatrixProductStateType& A,
 	               ContractedLeftPartType& cL,
-	               MatrixProductState& B,
-	               ContractedRightPartType& cR)
+				   MatrixProductStateType& B,
+				   ContractedRightPartType& cR,
+				   const ModelType& model)
 	: progress_("LeftRightSuper",0),
 	  A_(A),
 	  cL_(cL),
 	  B_(B),
-	  cR_(cR)
+	  cR_(cR),
+	model_(model)
 	{}
 
 	//! Moves the center of orthogonality by one to the right
@@ -94,10 +109,48 @@ private:
 	//! From cL and cR construct a new A, only A changes here
 	void updateA()
 	{
+		const ParametersSolverType& solverParams = model_.solverParams();
+
+		typedef InternalProductTemplate<typename VectorType::value_type,ModelType> InternalProductType;
+		typedef PsimagLite::ParametersForSolver<RealType> ParametersForSolverType;
+		typedef PsimagLite::LanczosOrDavidsonBase<ParametersForSolverType,InternalProductType,VectorType> LanczosOrDavidsonBaseType;
+		typedef typename ModelType::ModelHelperType ModelHelperType;
+
+		ReflectionSymmetryType *rs = 0;
+		ModelHelperType modelHelper;
+		typename LanczosOrDavidsonBaseType::MatrixType lanczosHelper(&model_,&modelHelper,rs);
+
+		RealType eps=ProgramGlobals::LanczosTolerance;
+		int iter=ProgramGlobals::LanczosSteps;
+
+		ParametersForSolverType params;
+		params.steps = iter;
+		params.tolerance = eps;
+		params.stepsForEnergyConvergence =ProgramGlobals::MaxLanczosSteps;
+		params.options= solverParams.options;
+		params.lotaMemory=false; //!(parameters_.options.find("DoNotSaveLanczosVectors")!=std::string::npos);
+
+		LanczosOrDavidsonBaseType* lanczosOrDavidson = 0;
+
+		bool useDavidson = (solverParams.options.find("useDavidson")!=std::string::npos);
+		if (useDavidson) {
+			lanczosOrDavidson = new PsimagLite::DavidsonSolver<ParametersForSolverType,InternalProductType,VectorType>(lanczosHelper,params);
+		} else {
+			lanczosOrDavidson = new PsimagLite::LanczosSolver<ParametersForSolverType,InternalProductType,VectorType>(lanczosHelper,params);
+		}
+
+		RealType energyTmp = 0;
+		VectorType tmpVec(lanczosHelper.rank());
+		VectorType initialVector(lanczosHelper.rank());
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to updateA(...) here. I cannot go further until this is implemented\n";
+		str += "Initial vector must be set here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
+
+		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
+		if (lanczosOrDavidson) delete lanczosOrDavidson;
+
+
 	}
 
 	//! From cL and cR construct a new B, only B changes here
@@ -110,10 +163,11 @@ private:
 	}
 
 	PsimagLite::ProgressIndicator progress_;
-	MatrixProductState& A_;
+	MatrixProductStateType& A_;
 	ContractedLeftPartType& cL_;
-	MatrixProductState& B_;
+	MatrixProductStateType& B_;
 	ContractedRightPartType& cR_;
+	const ModelType& model_;
 }; // LeftRightSuper
 
 } // namespace Mpspp

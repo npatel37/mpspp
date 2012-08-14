@@ -39,33 +39,59 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 *********************************************************
 
 */
-
 /** \ingroup MPSPP */
 /*@{*/
 
-/*! \file ProgramGlobals.h
+/*! \file InternalProductKron.h
  *
- *
+ *  A class to encapsulate the product x+=Hy, where x and y are vectors and H is the Hamiltonian matrix
  *
  */
-#ifndef PROGRAM_LIMITS_H
-#define PROGRAM_LIMITS_H
+#ifndef	INTERNALPRODUCT_KRON_H
+#define INTERNALPRODUCT_KRON_H
+
+#include <vector>
+#include "InitKron.h"
+#include "KronMatrix.h"
 
 namespace Mpspp {
-struct ProgramGlobals {
-	//		static size_t const MaxNumberOfSites = 300; // max number of sites that a model can use
-			static size_t const MaxLanczosSteps = 1000000; // max number of internal Lanczos steps
-			static size_t const LanczosSteps = 200; // max number of external Lanczos steps
-			static double const LanczosTolerance; // tolerance of the Lanczos Algorithm
-	//		enum {INFINITE=0,EXPAND_ENVIRON=1,EXPAND_SYSTEM=2};
-	//		enum {SYSTEM_SYSTEM,SYSTEM_ENVIRON,ENVIRON_SYSTEM,ENVIRON_ENVIRON};
-	//		enum {SYSTEM,ENVIRON};
-	//		enum {FERMION,BOSON};
-	enum {TO_THE_RIGHT,TO_THE_LEFT};
-}; // ProgramGlobals
+	template<typename T,typename ModelType>
+	class InternalProductKron {
+	public:
+		typedef T HamiltonianElementType;
+		typedef T value_type;
+		typedef typename ModelType::ModelHelperType ModelHelperType;
+		typedef typename ModelHelperType::RealType RealType;
+		typedef typename ModelType::ReflectionSymmetryType ReflectionSymmetryType;
+		typedef InitKron<ModelType,ModelHelperType> InitKronType;
+		typedef KronMatrix<InitKronType> KronMatrixType;
 
-	double const ProgramGlobals::LanczosTolerance = 1e-12;
-}; // namespace Mpspp
+		InternalProductKron(ModelType const *model,
+					ModelHelperType const *modelHelper,
+					ReflectionSymmetryType* rs=0)
+		: initKron_(*model,*modelHelper),kronMatrix_(initKron_)
+		{
+		}
+
+		size_t rank() const { return initKron_.size(); }
+
+		template<typename SomeVectorType>
+		void matrixVectorProduct(SomeVectorType &x,SomeVectorType const &y) const
+		{
+			 kronMatrix_.matrixVectorProduct(x,y);
+		}
+
+		size_t reflectionSector() const { return 0; }
+
+		void reflectionSector(size_t p) {  }
+
+	private:
+
+		InitKronType initKron_;
+		KronMatrixType kronMatrix_;
+	}; // class InternalProductKron
+} // namespace Mpspp
+
 /*@}*/
 #endif
 

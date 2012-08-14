@@ -64,14 +64,17 @@ class HubbardOneOrbital : public ModelBase<ParametersSolverType,
 					  ConcurrencyType> ModelBaseType;
 
 	typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
+	typedef typename ModelBaseType::SparseMatrixType SparseMatrixType;
+	typedef typename ModelBaseType::ModelHelperType ModelHelperType;
+	typedef typename ModelBaseType::VectorType VectorType;
 
 public:
 
-	HubbardOneOrbital(const ParametersSolverType& solverrParams,
+	HubbardOneOrbital(const ParametersSolverType& solverParams,
 					  InputValidatorType& io,
 					  const GeometryType& geometry,
 					  ConcurrencyType& concurrency)
-	: solverrParams_(solverrParams),
+	: solverParams_(solverParams),
 	  io_(io),
 	  geometry_(geometry),
 	  concurrency_(concurrency)
@@ -87,9 +90,27 @@ public:
 		return hamiltonian_;
 	}
 
+	virtual void fullHamiltonian(SparseMatrixType& matrix,const ModelHelperType& modelHelper) const
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need fullHamiltonian here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+
+	virtual void matrixVectorProduct(VectorType& x,const VectorType& y,const ModelHelperType& modelHelper) const
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need matrixVectorProduct here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+
+	virtual const ParametersSolverType& solverParams() const { return solverParams_; }
+
 private:
 
-	const ParametersSolverType& solverrParams_;
+	const ParametersSolverType& solverParams_;
 	InputValidatorType& io_;
 	const GeometryType& geometry_;
 	ConcurrencyType& concurrency_;

@@ -39,33 +39,35 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 *********************************************************
 
 */
-
 /** \ingroup MPSPP */
 /*@{*/
 
-/*! \file ProgramGlobals.h
- *
- *
- *
- */
-#ifndef PROGRAM_LIMITS_H
-#define PROGRAM_LIMITS_H
+#ifndef MODEL_HELPER_H
+#define MODEL_HELPER_H
+#include "MatrixProductOperator.h"
+#include "CrsMatrix.h"
 
 namespace Mpspp {
-struct ProgramGlobals {
-	//		static size_t const MaxNumberOfSites = 300; // max number of sites that a model can use
-			static size_t const MaxLanczosSteps = 1000000; // max number of internal Lanczos steps
-			static size_t const LanczosSteps = 200; // max number of external Lanczos steps
-			static double const LanczosTolerance; // tolerance of the Lanczos Algorithm
-	//		enum {INFINITE=0,EXPAND_ENVIRON=1,EXPAND_SYSTEM=2};
-	//		enum {SYSTEM_SYSTEM,SYSTEM_ENVIRON,ENVIRON_SYSTEM,ENVIRON_ENVIRON};
-	//		enum {SYSTEM,ENVIRON};
-	//		enum {FERMION,BOSON};
-	enum {TO_THE_RIGHT,TO_THE_LEFT};
-}; // ProgramGlobals
 
-	double const ProgramGlobals::LanczosTolerance = 1e-12;
-}; // namespace Mpspp
+template<typename RealType_,typename ComplexOrRealType>
+class ModelHelper {
+
+public:
+
+	typedef RealType_ RealType;
+	typedef PsimagLite::CrsMatrix<ComplexOrRealType> SparseMatrixType;
+
+	size_t size() const
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need size(...) here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+}; // ModelHelper
+
+} // namespace Mpspp
+
 /*@}*/
-#endif
+#endif // MODEL_HELPER_H
 

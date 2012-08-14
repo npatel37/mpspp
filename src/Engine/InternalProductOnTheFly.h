@@ -39,33 +39,56 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 *********************************************************
 
 */
-
 /** \ingroup MPSPP */
 /*@{*/
 
-/*! \file ProgramGlobals.h
+/*! \file InternalProductOnTheFly.h
  *
- *
+ *  A class to encapsulate the product x+=Hy, where x and y are vectors and H is the Hamiltonian matrix
  *
  */
-#ifndef PROGRAM_LIMITS_H
-#define PROGRAM_LIMITS_H
+#ifndef	INTERNALPRODUCT_OTF_H
+#define INTERNALPRODUCT_OTF_H
+
+#include <vector>
 
 namespace Mpspp {
-struct ProgramGlobals {
-	//		static size_t const MaxNumberOfSites = 300; // max number of sites that a model can use
-			static size_t const MaxLanczosSteps = 1000000; // max number of internal Lanczos steps
-			static size_t const LanczosSteps = 200; // max number of external Lanczos steps
-			static double const LanczosTolerance; // tolerance of the Lanczos Algorithm
-	//		enum {INFINITE=0,EXPAND_ENVIRON=1,EXPAND_SYSTEM=2};
-	//		enum {SYSTEM_SYSTEM,SYSTEM_ENVIRON,ENVIRON_SYSTEM,ENVIRON_ENVIRON};
-	//		enum {SYSTEM,ENVIRON};
-	//		enum {FERMION,BOSON};
-	enum {TO_THE_RIGHT,TO_THE_LEFT};
-}; // ProgramGlobals
+	template<typename T,typename ModelType>
+	class InternalProductOnTheFly {
+	public:
+		typedef T HamiltonianElementType;
+		typedef T value_type;
+		typedef typename ModelType::ModelHelperType ModelHelperType;
+		typedef typename ModelHelperType::RealType RealType;
+		typedef typename ModelType::ReflectionSymmetryType ReflectionSymmetryType;
 
-	double const ProgramGlobals::LanczosTolerance = 1e-12;
-}; // namespace Mpspp
+		InternalProductOnTheFly(ModelType const *model,
+					ModelHelperType const *modelHelper,
+					ReflectionSymmetryType* rs=0)
+		{
+			model_ = model;
+			modelHelper_=modelHelper;
+			
+		}
+
+		size_t rank() const { return modelHelper_->size(); }
+
+		template<typename SomeVectorType>
+		void matrixVectorProduct(SomeVectorType &x,SomeVectorType const &y) const
+		{
+			 model_->matrixVectorProduct(x,y,*modelHelper_);
+		}
+
+		size_t reflectionSector() const { return 0; }
+
+		void reflectionSector(size_t p) {  }
+
+	private:
+		ModelType const *model_;
+		ModelHelperType const *modelHelper_;
+	}; // class InternalProductOnTheFly
+} // namespace Mpspp
+
 /*@}*/
 #endif
 
