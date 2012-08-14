@@ -53,7 +53,12 @@ class ReflectionSymmetryEmpty {
 public:
 
 	void transform(SparseMatrixType& m1,SparseMatrixType& m2,const SparseMatrixType& m3) const
-	{}
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "No reflection symmetry support\n";
+		throw std::runtime_error(str.c_str());
+	}
 
 }; // ReflectionSymmetryEmpty
 

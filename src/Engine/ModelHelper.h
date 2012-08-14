@@ -57,6 +57,14 @@ public:
 	typedef RealType_ RealType;
 	typedef PsimagLite::CrsMatrix<ComplexOrRealType> SparseMatrixType;
 
+	ModelHelper(size_t direction)
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "ModelHelper::ctor(): it'll need also W, L and R to construct X\n";
+		throw std::runtime_error(str.c_str());
+	}
+
 	size_t size() const
 	{
 		std::string str(__FILE__);

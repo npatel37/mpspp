@@ -67,6 +67,8 @@ class LeftRightSuper {
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ModelType::VectorType VectorType;
 
+	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
+
 public:
 
 	typedef ContractedLeftPart<MatrixProductOperatorType> ContractedLeftPartType;
@@ -88,14 +90,14 @@ public:
 	//! Moves the center of orthogonality by one to the right
 	void moveRight()
 	{
-		updateA();
+		internalUpdate(TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
 		cL_.update(A_);
 	}
 
 	//! Moves the center of orthogonality by one to the left
 	void moveLeft()
 	{
-		updateB();
+		internalUpdate(TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
 		cR_.update(B_);
 	}
 
@@ -106,8 +108,7 @@ public:
 
 private:
 
-	//! From cL and cR construct a new A, only A changes here
-	void updateA()
+	void internalUpdate(size_t direction)
 	{
 		const ParametersSolverType& solverParams = model_.solverParams();
 
@@ -117,7 +118,7 @@ private:
 		typedef typename ModelType::ModelHelperType ModelHelperType;
 
 		ReflectionSymmetryType *rs = 0;
-		ModelHelperType modelHelper;
+		ModelHelperType modelHelper(direction);
 		typename LanczosOrDavidsonBaseType::MatrixType lanczosHelper(&model_,&modelHelper,rs);
 
 		RealType eps=ProgramGlobals::LanczosTolerance;
@@ -149,17 +150,6 @@ private:
 
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
-
-
-	}
-
-	//! From cL and cR construct a new B, only B changes here
-	void updateB()
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to updateB(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
 	}
 
 	PsimagLite::ProgressIndicator progress_;
