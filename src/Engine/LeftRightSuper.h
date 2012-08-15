@@ -150,6 +150,17 @@ private:
 
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
+
+		vector2Mps((direction==TO_THE_RIGHT) ? A_ : B_,tmpVec);
+	}
+
+	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
+	void vector2Mps(MatrixProductStateType& AorB,const VectorType& tmpVec)
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need vector2Mps(...) here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
 	}
 
 	PsimagLite::ProgressIndicator progress_;

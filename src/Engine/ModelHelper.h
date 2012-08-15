@@ -44,7 +44,6 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 #ifndef MODEL_HELPER_H
 #define MODEL_HELPER_H
-#include "MatrixProductOperator.h"
 #include "CrsMatrix.h"
 
 namespace Mpspp {
