@@ -63,11 +63,11 @@ public:
 	typedef GeometryType_ GeometryType;
 	typedef ConcurrencyType_ ConcurrencyType;
 	typedef MatrixProductOperator MatrixProductOperatorType;
-	typedef typename ParametersSolverType::RealType RealType;
+	typedef typename ParametersSolverType_::RealType RealType;
 	typedef ModelHelper<RealType,RealType> ModelHelperType;
 	typedef typename ModelHelperType::SparseMatrixType SparseMatrixType;
 	typedef ReflectionSymmetryEmpty<SparseMatrixType> ReflectionSymmetryType;
-	typedef std::vector<RealType> VectorType; // <-- FIXME: generalize
+	typedef typename ProgramGlobals::Vector<RealType>::Type VectorType;
 
 	virtual const MatrixProductOperatorType& hamiltonian() const=0;
 
