@@ -42,25 +42,25 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef CONTRACTED_RIGHT_PART_H
-#define CONTRACTED_RIGHT_PART_H
+#ifndef CONTRACTED_PART_H
+#define CONTRACTED_PART_H
 
 namespace Mpspp {
 
-template<typename MatrixProductOperatorType>
-class ContractedRightPart {
+template<typename ModelType>
+class ContractedPart {
 
+	typedef typename ModelType::MatrixProductOperatorType MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 
 public:
 
-	ContractedRightPart(const MatrixProductStateType& B,const MatrixProductOperatorType& W)
-	{
-		// TBW
-	}
+	ContractedPart(const MatrixProductStateType& AorB,const ModelType& model)
+	: model_(model)
+	{}
 
-	//! From Bs and Ws reconstruct *this
-	void update(const MatrixProductStateType& B)
+	//! From As (or Bs) and Ws reconstruct *this
+	void update(const MatrixProductStateType& B,size_t direction)
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
@@ -68,10 +68,16 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
-}; // ContractedRightPart
+	const ModelType& model() const { return model_; }
+
+private:
+
+	const ModelType& model_;
+
+}; // ContractedPart
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // CONTRACTED_RIGHT_PART_H
+#endif // CONTRACTED_PART_H
 

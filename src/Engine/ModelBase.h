@@ -69,7 +69,7 @@ public:
 	typedef ReflectionSymmetryEmpty<SparseMatrixType> ReflectionSymmetryType;
 	typedef typename ProgramGlobals::Vector<RealType>::Type VectorType;
 
-	virtual const MatrixProductOperatorType& hamiltonian() const=0;
+	virtual const MatrixProductOperatorType& hamiltonian(size_t site) const=0;
 
 	virtual const ParametersSolverType& solverParams() const=0;
 

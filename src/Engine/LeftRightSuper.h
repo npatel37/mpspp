@@ -45,8 +45,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef LEFT_RIGHT_SUPER_H
 #define LEFT_RIGHT_SUPER_H
 
-#include "ContractedLeftPart.h"
-#include "ContractedRightPart.h"
+#include "ContractedPart.h"
 #include "ProgressIndicator.h"
 #include "ParametersForSolver.h"
 #include "LanczosOrDavidsonBase.h"
@@ -71,34 +70,32 @@ class LeftRightSuper {
 
 public:
 
-	typedef ContractedLeftPart<MatrixProductOperatorType> ContractedLeftPartType;
-	typedef ContractedRightPart<MatrixProductOperatorType> ContractedRightPartType;
+	typedef ContractedPart<ModelType> ContractedPartType;
 
 	LeftRightSuper(MatrixProductStateType& A,
-	               ContractedLeftPartType& cL,
+				   ContractedPartType& cL,
 				   MatrixProductStateType& B,
-				   ContractedRightPartType& cR,
-				   const ModelType& model)
+				   ContractedPartType& cR)
 	: progress_("LeftRightSuper",0),
 	  A_(A),
 	  cL_(cL),
 	  B_(B),
 	  cR_(cR),
-	model_(model)
+	  model_(cR_.model())
 	{}
 
 	//! Moves the center of orthogonality by one to the right
 	void moveRight()
 	{
 		internalUpdate(TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
-		cL_.update(A_);
+		cL_.update(A_,TO_THE_RIGHT);
 	}
 
 	//! Moves the center of orthogonality by one to the left
 	void moveLeft()
 	{
 		internalUpdate(TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
-		cR_.update(B_);
+		cR_.update(B_,TO_THE_LEFT);
 	}
 
 	void printReport(std::ostream& os) const
@@ -165,9 +162,9 @@ private:
 
 	PsimagLite::ProgressIndicator progress_;
 	MatrixProductStateType& A_;
-	ContractedLeftPartType& cL_;
+	ContractedPartType& cL_;
 	MatrixProductStateType& B_;
-	ContractedRightPartType& cR_;
+	ContractedPartType& cR_;
 	const ModelType& model_;
 }; // LeftRightSuper
 

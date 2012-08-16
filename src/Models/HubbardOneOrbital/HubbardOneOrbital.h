@@ -47,6 +47,19 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 #include "ModelBase.h"
 
+/** Hamiltonian of the Hubbard Model:
+
+  For a chain:
+  left corner: [U_0 nup ndown, t_{01} c^\dagger,I]
+  right corner: [I,c,U_{n-1} nup ndown]
+  on middle site s: [ I                0          0 ]
+					[ c                0          0 ]
+					[ U_{s} nup ndown t_{s,s+1} c, I]
+
+  For a ladder: ?
+
+*/
+
 namespace Mpspp {
 
 template<typename ParametersSolverType,
@@ -85,7 +98,7 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
-	virtual const MatrixProductOperatorType& hamiltonian() const
+	virtual const MatrixProductOperatorType& hamiltonian(size_t site) const
 	{
 		return hamiltonian_;
 	}

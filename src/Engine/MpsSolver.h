@@ -64,8 +64,7 @@ class MpsSolver {
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef LeftRightSuper<ModelBaseType,InternalProductTemplate> LeftRightSuperType;
-	typedef typename LeftRightSuperType::ContractedLeftPartType ContractedLeftPartType;
-	typedef typename LeftRightSuperType::ContractedRightPartType ContractedRightPartType;
+	typedef typename LeftRightSuperType::ContractedPartType ContractedPartType;
 	typedef typename ParametersSolverType::FiniteLoopsType FiniteLoopsType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
@@ -89,10 +88,10 @@ public:
 
 	void computeGroundState(MatrixProductStateType& B)
 	{
-		ContractedRightPartType cR(B,model_.hamiltonian());
+		ContractedPartType cR(B,model_);
 		MatrixProductStateType A;
-		ContractedLeftPartType cL(A,model_.hamiltonian());
-		LeftRightSuperType lrs(A,cL,B,cR,model_);
+		ContractedPartType cL(A,model_);
+		LeftRightSuperType lrs(A,cL,B,cR);
 		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
 
 		size_t direction = TO_THE_RIGHT;
