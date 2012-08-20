@@ -45,7 +45,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef MPS_SOLVER_H
 #define MPS_SOLVER_H
 
-#include "LeftRightSuper.h"
+#include "Step.h"
 #include "ProgramGlobals.h"
 #include "ProgressIndicator.h"
 #include "MemoryUsage.h"
@@ -63,10 +63,10 @@ class MpsSolver {
 	typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 	typedef typename ParametersSolverType::RealType RealType;
-	typedef LeftRightSuper<ModelBaseType,InternalProductTemplate> LeftRightSuperType;
-	typedef typename LeftRightSuperType::ContractedPartType ContractedPartType;
 	typedef typename ParametersSolverType::FiniteLoopsType FiniteLoopsType;
-
+	typedef Step<ModelBaseType,InternalProductTemplate> StepType;
+	typedef typename StepType::LeftRightSuperType LeftRightSuperType;
+	typedef typename LeftRightSuperType::ContractedPartType ContractedPartType;
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 public:
@@ -88,9 +88,10 @@ public:
 
 	void computeGroundState(MatrixProductStateType& B)
 	{
-		ContractedPartType cR(B,model_);
-		MatrixProductStateType A;
-		ContractedPartType cL(A,model_);
+		size_t site = 0;
+		ContractedPartType cR(B,model_.hamiltonian(site));
+		MatrixProductStateType A(B.symmetry());
+		ContractedPartType cL(A,model_.hamiltonian(site));
 		LeftRightSuperType lrs(A,cL,B,cR);
 		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
 
@@ -141,18 +142,19 @@ private:
 //		wft_.setStage(direction);
 
 		int stepFinal = stepCurrent_+stepLength;
+		StepType step(lrs,model_);
 		while(true) {
 			// FIXME: make it an assert below
 			if (size_t(stepCurrent_)>=sitesIndices_.size())
 				throw std::runtime_error("stepCurrent_ too large!\n");
 
 			if (direction==TO_THE_RIGHT) {
-				lrs.moveRight();
+				step.moveRight();
 			} else {
-				lrs.moveLeft();
+				step.moveLeft();
 			}
 
-			lrs.printReport(std::cout);
+			step.printReport(std::cout);
 
 			if (finalStep(stepLength,stepFinal)) break;
 			// FIXME: make it an assert below

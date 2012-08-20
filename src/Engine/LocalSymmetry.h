@@ -42,55 +42,19 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef CONTRACTED_PART_H
-#define CONTRACTED_PART_H
+#ifndef LOCAL_SYMMETRY_H
+#define LOCAL_SYMMETRY_H
+
 
 namespace Mpspp {
 
-template<typename MatrixProductOperatorType>
-class ContractedPart {
+class LocalSymmetry {
 
-	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 
-	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
-
-public:
-
-	ContractedPart(const MatrixProductStateType& AorB,const MatrixProductOperatorType& h)
-	{}
-
-	//! From As (or Bs) and Ws reconstruct *this
-	void update(const MatrixProductStateType& AorB,size_t direction)
-	{
-		if (direction==TO_THE_RIGHT) {
-			updateLeft(AorB);
-		} else {
-			updateRight(AorB);
-		}
-	}
-
-private:
-
-	void updateLeft(const MatrixProductStateType& A)
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to update(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
-
-	void updateRight(const MatrixProductStateType& B)
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to update(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
-
-}; // ContractedPart
+}; // LocalSymmetry
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // CONTRACTED_PART_H
+#endif // LOCAL_SYMMETRY_H
 

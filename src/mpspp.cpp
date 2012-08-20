@@ -142,7 +142,8 @@ int main(int argc,char *argv[])
 
 	const ModelBaseType& model = modelSelector(mpsSolverParams,io,geometry,concurrency);
 
-	MatrixProductStateType psi; // initialize to something
+	typename MatrixProductStateType::LocalSymmetryType symm;
+	MatrixProductStateType psi(symm); // initialize to something
 
 	if (mpsSolverParams.options.find("InternalProductOnTheFly")!=std::string::npos) {
 

@@ -73,7 +73,38 @@ public:
 
 	virtual const ParametersSolverType& solverParams() const=0;
 
-	virtual void fullHamiltonian(SparseMatrixType& matrix,const ModelHelperType& modelHelper) const=0;
+	virtual void fullHamiltonian(SparseMatrixType& matrix,const ModelHelperType& modelHelper) const
+	{
+
+//		data_.resize(total,total);
+//		for (size_t i=0;i<total;i++) {
+//			data_.setRow(i,counter);
+//			PairType iLa2 = symm.super().unpack(i+offset);
+//			PairType a1sigma2 = symm.left().upack(iLa2.first);
+//			size_t sigma2 = a1sigma2.second;
+//			size_t a1 = a1sigma2.first;
+//			for (size_t b1=0;b1<hamiltonian.rank();b1++) {
+//				const SparseMatrixType& cLm = cL(b1);
+//				for (size_t k1=cLm.getRowPtr(a1);k1<cLm.getRowPtr(a1+1);k1++) {
+//					size_t a1prime = cLm.getCol(k1);
+//					for (size_t b2=0;b2<hamiltonian.rank();b2++) {
+//						const MatrixType& wm = hamiltonian(b1,b2);
+//						const SparseMatrixType& cLm = cL(b2);
+//						for (size_t k2=cRm.getRowPtr(a2);k2<cRm.getRowPtr(a2+1);k2++) {
+//							size_t a2prime = cLm.getCol(k2);
+//							for (size_t sigma2prime = 0;sigma2prime<hilbertSize;sigma2prime++) {
+//								size_t iLprime = packLeft.pack(a1prime,sigma2prime);
+//								size_t iprime = packSuper.pack(iLprime,a2prime);
+//								tmpVector[iprime] += cLm.getValue(k1) * wm(sigma2,sigma2prime) * cRm.getValue(k2);
+//							}
+//						}
+//					}
+//				}
+//			}
+//			counter += addThisRow(tmpVector);
+//		}
+//		data_.setRow(total,counter);
+	}
 
 	virtual void matrixVectorProduct(VectorType& x,const VectorType& y,const ModelHelperType& modelHelper) const=0;
 }; // ModelBase

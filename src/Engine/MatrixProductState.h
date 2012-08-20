@@ -44,12 +44,18 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 #ifndef MATRIX_PRODUCT_STATE_H
 #define MATRIX_PRODUCT_STATE_H
-
+#include "LocalSymmetry.h"
 namespace Mpspp {
 
 class MatrixProductState {
 
+	typedef LocalSymmetry LocalSymmetryType;
+
 public:
+
+	MatrixProductState(LocalSymmetryType& symm)
+	: symm_(symm)
+	{}
 
 	//! Returns the index-th site
 	size_t site(size_t index) const
@@ -69,6 +75,11 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
+	LocalSymmetryType& symmetry() { return symm_; }
+
+private:
+
+	LocalSymmetryType& symm_;
 }; // MatrixProductState
 
 } // namespace Mpspp

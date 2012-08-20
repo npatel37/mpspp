@@ -52,6 +52,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define PROGRAM_LIMITS_H
 #include "Matrix.h"
 #include <vector>
+#include "CrsMatrix.h"
 
 namespace Mpspp {
 struct ProgramGlobals {
@@ -66,7 +67,7 @@ struct ProgramGlobals {
 	template<typename SomeFieldType>
 	class Matrix {
 	public:
-#ifndef USE_UTILS
+#ifndef USE_MATH_UTILS
 		typedef PsimagLite::Matrix<SomeFieldType> Type;
 #else
 		typedef Utils::Matrix<SomeFieldType> Type;
@@ -76,10 +77,20 @@ struct ProgramGlobals {
 	template<typename SomeFieldType>
 	class Vector {
 	public:
-#ifndef USE_UTILS
+#ifndef USE_MATH_UTILS
 		typedef std::vector<SomeFieldType> Type;
 #else
 		typedef Utils::Vector<SomeFieldType> Type;
+#endif
+	};
+
+	template<typename SomeFieldType>
+	class CrsMatrix {
+	public:
+#ifndef USE_MATH_UTILS
+		typedef PsimagLite::CrsMatrix<SomeFieldType> Type;
+#else
+		typedef Utils::CrsMatrix<SomeFieldType> Type;
 #endif
 	};
 }; // ProgramGlobals

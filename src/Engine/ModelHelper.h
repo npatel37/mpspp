@@ -44,7 +44,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 #ifndef MODEL_HELPER_H
 #define MODEL_HELPER_H
-#include "CrsMatrix.h"
+#include "ProgramGlobals.h"
 
 namespace Mpspp {
 
@@ -54,14 +54,11 @@ class ModelHelper {
 public:
 
 	typedef RealType_ RealType;
-	typedef PsimagLite::CrsMatrix<ComplexOrRealType> SparseMatrixType;
+	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
+	typedef typename ProgramGlobals::Vector<ComplexOrRealType>::Type VectorType;
 
 	ModelHelper(size_t direction)
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "ModelHelper::ctor(): it'll need also W, L and R to construct X\n";
-		throw std::runtime_error(str.c_str());
 	}
 
 	size_t size() const
@@ -71,6 +68,16 @@ public:
 		str += "Need size(...) here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 	}
+
+	void matrixVectorProduct(VectorType& x,const VectorType& y) const
+	{
+		return matrix_.matrixVectorProduct(x,y);
+	}
+
+private:
+
+	SparseMatrixType matrix_;
+
 }; // ModelHelper
 
 } // namespace Mpspp

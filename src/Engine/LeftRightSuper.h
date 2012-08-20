@@ -47,30 +47,20 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 #include "ContractedPart.h"
 #include "ProgressIndicator.h"
-#include "ParametersForSolver.h"
-#include "LanczosOrDavidsonBase.h"
-#include "LanczosSolver.h"
-#include "DavidsonSolver.h"
 #include <vector>
 
 namespace Mpspp {
 
-template<typename ModelType,
-template<typename,typename> class InternalProductTemplate>
+template<typename MatrixProductOperatorType,typename VectorType,typename RealType>
 class LeftRightSuper {
 
-	typedef typename ModelType::MatrixProductOperatorType MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
-	typedef typename ModelType::ReflectionSymmetryType ReflectionSymmetryType;
-	typedef typename ModelType::ParametersSolverType ParametersSolverType;
-	typedef typename ParametersSolverType::RealType RealType;
-	typedef typename ModelType::VectorType VectorType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 public:
 
-	typedef ContractedPart<ModelType> ContractedPartType;
+	typedef ContractedPart<MatrixProductOperatorType> ContractedPartType;
 
 	LeftRightSuper(MatrixProductStateType& A,
 				   ContractedPartType& cL,
@@ -80,92 +70,24 @@ public:
 	  A_(A),
 	  cL_(cL),
 	  B_(B),
-	  cR_(cR),
-	  model_(cR_.model())
+	  cR_(cR)
 	{}
 
-	//! Moves the center of orthogonality by one to the right
-	void moveRight()
-	{
-		internalUpdate(TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
-		cL_.update(A_,TO_THE_RIGHT);
-	}
+	MatrixProductStateType& A() { return A_; }
 
-	//! Moves the center of orthogonality by one to the left
-	void moveLeft()
-	{
-		internalUpdate(TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
-		cR_.update(B_,TO_THE_LEFT);
-	}
+	ContractedPartType& contractedLeft() { return cL_; }
 
-	void printReport(std::ostream& os) const
-	{
-		os<<"Nothing to report so far, except that I need a progress indicator\n";
-	}
+	MatrixProductStateType& B() { return B_; }
+
+	ContractedPartType& contractedRight() { return cR_; }
 
 private:
-
-	void internalUpdate(size_t direction)
-	{
-		const ParametersSolverType& solverParams = model_.solverParams();
-
-		typedef InternalProductTemplate<typename VectorType::value_type,ModelType> InternalProductType;
-		typedef PsimagLite::ParametersForSolver<RealType> ParametersForSolverType;
-		typedef PsimagLite::LanczosOrDavidsonBase<ParametersForSolverType,InternalProductType,VectorType> LanczosOrDavidsonBaseType;
-		typedef typename ModelType::ModelHelperType ModelHelperType;
-
-		ReflectionSymmetryType *rs = 0;
-		ModelHelperType modelHelper(direction);
-		typename LanczosOrDavidsonBaseType::MatrixType lanczosHelper(&model_,&modelHelper,rs);
-
-		RealType eps=ProgramGlobals::LanczosTolerance;
-		int iter=ProgramGlobals::LanczosSteps;
-
-		ParametersForSolverType params;
-		params.steps = iter;
-		params.tolerance = eps;
-		params.stepsForEnergyConvergence =ProgramGlobals::MaxLanczosSteps;
-		params.options= solverParams.options;
-		params.lotaMemory=false; //!(parameters_.options.find("DoNotSaveLanczosVectors")!=std::string::npos);
-
-		LanczosOrDavidsonBaseType* lanczosOrDavidson = 0;
-
-		bool useDavidson = (solverParams.options.find("useDavidson")!=std::string::npos);
-		if (useDavidson) {
-			lanczosOrDavidson = new PsimagLite::DavidsonSolver<ParametersForSolverType,InternalProductType,VectorType>(lanczosHelper,params);
-		} else {
-			lanczosOrDavidson = new PsimagLite::LanczosSolver<ParametersForSolverType,InternalProductType,VectorType>(lanczosHelper,params);
-		}
-
-		RealType energyTmp = 0;
-		VectorType tmpVec(lanczosHelper.rank());
-		VectorType initialVector(lanczosHelper.rank());
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Initial vector must be set here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-
-		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
-		if (lanczosOrDavidson) delete lanczosOrDavidson;
-
-		vector2Mps((direction==TO_THE_RIGHT) ? A_ : B_,tmpVec);
-	}
-
-	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-	void vector2Mps(MatrixProductStateType& AorB,const VectorType& tmpVec)
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need vector2Mps(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
 
 	PsimagLite::ProgressIndicator progress_;
 	MatrixProductStateType& A_;
 	ContractedPartType& cL_;
 	MatrixProductStateType& B_;
 	ContractedPartType& cR_;
-	const ModelType& model_;
 }; // LeftRightSuper
 
 } // namespace Mpspp
