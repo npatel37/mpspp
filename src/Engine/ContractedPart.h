@@ -53,6 +53,8 @@ class ContractedPart {
 	typedef typename ModelType::MatrixProductOperatorType MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 
+	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
+
 public:
 
 	ContractedPart(const MatrixProductStateType& AorB,const ModelType& model)
@@ -60,7 +62,18 @@ public:
 	{}
 
 	//! From As (or Bs) and Ws reconstruct *this
-	void update(const MatrixProductStateType& B,size_t direction)
+	void update(const MatrixProductStateType& AorB,size_t direction)
+	{
+		if (direction==TO_THE_RIGHT) {
+			updateLeft(AorB);
+		} else {
+			updateRight(AorB);
+		}
+	}
+
+private:
+
+	void updateLeft(const MatrixProductStateType& A)
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
