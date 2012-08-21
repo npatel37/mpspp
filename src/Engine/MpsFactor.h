@@ -45,28 +45,40 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef MPS_FACTOR_TYPE_H
 #define MPS_FACTOR_TYPE_H
 
+#include "VectorWithOffset.h"
+
 namespace Mpspp {
 
 template<typename ComplexOrRealType,typename SymmetryFactorType>
 class MpsFactor {
 
-	// FIXME: IDEA: PULL SYMMETRY OUT, PASS THROUGH FUNCTIONS
-
 public:
 
-//	typedef SymmetryLocal SymmetryLocalType;
-
-//	typedef ComplexOrRealType_ ComplexOrRealType;
+	typedef VectorWithOffset<ComplexOrRealType> VectorWithOffsetType;
+	typedef typename VectorWithOffsetType::VectorType VectorType;
 
 	MpsFactor(const SymmetryFactorType& symm)
 	: symm_(symm)
-	{}
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to set data_ here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
 
-//	const SymmetryFactorType& symmetry() const { return symm_; }
+	void updateFromVector(const VectorType& v)
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to write updateFromVector. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+
 
 private:
 
 	const SymmetryFactorType& symm_;
+	VectorWithOffsetType data_;
 }; // MpsFactor
 
 } // namespace Mpspp

@@ -45,6 +45,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef MATRIX_PRODUCT_STATE_H
 #define MATRIX_PRODUCT_STATE_H
 
+#include "ProgramGlobals.h"
 #include "MpsFactor.h"
 
 namespace Mpspp {
@@ -60,6 +61,7 @@ public:
 	typedef ComplexOrRealType_ ComplexOrRealType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef MpsFactor<ComplexOrRealType,SymmetryFactorType> MpsFactorType;
+	typedef typename MpsFactorType::VectorType VectorType;
 
 	MatrixProductState(const SymmetryLocalType& symm)
 	: symm_(symm)
@@ -83,11 +85,18 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
+	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
+	void updateFromVector(size_t currentSite,const VectorType& v)
+	{
+		data_[currentSite].updateFromVector(v);
+	}
+
 	const SymmetryLocalType& symmetry() const { return symm_; }
 
 private:
 
 	const SymmetryLocalType& symm_;
+	typename ProgramGlobals::Vector<MpsFactorType>::Type data_;
 }; // MatrixProductState
 
 } // namespace Mpspp

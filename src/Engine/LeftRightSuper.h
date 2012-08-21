@@ -96,19 +96,13 @@ public:
 
 	void vector2Mps(const VectorType& v,size_t currentSite,size_t direction)
 	{
-		vector2Mps((direction==TO_THE_RIGHT) ? A_ : B_,v,currentSite);
+		if (direction==TO_THE_RIGHT)
+			A_.updateFromVector(currentSite,v);
+		else
+			B_.updateFromVector(currentSite,v);
 	}
 
 private:
-
-	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-	void vector2Mps(MatrixProductStateType& AorB,const VectorType& tmpVec,size_t currentSite)
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need vector2Mps(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
 
 	PsimagLite::ProgressIndicator progress_;
 	MatrixProductStateType& A_;

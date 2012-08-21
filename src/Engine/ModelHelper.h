@@ -86,11 +86,6 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
-	void matrixVectorProduct(VectorType& x,const VectorType& y) const
-	{
-		return matrix_.matrixVectorProduct(x,y);
-	}
-
 	size_t symmetrySector() const { return symmetrySector_; }
 
 	size_t hilbertSize() const { return hamiltonian_(0,0).n_row(); }
@@ -114,7 +109,6 @@ private:
 	size_t hilbertSize_;
 	const MpoFactorType& hamiltonian_;
 	const SymmetryFactorType& symmetry_;
-	SparseMatrixType matrix_;
 
 }; // ModelHelper
 
