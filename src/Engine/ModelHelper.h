@@ -56,6 +56,9 @@ public:
 	typedef typename LeftRightSuperType::RealType RealType;
 	typedef typename LeftRightSuperType::ComplexOrRealType ComplexOrRealType;
 	typedef typename LeftRightSuperType::ContractedPartType ContractedPartType;
+	typedef typename LeftRightSuperType::MatrixProductStateType MatrixProductStateType;
+	typedef typename MatrixProductStateType::SymmetryLocalType SymmetryLocalType;
+	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename ContractedPartType::SparseMatrixType SparseMatrixType;
 	typedef typename ProgramGlobals::Vector<ComplexOrRealType>::Type VectorType;
 	typedef typename LeftRightSuperType::MatrixProductOperatorType MatrixProductOperatorType;
@@ -68,8 +71,10 @@ public:
 				const MpoFactorType& hamiltonian)
 	: lrs_(lrs),
 	  symmetrySector_(symmetrySector),
+	  currentSite_(currentSite),
 	  direction_(direction),
-	  hamiltonian_(hamiltonian)
+	  hamiltonian_(hamiltonian),
+	  symmetry_(lrs_.A().symmetry()(currentSite_))
 	{}
 
 	size_t size() const
@@ -93,13 +98,17 @@ public:
 
 	const MpoFactorType& hamiltonian() const { return hamiltonian_; }
 
+	const SymmetryFactorType& symmetry() const { return symmetry_; }
+
 private:
 
 	const LeftRightSuperType& lrs_;
 	size_t symmetrySector_;
+	size_t currentSite_;
 	size_t direction_;
 	size_t hilbertSize_;
 	const MpoFactorType& hamiltonian_;
+	const SymmetryFactorType& symmetry_;
 	SparseMatrixType matrix_;
 
 }; // ModelHelper

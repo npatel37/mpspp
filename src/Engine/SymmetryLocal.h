@@ -42,53 +42,42 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef MATRIX_PRODUCT_STATE_H
-#define MATRIX_PRODUCT_STATE_H
-#include "SymmetryLocal.h"
+#ifndef SYMMETRY_LOCAL_H
+#define SYMMETRY_LOCAL_H
+
+#include "ProgramGlobals.h"
+#include "SymmetryFactor.h"
+
 namespace Mpspp {
 
-template<typename ComplexOrRealType_>
-class MatrixProductState {
-
-	// FIXME: IDEA: PULL SYMMETRY OUT, PASS THROUGH FUNCTIONS
+class SymmetryLocal {
 
 public:
 
-	typedef SymmetryLocal SymmetryLocalType;
+	typedef SymmetryFactor SymmetryFactorType;
+	typedef typename SymmetryFactorType::PairType PairType;
 
-	typedef ComplexOrRealType_ ComplexOrRealType;
-
-	MatrixProductState(const SymmetryLocalType& symm)
-	: symm_(symm)
-	{}
-
-	//! Returns the index-th site
-	size_t site(size_t index) const
+	SymmetryLocal()
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set sites here. I cannot go further until this is implemented\n";
+		str += "Need to set data_ here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 	}
 
-	//! Returns the number of sites
-	size_t sites() const
+	const SymmetryFactorType& operator()(size_t site) const
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set sites here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		return data_[site];
 	}
-
-	const SymmetryLocalType& symmetry() const { return symm_; }
 
 private:
 
-	const SymmetryLocalType& symm_;
-}; // MatrixProductState
+	ProgramGlobals::Vector<SymmetryFactorType>::Type data_;
+
+}; // SymmetryLocal
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // MATRIX_PRODUCT_STATE_H
+#endif // SYMMETRY_LOCAL_H
 

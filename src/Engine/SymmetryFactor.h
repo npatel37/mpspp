@@ -42,18 +42,27 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef LOCAL_SYMMETRY_H
-#define LOCAL_SYMMETRY_H
+#ifndef SYMMETRY_FACTOR_H
+#define SYMMETRY_FACTOR_H
 
 #include "SymmetryComponent.h"
 
 namespace Mpspp {
 
-class LocalSymmetry {
+class SymmetryFactor {
 
 	typedef SymmetryComponent SymmetryComponentType;
 
 public:
+
+	SymmetryFactor()
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to set super_ and lef_ here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+
 
 	typedef typename SymmetryComponentType::PairType PairType;
 
@@ -66,10 +75,10 @@ private:
 	SymmetryComponentType super_;
 	SymmetryComponentType left_;
 
-}; // LocalSymmetry
+}; // SymmetryFactor
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // LOCAL_SYMMETRY_H
+#endif // SYMMETRY_FACTOR_H
 

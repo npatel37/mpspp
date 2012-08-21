@@ -66,7 +66,8 @@ public:
 	typedef ConcurrencyType_ ConcurrencyType;
 	typedef MatrixProductOperator<ComplexOrRealType> MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
-	typedef typename MatrixProductStateType::LocalSymmetryType LocalSymmetryType;
+	typedef typename MatrixProductStateType::SymmetryLocalType SymmetryLocalType;
+	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ProgramGlobals::Vector<RealType>::Type VectorType;
 	typedef LeftRightSuper<MatrixProductOperatorType,VectorType,RealType> LeftRightSuperType;
@@ -82,10 +83,10 @@ public:
 
 	virtual void fullHamiltonian(SparseMatrixType& matrix,const ModelHelperType& modelHelper) const
 	{
-		typedef typename LocalSymmetryType::PairType PairType;
+		typedef typename SymmetryLocalType::PairType PairType;
 		size_t symmetrySector = modelHelper.symmetrySector();
 
-		const LocalSymmetryType& symm = modelHelper.lrs().A().symmetry();
+		const SymmetryFactorType& symm = modelHelper.symmetry();
 
 		size_t total = symm.super().partition(symmetrySector).size();
 		size_t offset = symm.super().partition(symmetrySector).offset();
