@@ -50,13 +50,15 @@ namespace Mpspp {
 template<typename ComplexOrRealType_>
 class MatrixProductState {
 
-	typedef LocalSymmetry LocalSymmetryType;
+	// FIXME: IDEA: PULL SYMMETRY OUT, PASS THROUGH FUNCTIONS
 
 public:
 
+	typedef LocalSymmetry LocalSymmetryType;
+
 	typedef ComplexOrRealType_ ComplexOrRealType;
 
-	MatrixProductState(LocalSymmetryType& symm)
+	MatrixProductState(const LocalSymmetryType& symm)
 	: symm_(symm)
 	{}
 
@@ -78,11 +80,11 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
-	LocalSymmetryType& symmetry() { return symm_; }
+	const LocalSymmetryType& symmetry() const { return symm_; }
 
 private:
 
-	LocalSymmetryType& symm_;
+	const LocalSymmetryType& symm_;
 }; // MatrixProductState
 
 } // namespace Mpspp

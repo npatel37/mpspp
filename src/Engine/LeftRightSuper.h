@@ -51,7 +51,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
-template<typename MatrixProductOperatorType,typename VectorType,typename RealType_>
+template<typename MatrixProductOperatorType_,typename VectorType,typename RealType_>
 class LeftRightSuper {
 
 
@@ -60,6 +60,7 @@ class LeftRightSuper {
 
 public:
 
+	typedef MatrixProductOperatorType_ MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
 	typedef RealType_ RealType;
@@ -76,15 +77,38 @@ public:
 	  cR_(cR)
 	{}
 
-	MatrixProductStateType& A() { return A_; }
+	const MatrixProductStateType& A() const { return A_; }
 
-	ContractedPartType& contractedLeft() { return cL_; }
+	const ContractedPartType& contractedLeft() const { return cL_; }
 
-	MatrixProductStateType& B() { return B_; }
+	const MatrixProductStateType& B() const { return B_; }
 
-	ContractedPartType& contractedRight() { return cR_; }
+	const ContractedPartType& contractedRight() const { return cR_; }
+
+	void updateContracted(const MatrixProductStateType& AorB,size_t direction)
+	{
+		if (direction==TO_THE_RIGHT)
+			cL_.update(AorB,direction);
+		else
+			cR_.update(AorB,direction);
+
+	}
+
+	void vector2Mps(const VectorType& v,size_t direction)
+	{
+		vector2Mps((direction==TO_THE_RIGHT) ? A_ : B_,v);
+	}
 
 private:
+
+	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
+	void vector2Mps(MatrixProductStateType& AorB,const VectorType& tmpVec)
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need vector2Mps(...) here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
 
 	PsimagLite::ProgressIndicator progress_;
 	MatrixProductStateType& A_;

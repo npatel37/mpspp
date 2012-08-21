@@ -64,9 +64,10 @@ class MpsSolver {
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ParametersSolverType::FiniteLoopsType FiniteLoopsType;
-	typedef Step<ModelBaseType,InternalProductTemplate> StepType;
 	typedef typename ModelBaseType::LeftRightSuperType LeftRightSuperType;
 	typedef typename LeftRightSuperType::ContractedPartType ContractedPartType;
+	typedef Step<ModelBaseType,InternalProductTemplate> StepType;
+
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 public:

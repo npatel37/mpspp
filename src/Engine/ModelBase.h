@@ -65,51 +65,90 @@ public:
 	typedef GeometryType_ GeometryType;
 	typedef ConcurrencyType_ ConcurrencyType;
 	typedef MatrixProductOperator<ComplexOrRealType> MatrixProductOperatorType;
-	typedef typename ParametersSolverType_::RealType RealType;
+	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+	typedef typename MatrixProductStateType::LocalSymmetryType LocalSymmetryType;
+	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ProgramGlobals::Vector<RealType>::Type VectorType;
 	typedef LeftRightSuper<MatrixProductOperatorType,VectorType,RealType> LeftRightSuperType;
 	typedef ModelHelper<LeftRightSuperType> ModelHelperType;
 	typedef typename ModelHelperType::SparseMatrixType SparseMatrixType;
 	typedef ReflectionSymmetryEmpty<SparseMatrixType> ReflectionSymmetryType;
+	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
+	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
 
-	virtual const MatrixProductOperatorType& hamiltonian(size_t site) const=0;
+	virtual const MpoFactorType& hamiltonian(size_t site) const=0;
 
 	virtual const ParametersSolverType& solverParams() const=0;
 
 	virtual void fullHamiltonian(SparseMatrixType& matrix,const ModelHelperType& modelHelper) const
 	{
+		typedef typename LocalSymmetryType::PairType PairType;
+		size_t symmetrySector = modelHelper.symmetrySector();
 
-//		data_.resize(total,total);
-//		for (size_t i=0;i<total;i++) {
-//			data_.setRow(i,counter);
-//			PairType iLa2 = symm.super().unpack(i+offset);
-//			PairType a1sigma2 = symm.left().upack(iLa2.first);
-//			size_t sigma2 = a1sigma2.second;
-//			size_t a1 = a1sigma2.first;
-//			for (size_t b1=0;b1<hamiltonian.rank();b1++) {
-//				const SparseMatrixType& cLm = cL(b1);
-//				for (size_t k1=cLm.getRowPtr(a1);k1<cLm.getRowPtr(a1+1);k1++) {
-//					size_t a1prime = cLm.getCol(k1);
-//					for (size_t b2=0;b2<hamiltonian.rank();b2++) {
-//						const MatrixType& wm = hamiltonian(b1,b2);
-//						const SparseMatrixType& cLm = cL(b2);
-//						for (size_t k2=cRm.getRowPtr(a2);k2<cRm.getRowPtr(a2+1);k2++) {
-//							size_t a2prime = cLm.getCol(k2);
-//							for (size_t sigma2prime = 0;sigma2prime<hilbertSize;sigma2prime++) {
-//								size_t iLprime = packLeft.pack(a1prime,sigma2prime);
-//								size_t iprime = packSuper.pack(iLprime,a2prime);
-//								tmpVector[iprime] += cLm.getValue(k1) * wm(sigma2,sigma2prime) * cRm.getValue(k2);
-//							}
-//						}
-//					}
-//				}
-//			}
-//			counter += addThisRow(tmpVector);
-//		}
-//		data_.setRow(total,counter);
+		const LocalSymmetryType& symm = modelHelper.lrs().A().symmetry();
+
+		size_t total = symm.super().partition(symmetrySector).size();
+		size_t offset = symm.super().partition(symmetrySector).offset();
+
+		const MpoFactorType& hamiltonian = modelHelper.hamiltonian();
+
+		matrix.resize(total,total);
+		size_t counter = 0;
+		typename ProgramGlobals::Vector<int>::Type ptr(total,-1);
+		typename ProgramGlobals::Vector<size_t>::Type index(total,0);
+		VectorType temp(total,0.0);
+
+		for (size_t i=0;i<total;i++) {
+			matrix.setRow(i,counter);
+			size_t itemp = 0;
+			PairType iLa2 = symm.super().unpack(i+offset);
+			size_t iL = iLa2.first;
+			size_t a2 = iLa2.second;
+			PairType a1sigma2 = symm.left().unpack(iL);
+			size_t sigma2 = a1sigma2.second;
+			size_t a1 = a1sigma2.first;
+			for (size_t b1=0;b1<hamiltonian.n_row();b1++) {
+				const SparseMatrixType& cLm = modelHelper.lrs().contractedLeft()(b1);
+				for (int k1=cLm.getRowPtr(a1);k1<cLm.getRowPtr(a1+1);k1++) {
+					size_t a1prime = cLm.getCol(k1);
+					for (size_t b2=0;b2<hamiltonian.n_col();b2++) {
+						const MatrixType& wm = hamiltonian(b1,b2);
+						const SparseMatrixType& cRm = modelHelper.lrs().contractedRight()(b2);
+						for (int k2=cRm.getRowPtr(a2);k2<cRm.getRowPtr(a2+1);k2++) {
+							size_t a2prime = cLm.getCol(k2);
+							for (size_t sigma2prime = 0;sigma2prime<modelHelper.hilbertSize();sigma2prime++) {
+								size_t iLprime = symm.left().pack(a1prime,sigma2prime);
+								size_t iprime = symm.super().pack(iLprime,a2prime);
+								assert(iprime>=offset && iprime<total+offset);
+								iprime -= offset;
+								assert(iprime>=0);
+								ComplexOrRealType tmp = cLm.getValue(k1) * wm(sigma2,sigma2prime) * cRm.getValue(k2);
+								if (ptr[iprime]<0) {
+									ptr[iprime]=itemp;
+									temp[ptr[iprime]]= tmp;
+									index[ptr[iprime]] = iprime;
+									itemp++;
+								} else {
+									temp[ptr[iprime]]+=tmp;
+								}
+							}
+						}
+					}
+				}
+			}
+			for (size_t s=0;s<itemp;s++) {
+				matrix.pushValue(temp[s]);
+				matrix.pushCol(index[s]);
+				ptr[index[s]] = -1;
+			}
+			counter += itemp;
+		}
+		matrix.setRow(total,counter);
+		matrix.checkValidity();
 	}
 
 	virtual void matrixVectorProduct(VectorType& x,const VectorType& y,const ModelHelperType& modelHelper) const=0;
+
 }; // ModelBase
 
 } // namespace Mpspp

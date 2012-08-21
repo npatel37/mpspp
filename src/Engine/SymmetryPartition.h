@@ -42,73 +42,44 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef CONTRACTED_PART_H
-#define CONTRACTED_PART_H
+#ifndef SYMMETRY_PARTITION_H
+#define SYMMETRY_PARTITION_H
 
 #include "ProgramGlobals.h"
 
 namespace Mpspp {
 
-template<typename MatrixProductOperatorType>
-class ContractedPart {
-
-	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
-	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
-	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
-
-	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
+class SymmetryPartition {
 
 public:
 
-	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
-
-	ContractedPart(const MatrixProductStateType& AorB,const MpoFactorType& h)
+	SymmetryPartition()
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set data_ here. I cannot go further until this is implemented\n";
+		str += "Need to set symmetry paritition here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 	}
 
-	//! From As (or Bs) and Ws reconstruct *this
-	void update(const MatrixProductStateType& AorB,size_t direction)
+	size_t size() const
 	{
-		if (direction==TO_THE_RIGHT) {
-			updateLeft(AorB);
-		} else {
-			updateRight(AorB);
-		}
+		return data_.size();
 	}
 
-	const SparseMatrixType& operator()(size_t b1) const
+	size_t offset() const
 	{
-		return data_[b1];
+		return offset_;
 	}
 
 private:
 
-	void updateLeft(const MatrixProductStateType& A)
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to update(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
+	ProgramGlobals::Vector<size_t>::Type data_;
+	size_t offset_;
 
-	void updateRight(const MatrixProductStateType& B)
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to update(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
-
-	typename ProgramGlobals::Vector<SparseMatrixType>::Type data_;
-
-}; // ContractedPart
+}; // SymmetryPartition
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // CONTRACTED_PART_H
+#endif // SYMMETRY_PARTITION_H
 

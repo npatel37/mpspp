@@ -45,11 +45,26 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef LOCAL_SYMMETRY_H
 #define LOCAL_SYMMETRY_H
 
+#include "SymmetryComponent.h"
 
 namespace Mpspp {
 
 class LocalSymmetry {
 
+	typedef SymmetryComponent SymmetryComponentType;
+
+public:
+
+	typedef typename SymmetryComponentType::PairType PairType;
+
+	const SymmetryComponentType& super() const { return super_; }
+
+	const SymmetryComponentType& left() const { return left_; }
+
+private:
+
+	SymmetryComponentType super_;
+	SymmetryComponentType left_;
 
 }; // LocalSymmetry
 

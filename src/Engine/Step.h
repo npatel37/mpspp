@@ -81,14 +81,14 @@ public:
 	void moveRight()
 	{
 		internalUpdate(TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
-		lrs_.contractedLeft().update(lrs_.A(),TO_THE_RIGHT);
+		lrs_.updateContracted(lrs_.A(),TO_THE_RIGHT);
 	}
 
 	//! Moves the center of orthogonality by one to the left
 	void moveLeft()
 	{
 		internalUpdate(TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
-		lrs_.contractedRight().update(lrs_.B(),TO_THE_LEFT);
+		lrs_.updateContracted(lrs_.B(),TO_THE_LEFT);
 	}
 
 	void printReport(std::ostream& os) const
@@ -109,12 +109,13 @@ private:
 
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set symmetry sector here. I cannot go further until this is implemented\n";
+		str += "Need to set symmetry sector  and currentSite here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 		size_t symmetrySector = 0;
+		size_t currentSite = 0;
 
 		ReflectionSymmetryType *rs = 0;
-		ModelHelperType modelHelper(lrs_,direction,symmetrySector);
+		ModelHelperType modelHelper(lrs_,symmetrySector,currentSite,direction,model_.hamiltonian(currentSite));
 		typename LanczosOrDavidsonBaseType::MatrixType lanczosHelper(&model_,&modelHelper,rs);
 
 		RealType eps=ProgramGlobals::LanczosTolerance;
@@ -147,16 +148,7 @@ private:
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
 
-		vector2Mps((direction==TO_THE_RIGHT) ? lrs_.A() : lrs_.B(),tmpVec);
-	}
-
-	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-	void vector2Mps(MatrixProductStateType& AorB,const VectorType& tmpVec)
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need vector2Mps(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		lrs_.vector2Mps(tmpVec,direction);
 	}
 
 	PsimagLite::ProgressIndicator progress_;

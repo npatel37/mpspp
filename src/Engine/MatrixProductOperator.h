@@ -45,6 +45,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef MATRIX_PRODUCT_OPERATOR_H
 #define MATRIX_PRODUCT_OPERATOR_H
 
+#include "ProgramGlobals.h"
 #include "MatrixProductState.h"
 
 namespace Mpspp {
@@ -55,7 +56,16 @@ class MatrixProductOperator {
 public:
 
 	typedef MatrixProductState<ComplexOrRealType> MatrixProductStateType;
+	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
+	typedef typename ProgramGlobals::Matrix<MatrixType>::Type MpoFactorType;
 
+	const MpoFactorType& operator()(size_t site) const
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to set MpoFactor here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
 }; // MatrixProductOperator
 
 } // namespace Mpspp

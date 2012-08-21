@@ -42,73 +42,58 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef CONTRACTED_PART_H
-#define CONTRACTED_PART_H
+#ifndef SYMMETRY_COMPONENT_H
+#define SYMMETRY_COMPONENT_H
 
 #include "ProgramGlobals.h"
+#include "SymmetryPartition.h"
 
 namespace Mpspp {
 
-template<typename MatrixProductOperatorType>
-class ContractedPart {
+class SymmetryComponent {
 
-	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
-	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
-	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
-
-	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
+	typedef SymmetryPartition SymmetryPartitionType;
 
 public:
 
-	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
+	typedef std::pair<size_t,size_t> PairType;
 
-	ContractedPart(const MatrixProductStateType& AorB,const MpoFactorType& h)
+	SymmetryComponent()
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set data_ here. I cannot go further until this is implemented\n";
+		str += "Need to set symmetry permutation and leftSize and permutationInverse_ here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 	}
 
-	//! From As (or Bs) and Ws reconstruct *this
-	void update(const MatrixProductStateType& AorB,size_t direction)
+	const SymmetryPartitionType& partition(size_t whatPartition) const
 	{
-		if (direction==TO_THE_RIGHT) {
-			updateLeft(AorB);
-		} else {
-			updateRight(AorB);
-		}
+		return partition_[whatPartition];
 	}
 
-	const SparseMatrixType& operator()(size_t b1) const
+	PairType unpack(size_t i) const
 	{
-		return data_[b1];
+		size_t ip = permutation_[i];
+		div_t q = div(ip,leftSize_);
+		return PairType(q.quot,q.rem);
+	}
+
+	size_t pack(size_t a1,size_t sigma2) const
+	{
+		return permutationInverse_[a1+sigma2*leftSize_];
 	}
 
 private:
 
-	void updateLeft(const MatrixProductStateType& A)
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to update(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
+	ProgramGlobals::Vector<SymmetryPartitionType>::Type partition_;
+	ProgramGlobals::Vector<size_t>::Type permutation_;
+	ProgramGlobals::Vector<size_t>::Type permutationInverse_;
+	size_t leftSize_;
 
-	void updateRight(const MatrixProductStateType& B)
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to update(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
-
-	typename ProgramGlobals::Vector<SparseMatrixType>::Type data_;
-
-}; // ContractedPart
+}; // SymmetryComponent
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // CONTRACTED_PART_H
+#endif // SYMMETRY_COMPONENT_H
 

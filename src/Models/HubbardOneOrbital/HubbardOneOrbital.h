@@ -77,6 +77,7 @@ class HubbardOneOrbital : public ModelBase<ParametersSolverType,
 					  ConcurrencyType> ModelBaseType;
 
 	typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
+	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
 	typedef typename ModelBaseType::SparseMatrixType SparseMatrixType;
 	typedef typename ModelBaseType::ModelHelperType ModelHelperType;
 	typedef typename ModelBaseType::VectorType VectorType;
@@ -98,9 +99,9 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
-	virtual const MatrixProductOperatorType& hamiltonian(size_t site) const
+	virtual const MpoFactorType& hamiltonian(size_t site) const
 	{
-		return hamiltonian_;
+		return hamiltonian_(site);
 	}
 
 	virtual void fullHamiltonian(SparseMatrixType& matrix,const ModelHelperType& modelHelper) const
