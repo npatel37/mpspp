@@ -51,7 +51,6 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "LanczosOrDavidsonBase.h"
 #include "LanczosSolver.h"
 #include "DavidsonSolver.h"
-#include "LeftRightSuper.h"
 #include <vector>
 
 namespace Mpspp {
@@ -66,12 +65,11 @@ class Step {
 	typedef typename ModelType::ParametersSolverType ParametersSolverType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ModelType::VectorType VectorType;
+	typedef typename ModelType::LeftRightSuperType LeftRightSuperType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 public:
-
-	typedef LeftRightSuper<MatrixProductOperatorType,VectorType,RealType> LeftRightSuperType;
 
 	Step(LeftRightSuperType& lrs,const ModelType& model)
 	: progress_("Step",0),
@@ -113,9 +111,10 @@ private:
 		str += " " + ttos(__LINE__) + "\n";
 		str += "Need to set symmetry sector here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
+		size_t symmetrySector = 0;
 
 		ReflectionSymmetryType *rs = 0;
-		ModelHelperType modelHelper(direction);
+		ModelHelperType modelHelper(lrs_,direction,symmetrySector);
 		typename LanczosOrDavidsonBaseType::MatrixType lanczosHelper(&model_,&modelHelper,rs);
 
 		RealType eps=ProgramGlobals::LanczosTolerance;

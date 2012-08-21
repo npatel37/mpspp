@@ -51,15 +51,18 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
-template<typename MatrixProductOperatorType,typename VectorType,typename RealType>
+template<typename MatrixProductOperatorType,typename VectorType,typename RealType_>
 class LeftRightSuper {
 
-	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 public:
 
+	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
+	typedef RealType_ RealType;
 	typedef ContractedPart<MatrixProductOperatorType> ContractedPartType;
 
 	LeftRightSuper(MatrixProductStateType& A,

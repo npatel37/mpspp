@@ -47,6 +47,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "MatrixProductOperator.h"
 #include "ModelHelper.h"
 #include "ReflectionSymmetryEmpty.h"
+#include "LeftRightSuper.h"
 
 namespace Mpspp {
 
@@ -59,15 +60,17 @@ class ModelBase {
 public:
 
 	typedef ParametersSolverType_ ParametersSolverType;
+	typedef typename ParametersSolverType::ComplexOrRealType ComplexOrRealType;
 	typedef InputValidatorType_ InputValidatorType;
 	typedef GeometryType_ GeometryType;
 	typedef ConcurrencyType_ ConcurrencyType;
-	typedef MatrixProductOperator MatrixProductOperatorType;
+	typedef MatrixProductOperator<ComplexOrRealType> MatrixProductOperatorType;
 	typedef typename ParametersSolverType_::RealType RealType;
-	typedef ModelHelper<RealType,RealType> ModelHelperType;
+	typedef typename ProgramGlobals::Vector<RealType>::Type VectorType;
+	typedef LeftRightSuper<MatrixProductOperatorType,VectorType,RealType> LeftRightSuperType;
+	typedef ModelHelper<LeftRightSuperType> ModelHelperType;
 	typedef typename ModelHelperType::SparseMatrixType SparseMatrixType;
 	typedef ReflectionSymmetryEmpty<SparseMatrixType> ReflectionSymmetryType;
-	typedef typename ProgramGlobals::Vector<RealType>::Type VectorType;
 
 	virtual const MatrixProductOperatorType& hamiltonian(size_t site) const=0;
 

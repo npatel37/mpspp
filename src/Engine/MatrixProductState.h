@@ -47,11 +47,14 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "LocalSymmetry.h"
 namespace Mpspp {
 
+template<typename ComplexOrRealType_>
 class MatrixProductState {
 
 	typedef LocalSymmetry LocalSymmetryType;
 
 public:
+
+	typedef ComplexOrRealType_ ComplexOrRealType;
 
 	MatrixProductState(LocalSymmetryType& symm)
 	: symm_(symm)

@@ -249,10 +249,11 @@ std::istream &operator>>(std::istream& is,DmrgCheckPoint& c)
  where $n_\\uparrow$, and $n_\\downarrow$ are the densities of up and down
  electrons respectively, and $j$ is twice the angular momentum divided by the number of sites.
  */
-template<typename RealType_,typename InputValidatorType>
+template<typename RealType_,typename ComplexOrRealType_,typename InputValidatorType>
 struct ParametersMpsSolver {
 
 	typedef RealType_ RealType;
+	typedef ComplexOrRealType_ ComplexOrRealType;
 	typedef std::vector<FiniteLoop> FiniteLoopsType;
 
 	std::string filename;
@@ -384,9 +385,9 @@ struct ParametersMpsSolver {
 };
 
 //! print dmrg parameters
-template<typename FieldType,typename InputValidatorType>
+template<typename RealType,typename ComplexOrRealType,typename InputValidatorType>
 std::ostream &operator<<(std::ostream &os,
-			 ParametersMpsSolver<FieldType,InputValidatorType> const &parameters)
+			 ParametersMpsSolver<RealType,ComplexOrRealType,InputValidatorType> const &parameters)
 {
 	os<<"#This is MPS++\n";
 	Provenance provenance;

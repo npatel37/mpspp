@@ -49,11 +49,12 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
+template<typename ComplexOrRealType>
 class MatrixProductOperator {
 
 public:
 
-	typedef MatrixProductState MatrixProductStateType;
+	typedef MatrixProductState<ComplexOrRealType> MatrixProductStateType;
 
 }; // MatrixProductOperator
 

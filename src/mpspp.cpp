@@ -60,10 +60,11 @@ const std::string license=
 
 
 typedef double RealType;
+typedef double ComplexOrRealType;
 typedef PsimagLite::ConcurrencySerial<RealType> ConcurrencyType;
 typedef PsimagLite::InputNg<Mpspp::InputCheck> InputNgType;
 typedef PsimagLite::Geometry<RealType,Mpspp::ProgramGlobals> GeometryType;
-typedef Mpspp::ParametersMpsSolver<RealType,InputNgType::Readable> ParametersSolverType;
+typedef Mpspp::ParametersMpsSolver<RealType,ComplexOrRealType,InputNgType::Readable> ParametersSolverType;
 typedef PsimagLite::InputNg<Mpspp::InputCheck>::Readable InputValidatorType;
 
 typedef Mpspp::ModelBase<ParametersSolverType,

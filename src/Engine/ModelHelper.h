@@ -48,18 +48,21 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
-template<typename RealType_,typename ComplexOrRealType>
+template<typename LeftRightSuperType>
 class ModelHelper {
 
 public:
 
-	typedef RealType_ RealType;
+	typedef typename LeftRightSuperType::RealType RealType;
+	typedef typename LeftRightSuperType::ComplexOrRealType ComplexOrRealType;
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
 	typedef typename ProgramGlobals::Vector<ComplexOrRealType>::Type VectorType;
 
-	ModelHelper(size_t direction)
-	{
-	}
+	ModelHelper(const LeftRightSuperType& lrs,size_t symmetrySector,size_t direction)
+	: lrs_(lrs),
+	  symmetrySector_(symmetrySector),
+	  direction_(direction)
+	{}
 
 	size_t size() const
 	{
@@ -76,6 +79,9 @@ public:
 
 private:
 
+	const LeftRightSuperType& lrs_;
+	size_t symmetrySector_;
+	size_t direction_;
 	SparseMatrixType matrix_;
 
 }; // ModelHelper
