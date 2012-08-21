@@ -57,18 +57,20 @@ const std::string license=
 #include "InternalProductStored.h"
 //#include "InternalProductKron.h"
 #include "InternalProductOnTheFly.h"
-
+#include "SymmetryLocal.h"
 
 typedef double RealType;
 typedef double ComplexOrRealType;
 typedef PsimagLite::ConcurrencySerial<RealType> ConcurrencyType;
 typedef PsimagLite::InputNg<Mpspp::InputCheck> InputNgType;
+typedef Mpspp::SymmetryLocal SymmetryLocalType;
 typedef PsimagLite::Geometry<RealType,Mpspp::ProgramGlobals> GeometryType;
 typedef Mpspp::ParametersMpsSolver<RealType,ComplexOrRealType,InputNgType::Readable> ParametersSolverType;
 typedef PsimagLite::InputNg<Mpspp::InputCheck>::Readable InputValidatorType;
 
 typedef Mpspp::ModelBase<ParametersSolverType,
 						 InputValidatorType,
+						 SymmetryLocalType,
 						 GeometryType,
 						 ConcurrencyType> ModelBaseType;
 typedef Mpspp::ModelSelector<ModelBaseType> ModelSelectorType;
@@ -143,7 +145,7 @@ int main(int argc,char *argv[])
 
 	const ModelBaseType& model = modelSelector(mpsSolverParams,io,geometry,concurrency);
 
-	typename MatrixProductStateType::SymmetryLocalType symm;
+	SymmetryLocalType symm;
 	MatrixProductStateType psi(symm); // initialize to something
 
 	if (mpsSolverParams.options.find("InternalProductOnTheFly")!=std::string::npos) {

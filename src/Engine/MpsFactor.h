@@ -42,34 +42,35 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef MATRIX_PRODUCT_OPERATOR_H
-#define MATRIX_PRODUCT_OPERATOR_H
-
-#include "ProgramGlobals.h"
-#include "MatrixProductState.h"
+#ifndef MPS_FACTOR_TYPE_H
+#define MPS_FACTOR_TYPE_H
 
 namespace Mpspp {
 
-template<typename ComplexOrRealType,typename SymmetryLocalType>
-class MatrixProductOperator {
+template<typename ComplexOrRealType,typename SymmetryFactorType>
+class MpsFactor {
+
+	// FIXME: IDEA: PULL SYMMETRY OUT, PASS THROUGH FUNCTIONS
 
 public:
 
-	typedef MatrixProductState<ComplexOrRealType,SymmetryLocalType> MatrixProductStateType;
-	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
-	typedef typename ProgramGlobals::Matrix<MatrixType>::Type MpoFactorType;
+//	typedef SymmetryLocal SymmetryLocalType;
 
-	const MpoFactorType& operator()(size_t site) const
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set MpoFactor here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
-}; // MatrixProductOperator
+//	typedef ComplexOrRealType_ ComplexOrRealType;
+
+	MpsFactor(const SymmetryFactorType& symm)
+	: symm_(symm)
+	{}
+
+//	const SymmetryFactorType& symmetry() const { return symm_; }
+
+private:
+
+	const SymmetryFactorType& symm_;
+}; // MpsFactor
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // MATRIX_PRODUCT_OPERATOR_H
+#endif // MPS_FACTOR_TYPE_H
 

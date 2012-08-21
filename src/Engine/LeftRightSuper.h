@@ -85,24 +85,24 @@ public:
 
 	const ContractedPartType& contractedRight() const { return cR_; }
 
-	void updateContracted(const MatrixProductStateType& AorB,size_t direction)
+	void updateContracted(size_t currentSite,const MatrixProductStateType& AorB,size_t direction)
 	{
 		if (direction==TO_THE_RIGHT)
-			cL_.update(AorB,direction);
+			cL_.update(currentSite,AorB,direction);
 		else
-			cR_.update(AorB,direction);
+			cR_.update(currentSite,AorB,direction);
 
 	}
 
-	void vector2Mps(const VectorType& v,size_t direction)
+	void vector2Mps(const VectorType& v,size_t currentSite,size_t direction)
 	{
-		vector2Mps((direction==TO_THE_RIGHT) ? A_ : B_,v);
+		vector2Mps((direction==TO_THE_RIGHT) ? A_ : B_,v,currentSite);
 	}
 
 private:
 
 	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-	void vector2Mps(MatrixProductStateType& AorB,const VectorType& tmpVec)
+	void vector2Mps(MatrixProductStateType& AorB,const VectorType& tmpVec,size_t currentSite)
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";

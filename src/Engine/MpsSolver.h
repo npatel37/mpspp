@@ -150,9 +150,9 @@ private:
 				throw std::runtime_error("stepCurrent_ too large!\n");
 
 			if (direction==TO_THE_RIGHT) {
-				step.moveRight();
+				step.moveRight(stepCurrent_);
 			} else {
-				step.moveLeft();
+				step.moveLeft(stepCurrent_);
 			}
 
 			step.printReport(std::cout);

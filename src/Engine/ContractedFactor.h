@@ -42,34 +42,74 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef MATRIX_PRODUCT_OPERATOR_H
-#define MATRIX_PRODUCT_OPERATOR_H
+#ifndef CONTRACTED_FACTOR_H
+#define CONTRACTED_FACTOR_H
 
 #include "ProgramGlobals.h"
-#include "MatrixProductState.h"
 
 namespace Mpspp {
 
-template<typename ComplexOrRealType,typename SymmetryLocalType>
-class MatrixProductOperator {
+template<typename MatrixProductOperatorType>
+class ContractedFactor {
+
+	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+	typedef typename MatrixProductStateType::MpsFactorType  MpsFactorType;
+	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
+	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
+
+	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 public:
 
-	typedef MatrixProductState<ComplexOrRealType,SymmetryLocalType> MatrixProductStateType;
-	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
-	typedef typename ProgramGlobals::Matrix<MatrixType>::Type MpoFactorType;
+	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
 
-	const MpoFactorType& operator()(size_t site) const
+	ContractedFactor(const MpsFactorType& AorB,const MpoFactorType& h)
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set MpoFactor here. I cannot go further until this is implemented\n";
+		str += "Need to set data_ here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 	}
-}; // MatrixProductOperator
+
+	//! From As (or Bs) and Ws reconstruct *this
+	void update(const MpsFactorType& AorB,size_t direction)
+	{
+		if (direction==TO_THE_RIGHT) {
+			updateLeft(AorB);
+		} else {
+			updateRight(AorB);
+		}
+	}
+
+	const SparseMatrixType& operator()(size_t b1) const
+	{
+		return data_[b1];
+	}
+
+private:
+
+	void updateLeft(const MpsFactorType& A)
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to update(...) here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+
+	void updateRight(const MpsFactorType& B)
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to update(...) here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+
+	typename ProgramGlobals::Vector<SparseMatrixType>::Type data_;
+
+}; // ContractedFactor
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // MATRIX_PRODUCT_OPERATOR_H
+#endif // CONTRACTED_FACTOR_H
 

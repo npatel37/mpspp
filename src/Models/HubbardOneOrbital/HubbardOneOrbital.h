@@ -64,15 +64,18 @@ namespace Mpspp {
 
 template<typename ParametersSolverType,
 		 typename InputValidatorType,
+		 typename SymmetryLocalType,
 		 typename GeometryType,
 		 typename ConcurrencyType>
 class HubbardOneOrbital : public ModelBase<ParametersSolverType,
 										   InputValidatorType,
+										   SymmetryLocalType,
 										   GeometryType,
 										   ConcurrencyType> {
 
 	typedef ModelBase<ParametersSolverType,
 					  InputValidatorType,
+					  SymmetryLocalType,
 					  GeometryType,
 					  ConcurrencyType> ModelBaseType;
 

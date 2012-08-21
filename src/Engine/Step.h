@@ -78,17 +78,17 @@ public:
 	{}
 
 	//! Moves the center of orthogonality by one to the right
-	void moveRight()
+	void moveRight(size_t currentSite)
 	{
-		internalUpdate(TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
-		lrs_.updateContracted(lrs_.A(),TO_THE_RIGHT);
+		internalUpdate(currentSite,TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
+		lrs_.updateContracted(currentSite,lrs_.A(),TO_THE_RIGHT);
 	}
 
 	//! Moves the center of orthogonality by one to the left
-	void moveLeft()
+	void moveLeft(size_t currentSite)
 	{
-		internalUpdate(TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
-		lrs_.updateContracted(lrs_.B(),TO_THE_LEFT);
+		internalUpdate(currentSite,TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
+		lrs_.updateContracted(currentSite,lrs_.B(),TO_THE_LEFT);
 	}
 
 	void printReport(std::ostream& os) const
@@ -98,7 +98,7 @@ public:
 
 private:
 
-	void internalUpdate(size_t direction)
+	void internalUpdate(size_t currentSite,size_t direction)
 	{
 		const ParametersSolverType& solverParams = model_.solverParams();
 
@@ -109,10 +109,9 @@ private:
 
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set symmetry sector  and currentSite here. I cannot go further until this is implemented\n";
+		str += "Need to set symmetry sector   here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 		size_t symmetrySector = 0;
-		size_t currentSite = 0;
 
 		ReflectionSymmetryType *rs = 0;
 		ModelHelperType modelHelper(lrs_,symmetrySector,currentSite,direction,model_.hamiltonian(currentSite));
@@ -148,7 +147,7 @@ private:
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
 
-		lrs_.vector2Mps(tmpVec,direction);
+		lrs_.vector2Mps(tmpVec,currentSite,direction);
 	}
 
 	PsimagLite::ProgressIndicator progress_;

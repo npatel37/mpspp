@@ -53,6 +53,7 @@ namespace Mpspp {
 
 template<typename ParametersSolverType_,
 		 typename InputValidatorType_,
+		 typename SymmetryLocalType_,
 		 typename GeometryType_,
 		 typename ConcurrencyType_>
 class ModelBase {
@@ -62,11 +63,11 @@ public:
 	typedef ParametersSolverType_ ParametersSolverType;
 	typedef typename ParametersSolverType::ComplexOrRealType ComplexOrRealType;
 	typedef InputValidatorType_ InputValidatorType;
+	typedef SymmetryLocalType_ SymmetryLocalType;
 	typedef GeometryType_ GeometryType;
 	typedef ConcurrencyType_ ConcurrencyType;
-	typedef MatrixProductOperator<ComplexOrRealType> MatrixProductOperatorType;
+	typedef MatrixProductOperator<ComplexOrRealType,SymmetryLocalType> MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
-	typedef typename MatrixProductStateType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ProgramGlobals::Vector<RealType>::Type VectorType;
@@ -109,12 +110,12 @@ public:
 			size_t sigma2 = a1sigma2.second;
 			size_t a1 = a1sigma2.first;
 			for (size_t b1=0;b1<hamiltonian.n_row();b1++) {
-				const SparseMatrixType& cLm = modelHelper.lrs().contractedLeft()(b1);
+				const SparseMatrixType& cLm = modelHelper.contractedFactorLeft()(b1);
 				for (int k1=cLm.getRowPtr(a1);k1<cLm.getRowPtr(a1+1);k1++) {
 					size_t a1prime = cLm.getCol(k1);
 					for (size_t b2=0;b2<hamiltonian.n_col();b2++) {
 						const MatrixType& wm = hamiltonian(b1,b2);
-						const SparseMatrixType& cRm = modelHelper.lrs().contractedRight()(b2);
+						const SparseMatrixType& cRm = modelHelper.contractedFactorRight()(b2);
 						for (int k2=cRm.getRowPtr(a2);k2<cRm.getRowPtr(a2+1);k2++) {
 							size_t a2prime = cLm.getCol(k2);
 							for (size_t sigma2prime = 0;sigma2prime<modelHelper.hilbertSize();sigma2prime++) {

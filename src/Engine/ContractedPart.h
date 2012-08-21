@@ -46,6 +46,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define CONTRACTED_PART_H
 
 #include "ProgramGlobals.h"
+#include "ContractedFactor.h"
 
 namespace Mpspp {
 
@@ -61,6 +62,7 @@ class ContractedPart {
 public:
 
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
+	typedef ContractedFactor<MatrixProductOperatorType> ContractedFactorType;
 
 	ContractedPart(const MatrixProductStateType& AorB,const MpoFactorType& h)
 	{
@@ -71,23 +73,23 @@ public:
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
-	void update(const MatrixProductStateType& AorB,size_t direction)
+	void update(size_t currentSite,const MatrixProductStateType& AorB,size_t direction)
 	{
 		if (direction==TO_THE_RIGHT) {
-			updateLeft(AorB);
+			updateLeft(currentSite,AorB);
 		} else {
-			updateRight(AorB);
+			updateRight(currentSite,AorB);
 		}
 	}
 
-	const SparseMatrixType& operator()(size_t b1) const
+	const ContractedFactorType& operator()(size_t currentSite) const
 	{
-		return data_[b1];
+		return data_[currentSite];
 	}
 
 private:
 
-	void updateLeft(const MatrixProductStateType& A)
+	void updateLeft(size_t currentSite,const MatrixProductStateType& A)
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
@@ -95,7 +97,7 @@ private:
 		throw std::runtime_error(str.c_str());
 	}
 
-	void updateRight(const MatrixProductStateType& B)
+	void updateRight(size_t currentSite,const MatrixProductStateType& B)
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
@@ -103,7 +105,7 @@ private:
 		throw std::runtime_error(str.c_str());
 	}
 
-	typename ProgramGlobals::Vector<SparseMatrixType>::Type data_;
+	typename ProgramGlobals::Vector<ContractedFactorType>::Type data_;
 
 }; // ContractedPart
 

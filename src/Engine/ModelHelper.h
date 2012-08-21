@@ -56,6 +56,7 @@ public:
 	typedef typename LeftRightSuperType::RealType RealType;
 	typedef typename LeftRightSuperType::ComplexOrRealType ComplexOrRealType;
 	typedef typename LeftRightSuperType::ContractedPartType ContractedPartType;
+	typedef typename ContractedPartType::ContractedFactorType ContractedFactorType;
 	typedef typename LeftRightSuperType::MatrixProductStateType MatrixProductStateType;
 	typedef typename MatrixProductStateType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
@@ -99,6 +100,10 @@ public:
 	const MpoFactorType& hamiltonian() const { return hamiltonian_; }
 
 	const SymmetryFactorType& symmetry() const { return symmetry_; }
+
+	const ContractedFactorType& contractedFactorLeft() const { return lrs_.contractedLeft()(currentSite_); }
+
+	const ContractedFactorType& contractedFactorRight() const { return lrs_.contractedRight()(currentSite_); }
 
 private:
 
