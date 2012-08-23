@@ -74,7 +74,7 @@ typedef Mpspp::ModelBase<ParametersSolverType,
 						 GeometryType,
 						 ConcurrencyType> ModelBaseType;
 typedef Mpspp::ModelSelector<ModelBaseType> ModelSelectorType;
-typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
+typedef ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
 typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 
 // FIXME: make configurable at runtime:

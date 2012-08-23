@@ -78,6 +78,8 @@ public:
 	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
 
+	virtual ~ModelBase() {}
+
 	virtual const MpoFactorType& hamiltonian(size_t site) const=0;
 
 	virtual const ParametersSolverType& solverParams() const=0;

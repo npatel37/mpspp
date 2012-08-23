@@ -115,7 +115,7 @@ private:
 
 		ReflectionSymmetryType *rs = 0;
 		ModelHelperType modelHelper(lrs_,symmetrySector,currentSite,direction,model_.hamiltonian(currentSite));
-		typename LanczosOrDavidsonBaseType::MatrixType lanczosHelper(&model_,&modelHelper,rs);
+		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 
 		RealType eps=ProgramGlobals::LanczosTolerance;
 		int iter=ProgramGlobals::LanczosSteps;

@@ -66,8 +66,8 @@ namespace Mpspp {
 		//typedef typename SparseMatrixType::value_type SparseElementType;
 
 		InternalProductStored(ModelType const *model,
-				      ModelHelperType const *modelHelper,
-				      const ReflectionSymmetryType* rs=0)
+					  ModelHelperType const *modelHelper,
+					  const ReflectionSymmetryType* rs=0)
 		: matrixStored_(2),pointer_(0),progress_("InternalProductStored",0)
 		{
 			model_ = model;
