@@ -84,6 +84,8 @@ public:
 
 	virtual const ParametersSolverType& solverParams() const=0;
 
+	virtual const GeometryType& geometry() const=0;
+
 	virtual void fullHamiltonian(SparseMatrixType& matrix,const ModelHelperType& modelHelper) const
 	{
 		typedef typename SymmetryLocalType::PairType PairType;

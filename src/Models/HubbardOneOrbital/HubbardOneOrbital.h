@@ -177,6 +177,8 @@ public:
 
 	virtual const ParametersSolverType& solverParams() const { return solverParams_; }
 
+	virtual const GeometryType& geometry() const { return geometry_; }
+
 private:
 
 	void fillDestructionMatrix(SparseMatrixType& cm,size_t spin) const

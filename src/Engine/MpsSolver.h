@@ -79,12 +79,10 @@ public:
 		  model_(model),
 		  concurrency_(concurrency),
 		  progress_("MpsSolver",concurrency.rank()),
-		  stepCurrent_(0)
+		  stepCurrent_(0),
+		  sitesIndices_(model.geometry().numberOfSites())
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set sitesIndices_ here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		for (size_t i=0;i<sitesIndices_.size();i++) sitesIndices_[i] = i;
 	}
 
 	void computeGroundState(MatrixProductStateType& psi)
@@ -92,6 +90,9 @@ public:
 		size_t site = 0;
 		ContractedPartType contracted(psi,model_.hamiltonian(site));
 		LeftRightSuperType lrs(psi,contracted);
+
+		infiniteDmrg(lrs);
+
 		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
 
 		size_t direction = TO_THE_RIGHT;
@@ -126,6 +127,14 @@ public:
 	}
 
 private:
+
+	void infiniteDmrg(LeftRightSuperType& lrs)
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need infiniteDmrg here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
 
 	void finiteStep(LeftRightSuperType& lrs,size_t loopIndex)
 	{

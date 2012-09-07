@@ -38,7 +38,7 @@ const std::string license=
 /** \ingroup MPSPP */
 /*@{*/
 
-/*! \file mpspp.h
+/*! \file mpspp.cpp
  *
  *  The MPS++ main driver
  *
@@ -145,8 +145,7 @@ int main(int argc,char *argv[])
 
 	const ModelBaseType& model = modelSelector(mpsSolverParams,io,geometry,concurrency);
 
-	SymmetryLocalType symm;
-	MatrixProductStateType psi(symm); // initialize to something
+	MatrixProductStateType psi;
 
 	if (mpsSolverParams.options.find("InternalProductStored")!=std::string::npos) {
 		mainLoop<ModelBaseType,Mpspp::InternalProductStored,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);

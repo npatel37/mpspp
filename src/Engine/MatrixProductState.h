@@ -64,8 +64,20 @@ public:
 	typedef typename MpsFactorType::VectorType VectorType;
 
 	MatrixProductState(const SymmetryLocalType& symm)
-	: symm_(symm)
+	: symmNonconst_(0),symm_(symm)
 	{}
+
+	MatrixProductState()
+	: symmNonconst_(new SymmetryLocalType()),symm_(*symmNonconst_)
+	{}
+
+	~MatrixProductState()
+	{
+		if (symmNonconst_) {
+			delete symmNonconst_;
+			symmNonconst_=0;
+		}
+	}
 
 	//! Returns the index-th site
 	size_t site(size_t index) const
@@ -103,6 +115,14 @@ public:
 
 private:
 
+	// copy ctor:
+	MatrixProductState(const MatrixProductState& other);
+
+	// assignment
+	MatrixProductState& operator=(const MatrixProductState& other);
+
+
+	SymmetryLocalType* symmNonconst_;
 	const SymmetryLocalType& symm_;
 	typename ProgramGlobals::Vector<MpsFactorType>::Type data_;
 }; // MatrixProductState

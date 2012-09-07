@@ -57,14 +57,6 @@ public:
 	typedef SymmetryFactor SymmetryFactorType;
 	typedef typename SymmetryFactorType::PairType PairType;
 
-	SymmetryLocal()
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set data_ here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
-
 	const SymmetryFactorType& operator()(size_t site) const
 	{
 		return data_[site];
