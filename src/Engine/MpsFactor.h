@@ -66,7 +66,7 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
-	void updateFromVector(const VectorType& v)
+	void updateFromVector(const VectorType& v,size_t direction)
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";

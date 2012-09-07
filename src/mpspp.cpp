@@ -148,15 +148,12 @@ int main(int argc,char *argv[])
 	SymmetryLocalType symm;
 	MatrixProductStateType psi(symm); // initialize to something
 
-	if (mpsSolverParams.options.find("InternalProductOnTheFly")!=std::string::npos) {
-
-		if (mpsSolverParams.options.find("InternalProductStored")!=std::string::npos) {
-			mainLoop<ModelBaseType,Mpspp::InternalProductStored,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
-			//} else if (mpsSolverParams.options.find("InternalProductKron")!=std::string::npos) {
-			//	mainLoop<ModelBaseType,Mpspp::InternalProductKron,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
-		} else {
-			mainLoop<ModelBaseType,Mpspp::InternalProductOnTheFly,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
-		}
+	if (mpsSolverParams.options.find("InternalProductStored")!=std::string::npos) {
+		mainLoop<ModelBaseType,Mpspp::InternalProductStored,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
+		//} else if (mpsSolverParams.options.find("InternalProductKron")!=std::string::npos) {
+		//	mainLoop<ModelBaseType,Mpspp::InternalProductKron,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
+	} else {
+		mainLoop<ModelBaseType,Mpspp::InternalProductOnTheFly,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
 	}
 }
 

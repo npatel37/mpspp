@@ -75,7 +75,7 @@ public:
 	  currentSite_(currentSite),
 	  direction_(direction),
 	  hamiltonian_(hamiltonian),
-	  symmetry_(lrs_.A().symmetry()(currentSite_))
+	  symmetry_(lrs_.symmetry()(currentSite_))
 	{}
 
 	size_t size() const
@@ -96,9 +96,15 @@ public:
 
 	const SymmetryFactorType& symmetry() const { return symmetry_; }
 
-	const ContractedFactorType& contractedFactorLeft() const { return lrs_.contractedLeft()(currentSite_); }
+	const ContractedFactorType& contractedFactorLeft() const
+	{
+		return lrs_.contracted()(currentSite_,ProgramGlobals::PART_LEFT);
+	}
 
-	const ContractedFactorType& contractedFactorRight() const { return lrs_.contractedRight()(currentSite_); }
+	const ContractedFactorType& contractedFactorRight() const
+	{
+		return lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
+	}
 
 private:
 

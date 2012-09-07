@@ -87,22 +87,20 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
-	void computeGroundState(MatrixProductStateType& B)
+	void computeGroundState(MatrixProductStateType& psi)
 	{
 		size_t site = 0;
-		ContractedPartType cR(B,model_.hamiltonian(site));
-		MatrixProductStateType A(B.symmetry());
-		ContractedPartType cL(A,model_.hamiltonian(site));
-		LeftRightSuperType lrs(A,cL,B,cR);
+		ContractedPartType contracted(psi,model_.hamiltonian(site));
+		LeftRightSuperType lrs(psi,contracted);
 		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
 
 		size_t direction = TO_THE_RIGHT;
 		if (finiteLoops[0].stepLength<0) direction=TO_THE_LEFT;
 
-		size_t siteToAdd(B.site(0)); // left-most site of B
-		if (direction==TO_THE_RIGHT) {
-			siteToAdd = A.site(A.sites()-1); // right-most site of A
-		}
+		size_t siteToAdd(psi.center(direction)); // left-most site of B or right-most site of A
+//		if (direction==TO_THE_RIGHT) {
+//			siteToAdd = A.site(A.sites()-1); // right-most site of A
+//		}
 		// now stepCurrent_ is such that sitesIndices_[stepCurrent_] = siteToAdd
 		// so:
 		int sc = PsimagLite::isInVector(sitesIndices_,siteToAdd);

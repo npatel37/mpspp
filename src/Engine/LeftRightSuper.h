@@ -62,53 +62,39 @@ public:
 
 	typedef MatrixProductOperatorType_ MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+	typedef typename MatrixProductStateType::SymmetryLocalType SymmetryLocalType;
 	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
 	typedef RealType_ RealType;
 	typedef ContractedPart<MatrixProductOperatorType> ContractedPartType;
 
-	LeftRightSuper(MatrixProductStateType& A,
-				   ContractedPartType& cL,
-				   MatrixProductStateType& B,
-				   ContractedPartType& cR)
+	LeftRightSuper(MatrixProductStateType& ab,
+				   ContractedPartType& contracted)
 	: progress_("LeftRightSuper",0),
-	  A_(A),
-	  cL_(cL),
-	  B_(B),
-	  cR_(cR)
+	  ab_(ab),
+	  contracted_(contracted)
 	{}
 
-	const MatrixProductStateType& A() const { return A_; }
+	const MatrixProductStateType& abState() const { return ab_; }
 
-	const ContractedPartType& contractedLeft() const { return cL_; }
+	const ContractedPartType& contracted() const { return contracted_; }
 
-	const MatrixProductStateType& B() const { return B_; }
+	const SymmetryLocalType& symmetry() const { return ab_.symmetry(); }
 
-	const ContractedPartType& contractedRight() const { return cR_; }
-
-	void updateContracted(size_t currentSite,const MatrixProductStateType& AorB,size_t direction)
+	void updateContracted(size_t currentSite,const MatrixProductStateType& abState,size_t direction)
 	{
-		if (direction==TO_THE_RIGHT)
-			cL_.update(currentSite,AorB,direction);
-		else
-			cR_.update(currentSite,AorB,direction);
-
+		contracted_.update(currentSite,abState,direction);
 	}
 
-	void vector2Mps(const VectorType& v,size_t currentSite,size_t direction)
+	void updateMps(size_t currentSite,const VectorType& v,size_t direction)
 	{
-		if (direction==TO_THE_RIGHT)
-			A_.updateFromVector(currentSite,v);
-		else
-			B_.updateFromVector(currentSite,v);
+		ab_.update(currentSite,v,direction);
 	}
 
 private:
 
 	PsimagLite::ProgressIndicator progress_;
-	MatrixProductStateType& A_;
-	ContractedPartType& cL_;
-	MatrixProductStateType& B_;
-	ContractedPartType& cR_;
+	MatrixProductStateType& ab_;
+	ContractedPartType& contracted_;
 }; // LeftRightSuper
 
 } // namespace Mpspp

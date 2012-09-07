@@ -64,32 +64,32 @@ public:
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
 	typedef ContractedFactor<MatrixProductOperatorType> ContractedFactorType;
 
-	ContractedPart(const MatrixProductStateType& AorB,const MpoFactorType& h)
+	ContractedPart(const MatrixProductStateType& abState,const MpoFactorType& h)
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set data_ here. I cannot go further until this is implemented\n";
+		str += "Need to set dataLeft_ and dataRight_ here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
-	void update(size_t currentSite,const MatrixProductStateType& AorB,size_t direction)
+	void update(size_t currentSite,const MatrixProductStateType& abState,size_t direction)
 	{
 		if (direction==TO_THE_RIGHT) {
-			updateLeft(currentSite,AorB);
+			updateLeft(currentSite,abState);
 		} else {
-			updateRight(currentSite,AorB);
+			updateRight(currentSite,abState);
 		}
 	}
 
-	const ContractedFactorType& operator()(size_t currentSite) const
+	const ContractedFactorType& operator()(size_t currentSite,size_t leftOrRight) const
 	{
-		return data_[currentSite];
+		return (leftOrRight == ProgramGlobals::PART_LEFT) ? dataLeft_[currentSite] : dataRight_[currentSite];
 	}
 
 private:
 
-	void updateLeft(size_t currentSite,const MatrixProductStateType& A)
+	void updateLeft(size_t currentSite,const MatrixProductStateType& abState)
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
@@ -97,7 +97,7 @@ private:
 		throw std::runtime_error(str.c_str());
 	}
 
-	void updateRight(size_t currentSite,const MatrixProductStateType& B)
+	void updateRight(size_t currentSite,const MatrixProductStateType& abState)
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
@@ -105,7 +105,8 @@ private:
 		throw std::runtime_error(str.c_str());
 	}
 
-	typename ProgramGlobals::Vector<ContractedFactorType>::Type data_;
+	typename ProgramGlobals::Vector<ContractedFactorType>::Type dataLeft_;
+	typename ProgramGlobals::Vector<ContractedFactorType>::Type dataRight_;
 
 }; // ContractedPart
 

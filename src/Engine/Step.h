@@ -81,14 +81,14 @@ public:
 	void moveRight(size_t currentSite)
 	{
 		internalUpdate(currentSite,TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
-		lrs_.updateContracted(currentSite,lrs_.A(),TO_THE_RIGHT);
+		lrs_.updateContracted(currentSite,lrs_.abState(),TO_THE_RIGHT);
 	}
 
 	//! Moves the center of orthogonality by one to the left
 	void moveLeft(size_t currentSite)
 	{
 		internalUpdate(currentSite,TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
-		lrs_.updateContracted(currentSite,lrs_.B(),TO_THE_LEFT);
+		lrs_.updateContracted(currentSite,lrs_.abState(),TO_THE_LEFT);
 	}
 
 	void printReport(std::ostream& os) const
@@ -147,7 +147,7 @@ private:
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
 
-		lrs_.vector2Mps(tmpVec,currentSite,direction);
+		lrs_.updateMps(currentSite,tmpVec,direction);
 	}
 
 	PsimagLite::ProgressIndicator progress_;

@@ -76,6 +76,14 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
+	size_t center(size_t direction) const
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to implement center() here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+
 	//! Returns the number of sites
 	size_t sites() const
 	{
@@ -86,9 +94,9 @@ public:
 	}
 
 	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-	void updateFromVector(size_t currentSite,const VectorType& v)
+	void update(size_t currentSite,const VectorType& v,size_t direction)
 	{
-		data_[currentSite].updateFromVector(v);
+		data_[currentSite].updateFromVector(v,direction);
 	}
 
 	const SymmetryLocalType& symmetry() const { return symm_; }

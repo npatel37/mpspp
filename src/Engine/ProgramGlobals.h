@@ -64,6 +64,8 @@ struct ProgramGlobals {
 
 	enum {TO_THE_RIGHT,TO_THE_LEFT};
 
+	enum {PART_LEFT,PART_RIGHT};
+
 	template<typename ComplexOrRealType>
 	class Real {
 	public:
