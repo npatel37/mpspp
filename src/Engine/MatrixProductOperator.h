@@ -62,15 +62,21 @@ public:
 	typedef MpoFactor<RealType,ComplexOrRealType> MpoFactorType;
 	typedef typename ProgramGlobals::Vector<MpoFactorType>::Type VectorType;
 
+	MatrixProductOperator(size_t nsites) : data_(nsites,MpoFactorType(0,0)) {}
+
 	const MpoFactorType& operator()(size_t site) const
 	{
+		assert(site<data_.size());
 		return data_[site];
 	}
 
 	MpoFactorType& operator()(size_t site)
 	{
+		assert(site<data_.size());
 		return data_[site];
 	}
+
+	size_t size() const { return data_.size(); }
 
 private:
 

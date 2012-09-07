@@ -104,11 +104,12 @@ public:
 	  io_(io),
 	  geometry_(geometry),
 	  concurrency_(concurrency),
-	  mp_(io)
+	  mp_(io),
+	  hamiltonian_(geometry_.numberOfSites())
 	{
 		// FIXME: CONNECT WITH THE GEOMETRY HERE!!
 		RealType tiip1 = 1.0;
-		size_t n = geometry_.numberOfSites();
+		size_t n = hamiltonian_.size();
 		size_t wdim = 4;
 		size_t hilbert = 4;
 

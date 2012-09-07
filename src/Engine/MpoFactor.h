@@ -63,21 +63,25 @@ public:
 
 	const SparseMatrixType& operator()(size_t i,size_t j) const
 	{
+		assert(i<n_row() && j<n_col());
 		return data_(i,j);
 	}
 
 	SparseMatrixType& operator()(size_t i,size_t j)
 	{
+		assert(i<n_row() && j<n_col());
 		return data_(i,j);
 	}
 
 	const SparseMatrixType& operator()(size_t i) const
 	{
+		assert(i<n_row() && 0<n_col());
 		return data_(i,0);
 	}
 
 	SparseMatrixType& operator()(size_t i)
 	{
+		assert(i<n_row() && 0<n_col());
 		return data_(i,0);
 	}
 
