@@ -63,12 +63,12 @@ public:
 	typedef MpsFactor<ComplexOrRealType,SymmetryFactorType> MpsFactorType;
 	typedef typename MpsFactorType::VectorType VectorType;
 
-	MatrixProductState(const SymmetryLocalType& symm)
-	: symmNonconst_(0),symm_(symm)
+	MatrixProductState(size_t nsites,const SymmetryLocalType& symm)
+	: nsites_(nsites),symmNonconst_(0),symm_(symm),center_(0)
 	{}
 
-	MatrixProductState()
-	: symmNonconst_(new SymmetryLocalType()),symm_(*symmNonconst_)
+	MatrixProductState(size_t nsites)
+	: nsites_(nsites),symmNonconst_(new SymmetryLocalType()),symm_(*symmNonconst_),center_(0)
 	{}
 
 	~MatrixProductState()
@@ -88,27 +88,26 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
-	size_t center(size_t direction) const
+	size_t center() const
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to implement center() here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		return center_;
 	}
 
 	//! Returns the number of sites
 	size_t sites() const
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set sites here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		return nsites_;
 	}
 
 	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
 	void update(size_t currentSite,const VectorType& v,size_t direction)
 	{
 		data_[currentSite].updateFromVector(v,direction);
+	}
+
+	const MpsFactorType& operator()(size_t site) const
+	{
+		return data_[site];
 	}
 
 	const SymmetryLocalType& symmetry() const { return symm_; }
@@ -121,9 +120,10 @@ private:
 	// assignment
 	MatrixProductState& operator=(const MatrixProductState& other);
 
-
+	size_t nsites_;
 	SymmetryLocalType* symmNonconst_;
 	const SymmetryLocalType& symm_;
+	size_t center_;
 	typename ProgramGlobals::Vector<MpsFactorType>::Type data_;
 }; // MatrixProductState
 

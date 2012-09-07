@@ -59,17 +59,22 @@ class ContractedPart {
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
+	enum {PART_LEFT = ProgramGlobals::PART_LEFT, PART_RIGHT = ProgramGlobals::PART_RIGHT};
+
 public:
 
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
 	typedef ContractedFactor<MatrixProductOperatorType> ContractedFactorType;
 
-	ContractedPart(const MatrixProductStateType& abState,const MpoFactorType& h)
+	ContractedPart(const MatrixProductStateType& abState,const MatrixProductOperatorType& h)
+	  : dataLeft_(abState.center()),dataRight_(abState.sites()-dataLeft_.size())
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set dataLeft_ and dataRight_ here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		// page 62, equations 192 and 193
+		for (size_t i=0;i<dataLeft_.size();i++)
+			dataLeft_[i].init(abState(i),h(i),i,PART_LEFT,(i>0) ? &dataLeft_[i-1] : 0);
+		size_t center = dataLeft_.size();
+		for (size_t i=0;i<dataRight_.size();i++)
+			dataRight_[i].init(abState(i+center),h(i+center),i+center,PART_RIGHT,(i>0) ? &dataRight_[i-1] : 0);
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
@@ -84,7 +89,7 @@ public:
 
 	const ContractedFactorType& operator()(size_t currentSite,size_t leftOrRight) const
 	{
-		return (leftOrRight == ProgramGlobals::PART_LEFT) ? dataLeft_[currentSite] : dataRight_[currentSite];
+		return (leftOrRight == PART_LEFT) ? dataLeft_[currentSite] : dataRight_[currentSite];
 	}
 
 private:
@@ -104,6 +109,8 @@ private:
 		str += "Need to update(...) here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 	}
+
+
 
 	typename ProgramGlobals::Vector<ContractedFactorType>::Type dataLeft_;
 	typename ProgramGlobals::Vector<ContractedFactorType>::Type dataRight_;

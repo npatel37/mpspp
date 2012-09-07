@@ -114,7 +114,7 @@ private:
 		size_t symmetrySector = 0;
 
 		ReflectionSymmetryType *rs = 0;
-		ModelHelperType modelHelper(lrs_,symmetrySector,currentSite,direction,model_.hamiltonian(currentSite));
+		ModelHelperType modelHelper(lrs_,symmetrySector,currentSite,direction,model_.hamiltonian()(currentSite));
 		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 
 		RealType eps=ProgramGlobals::LanczosTolerance;

@@ -145,7 +145,7 @@ int main(int argc,char *argv[])
 
 	const ModelBaseType& model = modelSelector(mpsSolverParams,io,geometry,concurrency);
 
-	MatrixProductStateType psi;
+	MatrixProductStateType psi(geometry.numberOfSites());
 
 	if (mpsSolverParams.options.find("InternalProductStored")!=std::string::npos) {
 		mainLoop<ModelBaseType,Mpspp::InternalProductStored,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);

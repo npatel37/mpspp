@@ -154,9 +154,9 @@ public:
 		hamiltonian_(n-1)=mright;
 	}
 
-	virtual const MpoFactorType& hamiltonian(size_t site) const
+	virtual const MatrixProductOperatorType& hamiltonian() const
 	{
-		return hamiltonian_(site);
+		return hamiltonian_;
 	}
 
 	virtual void fullHamiltonian(SparseMatrixType& matrix,const ModelHelperType& modelHelper) const

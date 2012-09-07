@@ -87,8 +87,7 @@ public:
 
 	void computeGroundState(MatrixProductStateType& psi)
 	{
-		size_t site = 0;
-		ContractedPartType contracted(psi,model_.hamiltonian(site));
+		ContractedPartType contracted(psi,model_.hamiltonian());
 		LeftRightSuperType lrs(psi,contracted);
 
 		infiniteDmrg(lrs);
@@ -98,10 +97,10 @@ public:
 		size_t direction = TO_THE_RIGHT;
 		if (finiteLoops[0].stepLength<0) direction=TO_THE_LEFT;
 
-		size_t siteToAdd(psi.center(direction)); // left-most site of B or right-most site of A
-//		if (direction==TO_THE_RIGHT) {
-//			siteToAdd = A.site(A.sites()-1); // right-most site of A
-//		}
+		size_t siteToAdd(psi.center()); // left-most site of B
+		if (direction==TO_THE_RIGHT) {
+			siteToAdd--; // right-most site of A
+		}
 		// now stepCurrent_ is such that sitesIndices_[stepCurrent_] = siteToAdd
 		// so:
 		int sc = PsimagLite::isInVector(sitesIndices_,siteToAdd);

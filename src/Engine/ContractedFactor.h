@@ -56,6 +56,7 @@ class ContractedFactor {
 	typedef typename MatrixProductStateType::MpsFactorType  MpsFactorType;
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
 	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
+	typedef ContractedFactor<MatrixProductOperatorType> ThisType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -63,7 +64,11 @@ public:
 
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
 
-	ContractedFactor(const MpsFactorType& AorB,const MpoFactorType& h)
+	void init(const MpsFactorType& AorB,
+			  const MpoFactorType& h,
+			  size_t site,
+			  size_t leftOrRight,
+			  const ThisType* previous)
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";

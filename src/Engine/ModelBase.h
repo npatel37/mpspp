@@ -80,7 +80,7 @@ public:
 
 	virtual ~ModelBase() {}
 
-	virtual const MpoFactorType& hamiltonian(size_t site) const=0;
+	virtual const MatrixProductOperatorType& hamiltonian() const=0;
 
 	virtual const ParametersSolverType& solverParams() const=0;
 
