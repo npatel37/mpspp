@@ -88,7 +88,7 @@ public:
 
 	size_t symmetrySector() const { return symmetrySector_; }
 
-	size_t hilbertSize() const { return hamiltonian_(0,0).n_row(); }
+	size_t hilbertSize() const { return hamiltonian_(0,0).row(); }
 
 	const LeftRightSuperType& lrs() const { return lrs_; }
 

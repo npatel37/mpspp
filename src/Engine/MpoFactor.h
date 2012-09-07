@@ -39,76 +39,60 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 *********************************************************
 
 */
-
 /** \ingroup MPSPP */
 /*@{*/
 
-/*! \file ProgramGlobals.h
- *
- *
- *
- */
-#ifndef PROGRAM_LIMITS_H
-#define PROGRAM_LIMITS_H
-#include "Matrix.h"
-#include <vector>
-#include "CrsMatrix.h"
+#ifndef MPO_FACTOR_H
+#define MPO_FACTOR_H
+
+#include "ProgramGlobals.h"
 
 namespace Mpspp {
-struct ProgramGlobals {
-	//		static size_t const MaxNumberOfSites = 300; // max number of sites that a model can use
-	static size_t const MaxLanczosSteps = 1000000; // max number of internal Lanczos steps
-	static size_t const LanczosSteps = 200; // max number of external Lanczos steps
-	static double const LanczosTolerance; // tolerance of the Lanczos Algorithm
-	//		enum {FERMION,BOSON};
 
-	enum {TO_THE_RIGHT,TO_THE_LEFT};
+template<typename RealType,typename ComplexOrRealType>
+class MpoFactor {
 
-	template<typename ComplexOrRealType>
-	class Real {
-	public:
-		typedef ComplexOrRealType Type;
-	};
+	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
+	typedef typename ProgramGlobals::Matrix<SparseMatrixType>::Type MatrixType;
 
-	template<typename RealType>
-	class Real<std::complex<RealType> > {
-	public:
-		typedef RealType Type;
-	};
+public:
 
-	template<typename SomeFieldType>
-	class Matrix {
-	public:
-#ifndef USE_MATH_UTILS
-		typedef PsimagLite::Matrix<SomeFieldType> Type;
-#else
-		typedef Utils::Matrix<SomeFieldType> Type;
-#endif
-	};
+	MpoFactor(size_t wdim1,size_t wdim2) : data_(wdim1,wdim2) {}
 
-	template<typename SomeFieldType>
-	class Vector {
-	public:
-#ifndef USE_MATH_UTILS
-		typedef std::vector<SomeFieldType> Type;
-#else
-		typedef Utils::Vector<SomeFieldType> Type;
-#endif
-	};
+	MpoFactor(size_t wdim1) : data_(wdim1,1) {}
 
-	template<typename SomeFieldType>
-	class CrsMatrix {
-	public:
-#ifndef USE_MATH_UTILS
-		typedef PsimagLite::CrsMatrix<SomeFieldType> Type;
-#else
-		typedef Utils::CrsMatrix<SomeFieldType> Type;
-#endif
-	};
-}; // ProgramGlobals
+	const SparseMatrixType& operator()(size_t i,size_t j) const
+	{
+		return data_(i,j);
+	}
 
-	double const ProgramGlobals::LanczosTolerance = 1e-12;
-}; // namespace Mpspp
+	SparseMatrixType& operator()(size_t i,size_t j)
+	{
+		return data_(i,j);
+	}
+
+	const SparseMatrixType& operator()(size_t i) const
+	{
+		return data_(i,0);
+	}
+
+	SparseMatrixType& operator()(size_t i)
+	{
+		return data_(i,0);
+	}
+
+	size_t n_row() const { return data_.n_row(); }
+
+	size_t n_col() const { return data_.n_col(); }
+
+private:
+
+	MatrixType data_;
+
+}; // MpoFactor
+
+} // namespace Mpspp
+
 /*@}*/
-#endif
+#endif // MPO_FACTOR_H
 

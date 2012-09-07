@@ -69,26 +69,27 @@ public:
 		if (optsReadable_!=0) delete optsReadable_;
 	}
 
+
 	bool check(const std::string& label,const std::vector<std::string>& vec,size_t line) const
 	{
-		//			if (label=="JMVALUES") {
-		//				if (vec.size()!=2) return error1("JMVALUES",line);
-		//				return true;
-		//			} else if (label=="RAW_MATRIX") {
-		//				size_t row = atoi(vec[0].c_str());
-		//				size_t col = atoi(vec[1].c_str());
-		//				size_t n = row*col;
-		//				if (vec.size()!=n+2) return error1("RAW_MATRIX",line);
-		//				return true;
-		//			} else if (label=="Connectors") {
-		//				return true;
-		//			} else if (label=="MagneticField") {
-		//				return true;
-		//			} else if (label=="FiniteLoops") {
-		//				size_t n = atoi(vec[0].c_str());
-		//				if (vec.size()!=3*n+1)  return error1("FiniteLoops",line);
-		//				return true;
-		//			}
+		if (label=="JMVALUES") {
+			if (vec.size()!=2) return error1("JMVALUES",line);
+			return true;
+		} else if (label=="RAW_MATRIX") {
+			size_t row = atoi(vec[0].c_str());
+			size_t col = atoi(vec[1].c_str());
+			size_t n = row*col;
+			if (vec.size()!=n+2) return error1("RAW_MATRIX",line);
+			return true;
+		} else if (label=="Connectors") {
+			return true;
+		} else if (label=="MagneticField") {
+			return true;
+		} else if (label=="FiniteLoops") {
+			size_t n = atoi(vec[0].c_str());
+			if (vec.size()!=3*n+1)  return error1("FiniteLoops",line);
+			return true;
+		}
 		return false;
 	}
 

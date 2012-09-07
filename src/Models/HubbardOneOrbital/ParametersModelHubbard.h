@@ -39,76 +39,69 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 *********************************************************
 
 */
-
 /** \ingroup MPSPP */
 /*@{*/
 
-/*! \file ProgramGlobals.h
+/*! \file ParametersModelHubbard.h
  *
- *
+ *  Contains the parameters for the Hubbard model and function to read them from a JSON file
  *
  */
-#ifndef PROGRAM_LIMITS_H
-#define PROGRAM_LIMITS_H
-#include "Matrix.h"
-#include <vector>
-#include "CrsMatrix.h"
+#ifndef PARAMETERSMODELHUBBARD_H
+#define PARAMETERSMODELHUBBARD_H
 
 namespace Mpspp {
-struct ProgramGlobals {
-	//		static size_t const MaxNumberOfSites = 300; // max number of sites that a model can use
-	static size_t const MaxLanczosSteps = 1000000; // max number of internal Lanczos steps
-	static size_t const LanczosSteps = 200; // max number of external Lanczos steps
-	static double const LanczosTolerance; // tolerance of the Lanczos Algorithm
-	//		enum {FERMION,BOSON};
+	//! Hubbard Model Parameters
+	template<typename Field>
+	struct ParametersModelHubbard {
+		
+		template<typename IoInputType>
+		ParametersModelHubbard(IoInputType& io) 
+		{	
+			io.read(hubbardU,"hubbardU");
+			io.read(potentialV,"potentialV");
 
-	enum {TO_THE_RIGHT,TO_THE_LEFT};
+			try {
+				io.read(potentialT,"PotentialT"); //level,beQuiet);
+			} catch (std::exception& e) {}
+			omega=0;
+			try {
+				io.readline(omega,"omega=");
+			} catch (std::exception& e) {}
+		}
+		
+		// Do not include here connection parameters
+		// those are handled by the Geometry
+		// Hubbard U values (one for each site)
+		std::vector<Field> hubbardU; 
+		// Onsite potential values, one for each site
+		std::vector<Field> potentialV;
 
-	template<typename ComplexOrRealType>
-	class Real {
-	public:
-		typedef ComplexOrRealType Type;
+		// for time-dependent H:
+		std::vector<Field> potentialT;
+		Field omega;
+
+		// target number of electrons  in the system
+		int nOfElectrons;
 	};
+	
+	//! Function that prints model parameters to stream os
+	template<typename FieldType>
+	std::ostream& operator<<(std::ostream &os,const ParametersModelHubbard<FieldType>& parameters)
+	{
+		os<<"hubbardU\n";
+		os<<parameters.hubbardU;
+		os<<"potentialV\n";
+		os<<parameters.potentialV;
+		if (parameters.potentialT.size()==0) return os;
 
-	template<typename RealType>
-	class Real<std::complex<RealType> > {
-	public:
-		typedef RealType Type;
-	};
+		// time-dependent stuff
+		os<<"potentialT\n";
+		os<<parameters.potentialT;
+		os<<"omega="<<parameters.omega<<"\n";
+		return os;
+	}
+} // namespace Mpspp
 
-	template<typename SomeFieldType>
-	class Matrix {
-	public:
-#ifndef USE_MATH_UTILS
-		typedef PsimagLite::Matrix<SomeFieldType> Type;
-#else
-		typedef Utils::Matrix<SomeFieldType> Type;
-#endif
-	};
-
-	template<typename SomeFieldType>
-	class Vector {
-	public:
-#ifndef USE_MATH_UTILS
-		typedef std::vector<SomeFieldType> Type;
-#else
-		typedef Utils::Vector<SomeFieldType> Type;
-#endif
-	};
-
-	template<typename SomeFieldType>
-	class CrsMatrix {
-	public:
-#ifndef USE_MATH_UTILS
-		typedef PsimagLite::CrsMatrix<SomeFieldType> Type;
-#else
-		typedef Utils::CrsMatrix<SomeFieldType> Type;
-#endif
-	};
-}; // ProgramGlobals
-
-	double const ProgramGlobals::LanczosTolerance = 1e-12;
-}; // namespace Mpspp
 /*@}*/
 #endif
-

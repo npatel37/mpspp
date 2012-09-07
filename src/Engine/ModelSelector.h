@@ -89,7 +89,7 @@ public:
 						  const GeometryType& geometry,
 						  ConcurrencyType& concurrency)
 	{
-		if (name_ == "HubbardOneOrbital") {
+		if (name_ == "HubbardOneBand") {
 			model_ = new HubbardOneOrbitalType(solverParams,io,geometry,concurrency);
 		} else {
 			std::string str(__FILE__);
