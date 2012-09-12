@@ -46,6 +46,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define MPS_FACTOR_TYPE_H
 
 #include "VectorWithOffset.h"
+#include "ProgramGlobals.h"
 
 namespace Mpspp {
 
@@ -56,6 +57,7 @@ public:
 
 	typedef VectorWithOffset<ComplexOrRealType> VectorWithOffsetType;
 	typedef typename VectorWithOffsetType::VectorType VectorType;
+	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
 
 	MpsFactor(const SymmetryFactorType& symm)
 	: symm_(symm)
@@ -74,11 +76,10 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
-
 private:
 
 	const SymmetryFactorType& symm_;
-	VectorWithOffsetType data_;
+	SparseMatrixType data_;
 }; // MpsFactor
 
 } // namespace Mpspp

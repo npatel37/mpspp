@@ -62,6 +62,7 @@ public:
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef MpsFactor<ComplexOrRealType,SymmetryFactorType> MpsFactorType;
 	typedef typename MpsFactorType::VectorType VectorType;
+	typedef typename MpsFactorType::SparseMatrixType SparseMatrixType;
 
 	MatrixProductState(size_t nsites,const SymmetryLocalType& symm)
 	: nsites_(nsites),symmNonconst_(0),symm_(symm),center_(0)

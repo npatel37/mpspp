@@ -110,8 +110,6 @@ private:
 		throw std::runtime_error(str.c_str());
 	}
 
-
-
 	typename ProgramGlobals::Vector<ContractedFactorType>::Type dataLeft_;
 	typename ProgramGlobals::Vector<ContractedFactorType>::Type dataRight_;
 

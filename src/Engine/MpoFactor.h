@@ -89,6 +89,12 @@ public:
 
 	size_t n_col() const { return data_.n_col(); }
 
+	size_t hilbertSize() const
+	{
+		assert(data_.n_row()>0 && data_.n_col()>0);
+		return data_(0,0).n_row();
+	}
+
 private:
 
 	MatrixType data_;

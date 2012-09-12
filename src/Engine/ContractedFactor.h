@@ -53,16 +53,22 @@ template<typename MatrixProductOperatorType>
 class ContractedFactor {
 
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+	typedef typename MatrixProductStateType::VectorType VectorType;
+	typedef typename MatrixProductStateType::SparseMatrixType SparseMatrixType;
 	typedef typename MatrixProductStateType::MpsFactorType  MpsFactorType;
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
 	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
 	typedef ContractedFactor<MatrixProductOperatorType> ThisType;
+	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type DenseMatrixType;
+	typedef typename MatrixProductStateType::SymmetryFactorType SymmetryFactorType;
+	typedef typename SymmetryFactorType::PairType PairType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 public:
 
-	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
+
+	typedef typename ProgramGlobals::Vector<SparseMatrixType>::Type DataType;
 
 	void init(const MpsFactorType& AorB,
 			  const MpoFactorType& h,
@@ -93,6 +99,113 @@ public:
 
 private:
 
+	//! Eq.(197), page 63
+	void nextF(DataType& thisf,const MpsFactorType& A,const MpsFactorType& Adagger,const MpoFactorType& h,const DataType& prevf) const
+	{
+		size_t hilbertSize = h.hilbertSize();
+		size_t leftBlockSize = A.row()/hilbertSize;
+
+		for (size_t bi=0;bi<prevf.size();bi++) {
+
+			size_t counter = 0;
+			size_t total = thisf[bi].row();
+			typename ProgramGlobals::Vector<int>::Type ptr(total,-1);
+			typename ProgramGlobals::Vector<size_t>::Type index(total,0);
+			VectorType temp(total,0.0);
+			for (size_t ai=0;ai<leftBlockSize;ai++) {
+				size_t itemp = 0;
+				thisf[bi].setRow(ai,counter);
+
+				for (int k=Adagger.getRowPtr(ai);k<Adagger.getRowPtr(ai+1);k++) {
+					size_t aim1si = Adagger.getCol(k);
+					PairType aim1siP = Adagger.symm().left().unpack(aim1si);
+					size_t si = aim1siP.second;
+					DenseMatrixType matrix2(leftBlockSize,A.col());
+					middle197(matrix2,si,bi,A,prevf);
+					size_t aim1 = aim1siP.first;
+					for (size_t aip=0;aip<A.getCol();aip++) {
+						ComplexOrRealType tmp = Adagger.getValue(k) * matrix2(aim1,aip);
+						if (ptr[aip]<0) {
+							ptr[aip]=itemp;
+							temp[ptr[aip]]= tmp;
+							index[ptr[aip]] = aip;
+							itemp++;
+						} else {
+							temp[ptr[aip]]+=tmp;
+						}
+					}
+				}
+
+				for (size_t s=0;s<itemp;s++) {
+					thisf[bi].pushValue(temp[s]);
+					thisf[bi].pushCol(index[s]);
+					ptr[index[s]] = -1;
+				}
+				counter += itemp;
+			}
+
+			thisf[bi].setRow(total,counter);
+			thisf[bi].checkValidity();
+		}
+	}
+
+	//! Eq.(197), page 63, middle bracket
+	void middle197(DenseMatrixType& matrix2,size_t si,size_t bi,const SparseMatrixType& A,const MpoFactorType& h,const DataType& prevf) const
+	{
+		for (size_t bim1=0;bim1<prevf.size();bim1++) {
+			const SparseMatrixType& wtmp = h(bim1,bi);
+			for (size_t ks=wtmp.getRowPtr(si);ks<wtmp.getRowPtr(si+1);ks++) {
+				size_t sip = wtmp.getCol(ks);
+				SparseMatrixType matrix(prevf.row(),A.col());
+				inner197(matrix,sip,A,prevf[bim1]);
+				for (size_t aim1=0;aim1<matrix.row();aim1++) {
+					for (size_t k=matrix.getRowPtr(aim1);k<matrix.getRowPtr(aim1+1);k++) {
+						matrix2(aim1,matrix.getCol(k)) += wtmp.getValue(ks) * matrix.getValue(k);
+					}
+
+				}
+			}
+		}
+	}
+
+	//! Eq.(197), page 63, inner bracket
+	void inner197(SparseMatrixType& matrix,size_t sip,const SparseMatrixType& A,const SparseMatrixType& prevf) const
+	{
+		size_t counter = 0;
+		size_t total = matrix.row();
+		typename ProgramGlobals::Vector<int>::Type ptr(total,-1);
+		typename ProgramGlobals::Vector<size_t>::Type index(total,0);
+		VectorType temp(total,0.0);
+		for (size_t aim1=0;aim1<prevf.row();aim1++) {
+			size_t itemp = 0;
+			matrix.setRow(aim1,counter);
+			for (size_t k=prevf.getRowPtr(aim1);k<prevf.getRowPtr(aim1+1);k++) {
+				size_t aipm1 = prevf.getCol(k);
+				size_t aipm1sip = A.symm().left().pack(aipm1,sip);
+				for (size_t k2=A.getRow(aipm1sip);k2<A.getRow(aipm1sip+1);k2++) {
+					size_t aip = A.getCol(k2);
+					ComplexOrRealType tmp = prevf.getValue(k) * A.getValue(k2);
+					if (ptr[aip]<0) {
+						ptr[aip]=itemp;
+						temp[ptr[aip]]= tmp;
+						index[ptr[aip]] = aip;
+						itemp++;
+					} else {
+						temp[ptr[aip]]+=tmp;
+					}
+				}
+			}
+			for (size_t s=0;s<itemp;s++) {
+				matrix.pushValue(temp[s]);
+				matrix.pushCol(index[s]);
+				ptr[index[s]] = -1;
+			}
+			counter += itemp;
+		}
+		matrix.setRow(total,counter);
+		matrix.checkValidity();
+	}
+
 	void updateLeft(const MpsFactorType& A)
 	{
 		std::string str(__FILE__);
@@ -109,7 +222,7 @@ private:
 		throw std::runtime_error(str.c_str());
 	}
 
-	typename ProgramGlobals::Vector<SparseMatrixType>::Type data_;
+	DataType data_;
 
 }; // ContractedFactor
 

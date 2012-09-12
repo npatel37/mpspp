@@ -55,6 +55,8 @@ class SymmetryFactor {
 
 public:
 
+	typedef typename SymmetryComponentType::PairType PairType;
+
 	SymmetryFactor()
 	{
 		std::string str(__FILE__);
@@ -62,9 +64,6 @@ public:
 		str += "Need to set super_ and lef_ here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 	}
-
-
-	typedef typename SymmetryComponentType::PairType PairType;
 
 	const SymmetryComponentType& super() const { return super_; }
 
