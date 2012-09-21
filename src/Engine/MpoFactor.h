@@ -92,7 +92,7 @@ public:
 	size_t hilbertSize() const
 	{
 		assert(data_.n_row()>0 && data_.n_col()>0);
-		return data_(0,0).n_row();
+		return data_(0,0).row();
 	}
 
 private:

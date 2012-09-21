@@ -76,6 +76,10 @@ public:
 		throw std::runtime_error(str.c_str());
 	}
 
+	const SparseMatrixType& operator()() const { return data_; }
+
+	const SymmetryFactorType& symm() const { return symm_; }
+
 private:
 
 	const SymmetryFactorType& symm_;

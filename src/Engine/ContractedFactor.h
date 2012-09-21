@@ -65,6 +65,8 @@ class ContractedFactor {
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
+	enum {PART_LEFT = ProgramGlobals::PART_LEFT, PART_RIGHT = ProgramGlobals::PART_RIGHT};
+
 public:
 
 
@@ -76,10 +78,27 @@ public:
 			  size_t leftOrRight,
 			  const ThisType* previous)
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set data_ here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		DataType prevfFirst;
+		const DataType* prevf = &(previous->data_);
+
+		if (previous==0) {
+			SparseMatrixType m(1,1);
+			m.makeDiagonal(1,1);
+			prevfFirst.push_back(m);
+			prevf = &prevfFirst;
+		}
+
+
+		if (leftOrRight==PART_LEFT) {
+			SparseMatrixType Adagger;
+			transposeConjugate(Adagger,AorB());
+			leftNextF(data_,AorB,Adagger,h,*prevf);
+		} else {
+			std::string str(__FILE__);
+			str += " " + ttos(__LINE__) + "\n";
+			str += "contracted factor right is needed\n";
+			throw std::runtime_error(str.c_str());
+		}
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
@@ -100,9 +119,10 @@ public:
 private:
 
 	//! Eq.(197), page 63
-	void nextF(DataType& thisf,const MpsFactorType& A,const MpsFactorType& Adagger,const MpoFactorType& h,const DataType& prevf) const
+	void leftNextF(DataType& thisf,const MpsFactorType& Amps,const SparseMatrixType& Adagger,const MpoFactorType& h,const DataType& prevf) const
 	{
 		size_t hilbertSize = h.hilbertSize();
+		const SparseMatrixType& A = Amps();
 		size_t leftBlockSize = A.row()/hilbertSize;
 
 		for (size_t bi=0;bi<prevf.size();bi++) {
@@ -118,12 +138,12 @@ private:
 
 				for (int k=Adagger.getRowPtr(ai);k<Adagger.getRowPtr(ai+1);k++) {
 					size_t aim1si = Adagger.getCol(k);
-					PairType aim1siP = Adagger.symm().left().unpack(aim1si);
+					PairType aim1siP = Amps.symm().left().unpack(aim1si);
 					size_t si = aim1siP.second;
 					DenseMatrixType matrix2(leftBlockSize,A.col());
-					middle197(matrix2,si,bi,A,prevf);
+					leftMiddle197(matrix2,si,bi,Amps,h,prevf);
 					size_t aim1 = aim1siP.first;
-					for (size_t aip=0;aip<A.getCol();aip++) {
+					for (size_t aip=0;aip<A.col();aip++) {
 						ComplexOrRealType tmp = Adagger.getValue(k) * matrix2(aim1,aip);
 						if (ptr[aip]<0) {
 							ptr[aip]=itemp;
@@ -150,16 +170,18 @@ private:
 	}
 
 	//! Eq.(197), page 63, middle bracket
-	void middle197(DenseMatrixType& matrix2,size_t si,size_t bi,const SparseMatrixType& A,const MpoFactorType& h,const DataType& prevf) const
+	void leftMiddle197(DenseMatrixType& matrix2,size_t si,size_t bi,const MpsFactorType& Amps,const MpoFactorType& h,const DataType& prevf) const
 	{
+		const SparseMatrixType& A = Amps();
+
 		for (size_t bim1=0;bim1<prevf.size();bim1++) {
 			const SparseMatrixType& wtmp = h(bim1,bi);
-			for (size_t ks=wtmp.getRowPtr(si);ks<wtmp.getRowPtr(si+1);ks++) {
+			for (int ks=wtmp.getRowPtr(si);ks<wtmp.getRowPtr(si+1);ks++) {
 				size_t sip = wtmp.getCol(ks);
-				SparseMatrixType matrix(prevf.row(),A.col());
-				inner197(matrix,sip,A,prevf[bim1]);
+				SparseMatrixType matrix(prevf[bim1].row(),A.col());
+				leftInner197(matrix,sip,Amps,prevf[bim1]);
 				for (size_t aim1=0;aim1<matrix.row();aim1++) {
-					for (size_t k=matrix.getRowPtr(aim1);k<matrix.getRowPtr(aim1+1);k++) {
+					for (int k=matrix.getRowPtr(aim1);k<matrix.getRowPtr(aim1+1);k++) {
 						matrix2(aim1,matrix.getCol(k)) += wtmp.getValue(ks) * matrix.getValue(k);
 					}
 
@@ -169,20 +191,23 @@ private:
 	}
 
 	//! Eq.(197), page 63, inner bracket
-	void inner197(SparseMatrixType& matrix,size_t sip,const SparseMatrixType& A,const SparseMatrixType& prevf) const
+	void leftInner197(SparseMatrixType& matrix,size_t sip,const MpsFactorType& Amps,const SparseMatrixType& prevf) const
 	{
 		size_t counter = 0;
 		size_t total = matrix.row();
 		typename ProgramGlobals::Vector<int>::Type ptr(total,-1);
 		typename ProgramGlobals::Vector<size_t>::Type index(total,0);
 		VectorType temp(total,0.0);
+
+		const SparseMatrixType& A = Amps();
+
 		for (size_t aim1=0;aim1<prevf.row();aim1++) {
 			size_t itemp = 0;
 			matrix.setRow(aim1,counter);
-			for (size_t k=prevf.getRowPtr(aim1);k<prevf.getRowPtr(aim1+1);k++) {
+			for (int k=prevf.getRowPtr(aim1);k<prevf.getRowPtr(aim1+1);k++) {
 				size_t aipm1 = prevf.getCol(k);
-				size_t aipm1sip = A.symm().left().pack(aipm1,sip);
-				for (size_t k2=A.getRow(aipm1sip);k2<A.getRow(aipm1sip+1);k2++) {
+				size_t aipm1sip = Amps.symm().left().pack(aipm1,sip);
+				for (int k2=A.getRowPtr(aipm1sip);k2<A.getRowPtr(aipm1sip+1);k2++) {
 					size_t aip = A.getCol(k2);
 					ComplexOrRealType tmp = prevf.getValue(k) * A.getValue(k2);
 					if (ptr[aip]<0) {
