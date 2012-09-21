@@ -55,15 +55,12 @@ class SymmetryFactor {
 
 public:
 
+	typedef typename SymmetryComponentType::IoInputType IoInputType;
 	typedef typename SymmetryComponentType::PairType PairType;
 
-	SymmetryFactor()
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set super_ and lef_ here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
+	SymmetryFactor(IoInputType& io)
+		: super_(io),left_(io)
+	{}
 
 	const SymmetryComponentType& super() const { return super_; }
 

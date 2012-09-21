@@ -58,6 +58,7 @@ class MatrixProductState {
 public:
 
 	typedef SymmetryLocalType_ SymmetryLocalType;
+	typedef typename SymmetryLocalType::IoInputType IoInputType;
 	typedef ComplexOrRealType_ ComplexOrRealType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef MpsFactor<ComplexOrRealType,SymmetryFactorType> MpsFactorType;
@@ -68,13 +69,26 @@ public:
 	: nsites_(nsites),symmNonconst_(0),symm_(symm),center_(0)
 	{}
 
-	MatrixProductState(size_t nsites)
-	: nsites_(nsites),symmNonconst_(new SymmetryLocalType()),symm_(*symmNonconst_),center_(0)
+//	MatrixProductState(size_t nsites)
+//	: nsites_(nsites),symmNonconst_(new SymmetryLocalType()),symm_(*symmNonconst_),center_(0)
+//	{
+//		std::string str(__FILE__);
+//		str += " " + ttos(__LINE__) + "\n";
+//		str += "Need to set data_ here. I cannot go further until this is implemented\n";
+//		throw std::runtime_error(str.c_str());
+//	}
+
+	MatrixProductState(IoInputType& io)
+		: symmNonconst_(new SymmetryLocalType(io)),symm_(*symmNonconst_)
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set data_ here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		// read center and nsites
+		io.readline(nsites_,"TotalNumberOfSites=");
+		io.readline(center_,"Center=");
+
+		for (size_t i=0;i<nsites_;i++) {
+			MpsFactorType f(io,symm_(i));
+			data_.push_back(f);
+		}
 	}
 
 	~MatrixProductState()

@@ -53,22 +53,25 @@ namespace Mpspp {
 class SymmetryComponent {
 
 	typedef SymmetryPartition SymmetryPartitionType;
+	typedef typename SymmetryPartition::SymmetryPartitionOpaque SymmetryPartitionOpaqueType;
 
 public:
 
+	typedef typename SymmetryPartitionType::IoInputType IoInputType;
 	typedef std::pair<size_t,size_t> PairType;
 
-	SymmetryComponent()
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set symmetry permutation and leftSize and permutationInverse_ here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+	SymmetryComponent(IoInputType& io)
+		: partition_(io)
+	{		
+		io.read(permutation_,"Permutation");
+		permutationInverse_.resize(permutation_.size());
+		for (size_t i=0;permutationInverse_.size();i++)
+			permutationInverse_[permutation_[i]]=i;
 	}
 
-	const SymmetryPartitionType& partition(size_t whatPartition) const
+	SymmetryPartitionOpaqueType partition(size_t whatPartition) const
 	{
-		return partition_[whatPartition];
+		return partition_(whatPartition);
 	}
 
 	PairType unpack(size_t i) const
@@ -85,7 +88,7 @@ public:
 
 private:
 
-	ProgramGlobals::Vector<SymmetryPartitionType>::Type partition_;
+	SymmetryPartitionType partition_;
 	ProgramGlobals::Vector<size_t>::Type permutation_;
 	ProgramGlobals::Vector<size_t>::Type permutationInverse_;
 	size_t leftSize_;

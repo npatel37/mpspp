@@ -58,14 +58,19 @@ public:
 	typedef VectorWithOffset<ComplexOrRealType> VectorWithOffsetType;
 	typedef typename VectorWithOffsetType::VectorType VectorType;
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
+	typedef typename SymmetryFactorType::IoInputType IoInputType;
 
-	MpsFactor(const SymmetryFactorType& symm)
+	MpsFactor(IoInputType& io,const SymmetryFactorType& symm)
 	: symm_(symm)
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set data_ here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		io.readMatrix(data_,"MpsFactor");
+	}
+
+	MpsFactor& operator=(const MpsFactor& other)
+	{
+		this->data_ = other.data_;
+		//this->symm_ = other.symm_;
+		return *this;
 	}
 
 	void updateFromVector(const VectorType& v,size_t direction)

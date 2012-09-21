@@ -46,19 +46,38 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define SYMMETRY_PARTITION_H
 
 #include "ProgramGlobals.h"
+#include "IoSimple.h"
 
 namespace Mpspp {
 
 class SymmetryPartition {
 
+	class SymmetryPartitionOpaque {
+
+	public:
+
+		SymmetryPartitionOpaque(size_t length,size_t offset)
+			: length_(length),offset_(offset)
+		{}
+
+		size_t size() const { return length_; }
+
+		size_t offset() const { return offset_; }
+
+	private:
+
+		size_t length_;
+		size_t offset_;
+	};
+
 public:
 
-	SymmetryPartition()
+	typedef PsimagLite::IoSimple::In IoInputType;
+
+	SymmetryPartition(IoInputType& io)
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set symmetry paritition here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		io.read(data_,"Partition");
+//		io.readline(offset_,"Offset=");
 	}
 
 	size_t size() const
@@ -66,15 +85,20 @@ public:
 		return data_.size();
 	}
 
-	size_t offset() const
+//	size_t offset() const
+//	{
+//		return offset_;
+//	}
+
+	SymmetryPartitionOpaque operator()(size_t i) const
 	{
-		return offset_;
+		return SymmetryPartitionOpaque(data_[i+1]-data_[i],data_[i]);
 	}
 
 private:
 
 	ProgramGlobals::Vector<size_t>::Type data_;
-	size_t offset_;
+//	size_t offset_;
 
 }; // SymmetryPartition
 

@@ -56,6 +56,17 @@ public:
 
 	typedef SymmetryFactor SymmetryFactorType;
 	typedef typename SymmetryFactorType::PairType PairType;
+	typedef typename SymmetryFactorType::IoInputType IoInputType;
+
+	SymmetryLocal(IoInputType& io)
+	{
+		size_t n = 0;
+		io.readline(n,"TotalNumberOfSites=");
+		for (size_t i=0;i<n;i++) {
+			SymmetryFactorType f(io);
+			data_.push_back(f);
+		}
+	}
 
 	const SymmetryFactorType& operator()(size_t site) const
 	{
