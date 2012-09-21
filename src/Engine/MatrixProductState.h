@@ -70,7 +70,12 @@ public:
 
 	MatrixProductState(size_t nsites)
 	: nsites_(nsites),symmNonconst_(new SymmetryLocalType()),symm_(*symmNonconst_),center_(0)
-	{}
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to set data_ here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
 
 	~MatrixProductState()
 	{
@@ -108,6 +113,7 @@ public:
 
 	const MpsFactorType& operator()(size_t site) const
 	{
+		assert(site<data_.size());
 		return data_[site];
 	}
 
