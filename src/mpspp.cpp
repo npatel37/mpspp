@@ -127,7 +127,7 @@ int main(int argc,char *argv[])
 
 	const ModelBaseType& model = modelSelector(mpsSolverParams,io,geometry,concurrency);
 
-	typename MatrixProductStateType::IoInputType ioForMps("file.txt");
+	typename MatrixProductStateType::IoInputType ioForMps(mpsSolverParams.initialMps);
 
 	MatrixProductStateType psi(ioForMps);
 
