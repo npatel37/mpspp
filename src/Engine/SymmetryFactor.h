@@ -62,26 +62,32 @@ public:
 		  CORNER_RIGHT = SymmetryComponentType::CORNER_RIGHT};
 
 	SymmetryFactor(IoInputType& io)
-		: super_(io),left_(io)
+		: super_(io),left_(io),right_(io)
 	{
-		std::cerr<<"SymmetryFactor (super+left): constructed\n";
+		std::string str("SymmetryFactor: super=");
+		str += ttos(super_.size()) + " left=" + ttos(left_.size());
+		str += " right=" + ttos(right_.size()) + "\n";
+		std::cerr<<str;
 	}
 
 	void adjustCorner(size_t corner)
 	{
 		super_.adjustCorner(corner);
 		left_.adjustCorner(corner);
+		right_.adjustCorner(corner);
 	}
 
 	const SymmetryComponentType& super() const { return super_; }
 
 	const SymmetryComponentType& left() const { return left_; }
 
+	const SymmetryComponentType& right() const { return right_; }
+
 private:
 
 	SymmetryComponentType super_;
 	SymmetryComponentType left_;
-
+	SymmetryComponentType right_;
 }; // SymmetryFactor
 
 } // namespace Mpspp

@@ -79,14 +79,14 @@ public:
 //	}
 
 	MatrixProductState(IoInputType& io)
-		: symmNonconst_(new SymmetryLocalType(io)),symm_(*symmNonconst_)
+		: symmNonconst_(new SymmetryLocalType(io)),
+		  symm_(*symmNonconst_),
+		  nsites_(symm_(0).super().block().size()),
+		  center_(1)
 	{
-		// read center and nsites
-		io.readline(nsites_,"TotalNumberOfSites=");
-		io.readline(center_,"Center=");
-
+		io.rewind();
 		for (size_t i=0;i<nsites_;i++) {
-			MpsFactorType f(io,symm_(i));
+			MpsFactorType f(io,symm_(i),i);
 			data_.push_back(f);
 		}
 	}
@@ -132,9 +132,9 @@ private:
 	// assignment
 	MatrixProductState& operator=(const MatrixProductState& other);
 
-	size_t nsites_;
 	SymmetryLocalType* symmNonconst_;
 	const SymmetryLocalType& symm_;
+	size_t nsites_;
 	size_t center_;
 	typename ProgramGlobals::Vector<MpsFactorType>::Type data_;
 }; // MatrixProductState

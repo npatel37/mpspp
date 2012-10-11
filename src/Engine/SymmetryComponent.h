@@ -70,7 +70,8 @@ public:
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
 		str += "Need to write adjustCorner. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+//		throw std::runtime_error(str.c_str());
+		std::cerr<<str;
 	}
 
 	size_t partitionSize(size_t i) const
@@ -96,6 +97,13 @@ public:
 	{
 		return permutationInverse_[a1+sigma2*leftSize_];
 	}
+
+	size_t size() const
+	{
+		return quantumNumbers_.size();
+	}
+
+	const std::vector<size_t>& block() const { return block_; }
 
 private:
 

@@ -69,6 +69,7 @@ public:
 			if (i==0) data_.push_back(f); // left corner
 			if (i==n-3) data_.push_back(f); // right corner
 		}
+
 		assert(data_.size()==n);
 		data_[0].adjustCorner(SymmetryFactorType::CORNER_LEFT);
 		data_[n-1].adjustCorner(SymmetryFactorType::CORNER_RIGHT);

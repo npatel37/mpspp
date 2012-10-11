@@ -53,17 +53,37 @@ namespace Mpspp {
 template<typename ComplexOrRealType,typename SymmetryFactorType>
 class MpsFactor {
 
+	typedef std::pair<size_t,size_t> PairType;
+
 public:
 
+	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
 	typedef VectorWithOffset<ComplexOrRealType> VectorWithOffsetType;
 	typedef typename VectorWithOffsetType::VectorType VectorType;
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
+	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
 	typedef typename SymmetryFactorType::IoInputType IoInputType;
 
-	MpsFactor(IoInputType& io,const SymmetryFactorType& symm)
+	MpsFactor(IoInputType& io,const SymmetryFactorType& symm,size_t site)
 	: symm_(symm)
 	{
-		io.readMatrix(data_,"MpsFactor");
+		if (site==0 || site+1 ==symm_.super().block().size()) {
+			std::string str(__FILE__);
+			str += " " + ttos(__LINE__) + "\n";
+			str += "Needs corner cases. I cannot go further until this is implemented\n";
+			std::cerr<<str;
+			return;
+		}
+		VectorWithOffsetType mpsFactorM;
+		mpsFactorM.load(io,"MpsFactorM");
+
+		MatrixType mpsFactor;
+		findMpsFactor1(mpsFactor,mpsFactorM);
+
+		std::vector<RealType> s;
+		svd(mpsFactor,s);
+
+		fullMatrixToCrsMatrix(data_,mpsFactor);
 	}
 
 	MpsFactor& operator=(const MpsFactor& other)
@@ -87,6 +107,19 @@ public:
 
 private:
 
+	//! MpsFactorM is phi_i
+	//! interpret M^{sigma2}_{a1,a2^B} as  M_(alpha,a2^B)
+	//!  M_(alpha,a2^B) = \sum_{i} phi_i \delta_{P^SE(alpha+a2^B*ns),i}
+	void findMpsFactor1(MatrixType& m,const VectorWithOffsetType& v) const
+	{
+		size_t total = v.effectiveSize();
+		size_t offset = v.offset(0);
+		m.resize( symm_.left().size(),symm_.right().size());
+		for (size_t i=0;i<total;i++) {
+			PairType alphaBeta = symm_.super().unpack(i+offset);
+			m(alphaBeta.first,alphaBeta.second) = v.fastAccess(0,i);
+		}
+	}
 	const SymmetryFactorType& symm_;
 	SparseMatrixType data_;
 }; // MpsFactor
