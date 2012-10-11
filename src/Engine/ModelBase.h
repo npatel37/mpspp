@@ -93,8 +93,8 @@ public:
 
 		const SymmetryFactorType& symm = modelHelper.symmetry();
 
-		size_t total = symm.super().partition(symmetrySector).size();
-		size_t offset = symm.super().partition(symmetrySector).offset();
+		size_t total = symm.super().partitionSize(symmetrySector);
+		size_t offset = symm.super().partitionOffset(symmetrySector);
 
 		const MpoFactorType& hamiltonian = modelHelper.hamiltonian();
 

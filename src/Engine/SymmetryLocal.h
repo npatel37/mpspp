@@ -62,10 +62,16 @@ public:
 	{
 		size_t n = 0;
 		io.readline(n,"TotalNumberOfSites=");
-		for (size_t i=0;i<n;i++) {
+		assert(n>2);
+		for (size_t i=0;i<n-2;i++) {
 			SymmetryFactorType f(io);
 			data_.push_back(f);
+			if (i==0) data_.push_back(f); // left corner
+			if (i==n-3) data_.push_back(f); // right corner
 		}
+		assert(data_.size()==n);
+		data_[0].adjustCorner(SymmetryFactorType::CORNER_LEFT);
+		data_[n-1].adjustCorner(SymmetryFactorType::CORNER_RIGHT);
 	}
 
 	const SymmetryFactorType& operator()(size_t site) const

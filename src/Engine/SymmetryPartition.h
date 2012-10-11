@@ -74,11 +74,9 @@ public:
 
 	typedef PsimagLite::IoSimple::In IoInputType;
 
-	SymmetryPartition(IoInputType& io)
-	{
-		io.read(data_,"Partition");
-//		io.readline(offset_,"Offset=");
-	}
+	SymmetryPartition(const ProgramGlobals::Vector<size_t>::Type& data)
+	: data_(data)
+	{}
 
 	size_t size() const
 	{
@@ -97,7 +95,7 @@ public:
 
 private:
 
-	ProgramGlobals::Vector<size_t>::Type data_;
+	const ProgramGlobals::Vector<size_t>::Type& data_;
 //	size_t offset_;
 
 }; // SymmetryPartition

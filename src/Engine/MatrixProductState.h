@@ -99,15 +99,6 @@ public:
 		}
 	}
 
-	//! Returns the index-th site
-	size_t site(size_t index) const
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set sites here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
-
 	size_t center() const
 	{
 		return center_;

@@ -58,9 +58,20 @@ public:
 	typedef typename SymmetryComponentType::IoInputType IoInputType;
 	typedef typename SymmetryComponentType::PairType PairType;
 
+	enum {CORNER_LEFT = SymmetryComponentType::CORNER_LEFT,
+		  CORNER_RIGHT = SymmetryComponentType::CORNER_RIGHT};
+
 	SymmetryFactor(IoInputType& io)
 		: super_(io),left_(io)
-	{}
+	{
+		std::cerr<<"SymmetryFactor (super+left): constructed\n";
+	}
+
+	void adjustCorner(size_t corner)
+	{
+		super_.adjustCorner(corner);
+		left_.adjustCorner(corner);
+	}
 
 	const SymmetryComponentType& super() const { return super_; }
 

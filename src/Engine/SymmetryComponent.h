@@ -46,32 +46,43 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define SYMMETRY_COMPONENT_H
 
 #include "ProgramGlobals.h"
-#include "SymmetryPartition.h"
+#include "IoSimple.h"
 
 namespace Mpspp {
 
 class SymmetryComponent {
 
-	typedef SymmetryPartition SymmetryPartitionType;
-	typedef typename SymmetryPartition::SymmetryPartitionOpaque SymmetryPartitionOpaqueType;
 
 public:
 
-	typedef typename SymmetryPartitionType::IoInputType IoInputType;
+	typedef PsimagLite::IoSimple::In IoInputType;
 	typedef std::pair<size_t,size_t> PairType;
 
+	enum {CORNER_LEFT,CORNER_RIGHT};
+
 	SymmetryComponent(IoInputType& io)
-		: partition_(io)
 	{		
-		io.read(permutation_,"Permutation");
-		permutationInverse_.resize(permutation_.size());
-		for (size_t i=0;permutationInverse_.size();i++)
-			permutationInverse_[permutation_[i]]=i;
+		loadInternal(io);
 	}
 
-	SymmetryPartitionOpaqueType partition(size_t whatPartition) const
+	void adjustCorner(size_t corner)
 	{
-		return partition_(whatPartition);
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to write adjustCorner. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
+
+	size_t partitionSize(size_t i) const
+	{
+		assert(i+1<partition_.size());
+		return partition_[i+1]-partition_[i];
+	}
+
+	size_t partitionOffset(size_t i) const
+	{
+		assert(i<partition_.size());
+		return partition_[i];
 	}
 
 	PairType unpack(size_t i) const
@@ -88,7 +99,32 @@ public:
 
 private:
 
-	SymmetryPartitionType partition_;
+	// Match with SaveInternal in DMRG++'s Basis.h
+	template<typename IoInputter>
+	void loadInternal(IoInputter& io)
+	{
+		//int x=0;
+		//useSu2Symmetry_=false;
+		//io.readline(x,"#useSu2Symmetry=");
+		//if (x>0) useSu2Symmetry_=true;
+		io.read(block_,"#BLOCK");
+		io.read(quantumNumbers_,"#QN");
+		//io.read(electrons_,"#ELECTRONS");
+		//io.read(electronsOld_,"#0OLDELECTRONS");
+		io.read(partition_,"#PARTITION");
+		io.read(permutationInverse_,"#PERMUTATIONINVERSE");
+		permutation_.resize(permutationInverse_.size());
+		for (size_t i=0;i<permutation_.size();i++) permutation_[permutationInverse_[i]]=i;
+		/*dmrgTransformed_=false;
+		if (useSu2Symmetry_)
+			symmSu2_.load(io);
+		else
+			symmLocal_.load(io);*/
+	}
+
+	std::vector<size_t> block_;
+	std::vector<size_t> quantumNumbers_;
+	std::vector<size_t> partition_;
 	ProgramGlobals::Vector<size_t>::Type permutation_;
 	ProgramGlobals::Vector<size_t>::Type permutationInverse_;
 	size_t leftSize_;

@@ -54,8 +54,6 @@ namespace Mpspp {
 template<typename MatrixProductOperatorType_,typename VectorType,typename RealType_>
 class LeftRightSuper {
 
-
-
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 public:
