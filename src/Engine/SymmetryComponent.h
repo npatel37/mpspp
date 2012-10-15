@@ -60,7 +60,8 @@ public:
 
 	enum {CORNER_LEFT,CORNER_RIGHT};
 
-	SymmetryComponent(IoInputType& io)
+	SymmetryComponent(IoInputType& io,size_t leftSize)
+	: leftSize_(leftSize)
 	{		
 		loadInternal(io);
 	}
@@ -90,7 +91,7 @@ public:
 	{
 		size_t ip = permutation_[i];
 		div_t q = div(ip,leftSize_);
-		return PairType(q.quot,q.rem);
+		return PairType(q.rem,q.quot);
 	}
 
 	size_t pack(size_t a1,size_t sigma2) const
