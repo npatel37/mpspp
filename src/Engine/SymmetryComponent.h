@@ -59,6 +59,7 @@ public:
 	typedef std::pair<size_t,size_t> PairType;
 
 	enum {CORNER_LEFT,CORNER_RIGHT};
+	enum {COMPONENT_LEFT,COMPONENT_RIGHT,COMPONENT_SUPER};
 
 	SymmetryComponent(IoInputType& io,size_t leftSize)
 	: leftSize_(leftSize)
@@ -66,14 +67,14 @@ public:
 		loadInternal(io);
 	}
 
-	void adjustCorner(size_t corner)
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to write adjustCorner. I cannot go further until this is implemented\n";
-//		throw std::runtime_error(str.c_str());
-		std::cerr<<str;
-	}
+//	void adjustCorner(size_t corner)
+//	{
+//		std::string str(__FILE__);
+//		str += " " + ttos(__LINE__) + "\n";
+//		str += "Need to write adjustCorner. I cannot go further until this is implemented\n";
+////		throw std::runtime_error(str.c_str());
+//		std::cerr<<str;
+//	}
 
 	size_t partitionSize(size_t i) const
 	{
@@ -131,12 +132,18 @@ private:
 			symmLocal_.load(io);*/
 	}
 
+	void adjustCornerLeft()
+	{
+
+	}
+
+	size_t leftSize_;
 	std::vector<size_t> block_;
 	std::vector<size_t> quantumNumbers_;
 	std::vector<size_t> partition_;
 	ProgramGlobals::Vector<size_t>::Type permutation_;
 	ProgramGlobals::Vector<size_t>::Type permutationInverse_;
-	size_t leftSize_;
+
 
 }; // SymmetryComponent
 

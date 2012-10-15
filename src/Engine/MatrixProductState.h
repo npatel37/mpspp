@@ -85,7 +85,8 @@ public:
 		  center_(1)
 	{
 		io.rewind();
-		for (size_t i=0;i<nsites_;i++) {
+		assert(nsites_>0);
+		for (size_t i=0;i<nsites_-1;i++) {
 			MpsFactorType f(io,symm_(i),i);
 			data_.push_back(f);
 		}

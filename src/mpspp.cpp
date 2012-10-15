@@ -131,7 +131,8 @@ int main(int argc,char *argv[])
 
 	MatrixProductStateType psi(ioForMps);
 
-	throw std::runtime_error("Testing: mps read from disk successfully\n");
+	std::cerr<<"Testing: mps read from disk successfully\n";
+
 	if (mpsSolverParams.options.find("InternalProductStored")!=std::string::npos) {
 		mainLoop<ModelBaseType,Mpspp::InternalProductStored,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
 		//} else if (mpsSolverParams.options.find("InternalProductKron")!=std::string::npos) {

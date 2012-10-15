@@ -70,12 +70,12 @@ public:
 		std::cerr<<str;
 	}
 
-	void adjustCorner(size_t corner)
-	{
-		super_.adjustCorner(corner);
-		left_.adjustCorner(corner);
-		right_.adjustCorner(corner);
-	}
+//	void adjustCorner(size_t corner)
+//	{
+//		super_.adjustCorner(corner);
+//		left_.adjustCorner(corner);
+//		right_.adjustCorner(corner);
+//	}
 
 	const SymmetryComponentType& super() const { return super_; }
 

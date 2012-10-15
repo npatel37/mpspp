@@ -125,26 +125,32 @@ private:
 		size_t hilbertSize = h.hilbertSize();
 		size_t leftBlockSize = A.row()/hilbertSize;
 
+		data_.resize(prevf.size());
+		DenseMatrixType matrix2(leftBlockSize,A.col());
+
 		for (size_t bi=0;bi<prevf.size();bi++) {
 
+			data_[bi].resize(A.col(),A.col());
 			size_t counter = 0;
 			size_t total = data_[bi].row();
 			typename ProgramGlobals::Vector<int>::Type ptr(total,-1);
 			typename ProgramGlobals::Vector<size_t>::Type index(total,0);
 			VectorType temp(total,0.0);
-			for (size_t ai=0;ai<leftBlockSize;ai++) {
+
+			for (size_t ai=0;ai<A.col();ai++) {
 				size_t itemp = 0;
 				data_[bi].setRow(ai,counter);
 
 				for (int k=Atransp.getRowPtr(ai);k<Atransp.getRowPtr(ai+1);k++) {
 					size_t aim1si = Atransp.getCol(k);
 					PairType aim1siP = symm.left().unpack(aim1si);
-					size_t si = aim1siP.second;
-					DenseMatrixType matrix2(leftBlockSize,A.col());
+					size_t si = (leftBlockSize>1) ? aim1siP.second : aim1siP.first;
+
 					middle197(matrix2,symm,si,bi,A,h,prevf,leftOrRight);
-					size_t aim1 = aim1siP.first;
+					size_t aim1 = (leftBlockSize>1) ? aim1siP.first : 0;
 					for (size_t aip=0;aip<A.col();aip++) {
 						ComplexOrRealType tmp = std::conj(Atransp.getValue(k)) * matrix2(aim1,aip);
+						assert(aip<ptr.size());
 						if (ptr[aip]<0) {
 							ptr[aip]=itemp;
 							temp[ptr[aip]]= tmp;
@@ -162,6 +168,7 @@ private:
 					ptr[index[s]] = -1;
 				}
 				counter += itemp;
+				std::cerr<<"Testing ai="<<ai<<" out of "<<A.col()<<"\n";
 			}
 
 			data_[bi].setRow(total,counter);
@@ -172,6 +179,10 @@ private:
 	//! Eq.(197), page 63, middle bracket
 	void middle197(DenseMatrixType& matrix2,const SymmetryFactorType& symm,size_t si,size_t bi,const SparseMatrixType& A,const MpoFactorType& h,const DataType& prevf,size_t leftOrRight) const
 	{
+
+		for (size_t i=0;i<matrix2.n_row();i++)
+			for (size_t j=0;j<matrix2.n_col();j++)
+				matrix2(i,j) = 0;
 
 		for (size_t bim1=0;bim1<prevf.size();bim1++) {
 			size_t bFirst = (leftOrRight==PART_LEFT) ? bim1  : bi;
@@ -185,9 +196,9 @@ private:
 					for (int k=matrix.getRowPtr(aim1);k<matrix.getRowPtr(aim1+1);k++) {
 						matrix2(aim1,matrix.getCol(k)) += wtmp.getValue(ks) * matrix.getValue(k);
 					}
-
 				}
 			}
+			//std::cerr<<"Testing bim1="<<bim1<<" out of "<<prevf.size()<<"\n";
 		}
 	}
 
@@ -195,10 +206,12 @@ private:
 	void inner197(SparseMatrixType& matrix,const SymmetryFactorType& symm,size_t sip,const SparseMatrixType& A,const SparseMatrixType& prevf) const
 	{
 		size_t counter = 0;
-		size_t total = matrix.row();
-		typename ProgramGlobals::Vector<int>::Type ptr(total,-1);
-		typename ProgramGlobals::Vector<size_t>::Type index(total,0);
-		VectorType temp(total,0.0);
+		//size_t total = matrix.row();
+		typename ProgramGlobals::Vector<int>::Type ptr(A.col(),-1);
+		typename ProgramGlobals::Vector<size_t>::Type index(matrix.col(),0);
+		VectorType temp(matrix.col(),0.0);
+
+		assert(prevf.row()==matrix.row());
 
 		for (size_t aim1=0;aim1<prevf.row();aim1++) {
 			size_t itemp = 0;
@@ -209,6 +222,7 @@ private:
 				for (int k2=A.getRowPtr(aipm1sip);k2<A.getRowPtr(aipm1sip+1);k2++) {
 					size_t aip = A.getCol(k2);
 					ComplexOrRealType tmp = prevf.getValue(k) * A.getValue(k2);
+					assert(aip<ptr.size());
 					if (ptr[aip]<0) {
 						ptr[aip]=itemp;
 						temp[ptr[aip]]= tmp;
@@ -226,7 +240,7 @@ private:
 			}
 			counter += itemp;
 		}
-		matrix.setRow(total,counter);
+		matrix.setRow(matrix.row(),counter);
 		matrix.checkValidity();
 	}
 

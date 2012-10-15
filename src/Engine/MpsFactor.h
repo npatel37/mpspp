@@ -67,13 +67,13 @@ public:
 	MpsFactor(IoInputType& io,const SymmetryFactorType& symm,size_t site)
 	: symm_(symm)
 	{
-		if (site==0 || site+1 ==symm_.super().block().size()) {
-			std::string str(__FILE__);
-			str += " " + ttos(__LINE__) + "\n";
-			str += "Needs corner cases. I cannot go further until this is implemented\n";
-			std::cerr<<str;
-			return;
-		}
+//		if (site==0 || site+1 ==symm_.super().block().size()) {
+//			std::string str(__FILE__);
+//			str += " " + ttos(__LINE__) + "\n";
+//			str += "Needs corner cases. I cannot go further until this is implemented\n";
+//			std::cerr<<str;
+//			return;
+//		}
 		VectorWithOffsetType mpsFactorM;
 		mpsFactorM.load(io,"MpsFactorM");
 

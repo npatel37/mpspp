@@ -70,11 +70,15 @@ public:
 	  : dataLeft_(abState.center()),dataRight_(abState.sites()-dataLeft_.size())
 	{
 		// page 62, equations 192 and 193
-		for (size_t i=0;i<dataLeft_.size();i++)
+		for (size_t i=0;i<dataLeft_.size();i++) {
 			dataLeft_[i].init(abState(i),h(i),i,PART_LEFT,(i>0) ? &dataLeft_[i-1] : 0);
+			std::cerr<<"Testing: ContracedPart (left) i="<<i<<" out of "<<dataLeft_.size()<<"\n";
+		}
 		size_t center = dataLeft_.size();
-		for (size_t i=0;i<dataRight_.size();i++)
+		for (size_t i=0;i<dataRight_.size();i++) {
 			dataRight_[i].init(abState(i+center),h(i+center),i+center,PART_RIGHT,(i>0) ? &dataRight_[i-1] : 0);
+			std::cerr<<"Testing: ContracedPart (right) i="<<i<<" out of "<<dataRight_.size()<<"\n";
+		}
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
