@@ -61,8 +61,8 @@ public:
 	enum {CORNER_LEFT = SymmetryComponentType::CORNER_LEFT,
 		  CORNER_RIGHT = SymmetryComponentType::CORNER_RIGHT};
 
-	SymmetryFactor(IoInputType& io,size_t leftSize,size_t rightSize)
-		: left_(io,leftSize),right_(io,rightSize),super_(io,left_.size())
+	SymmetryFactor(IoInputType& io,size_t nk)
+		: left_(io,nk),right_(io,nk),super_(io,right_.size())
 	{
 		std::string str("SymmetryFactor: super=");
 		str += ttos(super_.size()) + " left=" + ttos(left_.size());

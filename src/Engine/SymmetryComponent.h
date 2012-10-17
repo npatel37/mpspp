@@ -61,10 +61,10 @@ public:
 	enum {CORNER_LEFT,CORNER_RIGHT};
 	enum {COMPONENT_LEFT,COMPONENT_RIGHT,COMPONENT_SUPER};
 
-	SymmetryComponent(IoInputType& io,size_t leftSize)
-	: leftSize_(leftSize)
+	SymmetryComponent(IoInputType& io,size_t divisor)
 	{		
 		loadInternal(io);
+		leftSize_ = size()/divisor;
 	}
 
 //	void adjustCorner(size_t corner)
@@ -90,6 +90,7 @@ public:
 
 	PairType unpack(size_t i) const
 	{
+		assert(i<permutation_.size());
 		size_t ip = permutation_[i];
 		div_t q = div(ip,leftSize_);
 		return PairType(q.rem,q.quot);
@@ -97,6 +98,7 @@ public:
 
 	size_t pack(size_t a1,size_t sigma2) const
 	{
+		assert(a1+sigma2*leftSize_<permutationInverse_.size());
 		return permutationInverse_[a1+sigma2*leftSize_];
 	}
 

@@ -65,13 +65,11 @@ public:
 		size_t nk = 0;
 		io.readline(nk,"HilbertOneSite=");
 		assert(n>2);
-		size_t leftSize = nk;
 		for (size_t i=0;i<n-1;i++) {
-			SymmetryFactorType f(io,leftSize,nk);
+			SymmetryFactorType f(io,nk);
 			data_.push_back(f);
 //			if (i==0) data_.push_back(f); // left corner
 //			if (i==n-3) data_.push_back(f); // right corner
-			leftSize = f.left().size();
 		}
 
 		assert(data_.size()==n-1);
