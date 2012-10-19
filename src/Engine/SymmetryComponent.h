@@ -107,6 +107,8 @@ public:
 		return quantumNumbers_.size();
 	}
 
+	size_t split() const { return leftSize_; }
+
 	const std::vector<size_t>& block() const { return block_; }
 
 private:

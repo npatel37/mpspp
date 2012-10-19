@@ -127,12 +127,19 @@ private:
 		size_t leftBlockSize = A.row()/hilbertSize;
 
 		data_.resize(prevf.size());
-		DenseMatrixType matrix2(leftBlockSize,A.col());
 
 		DenseMatrixType dataMatrix(A.col(),A.col());
 
 		size_t hsize = h(0,0).col();
 		auxStorage_.resize(hsize,prevf.size());
+		auxStorage2_.resize(hsize,prevf.size());
+
+		size_t siSize = (leftBlockSize>1) ? hilbertSize : symm.left().split();
+
+		for (size_t bi=0;bi<prevf.size();bi++)
+			for (size_t si=0;si<siSize;si++)
+				saveMiddle197(symm,si,bi,A,h,prevf,leftOrRight);
+
 
 		for (size_t bi=0;bi<prevf.size();bi++) {
 			dataMatrix.setTo(0);
@@ -142,7 +149,8 @@ private:
 					PairType aim1siP = symm.left().unpack(aim1si);
 					size_t si = (leftBlockSize>1) ? aim1siP.second : aim1siP.first;
 
-					middle197(matrix2,symm,si,bi,A,h,prevf,leftOrRight);
+					//middle197(matrix2,symm,si,bi,A,h,prevf,leftOrRight);
+					const DenseMatrixType& matrix2 = auxStorage2_(si,bi);
 					size_t aim1 = (leftBlockSize>1) ? aim1siP.first : 0;
 					for (size_t aip=0;aip<A.col();aip++) {
 						dataMatrix(ai,aip) += std::conj(Atransp.getValue(k)) * matrix2(aim1,aip);
@@ -153,6 +161,21 @@ private:
 			fullMatrixToCrsMatrix(data_[bi],dataMatrix);
 		}
 		auxStorage_.reset(0,0);
+		auxStorage2_.reset(0,0);
+	}
+
+	void saveMiddle197(const SymmetryFactorType& symm,size_t si,size_t bi,const SparseMatrixType& A,const MpoFactorType& h,const DataType& prevf,size_t leftOrRight)
+	{
+		if (auxStorage2_(si,bi).n_row()!=0) return;
+
+		size_t hilbertSize = h.hilbertSize();
+		size_t leftBlockSize = A.row()/hilbertSize;
+
+		DenseMatrixType matrix2(leftBlockSize,A.col());
+
+		middle197(matrix2,symm,si,bi,A,h,prevf,leftOrRight);
+//		SparseMatrixType matrixSparse(matrix2);
+		auxStorage2_(si,bi) = matrix2;
 	}
 
 	//! Eq.(197), page 63, middle bracket
@@ -171,7 +194,9 @@ private:
 				//SparseMatrixType matrixSparse(matrix);
 				const SparseMatrixType& matrixSparse = auxStorage_(sip,bim1);
 				for (size_t aim1=0;aim1<matrixSparse.row();aim1++) {
-					for (int k=matrixSparse.getRowPtr(aim1);k<matrixSparse.getRowPtr(aim1+1);k++) {
+					size_t start = matrixSparse.getRowPtr(aim1);
+					size_t end = matrixSparse.getRowPtr(aim1+1);
+					for (size_t k=start;k<end;++k) {
 						matrix2(aim1,matrixSparse.getCol(k)) += wtmp.getValue(ks) * matrixSparse.getValue(k);
 					}
 				}
@@ -181,13 +206,16 @@ private:
 	}
 
 	//! Eq.(197), page 63, inner bracket
+	//! Takes into account truncation
 	void inner197(DenseMatrixType& matrixTemp,const SymmetryFactorType& symm,size_t sip,const SparseMatrixType& A,const SparseMatrixType& prevf) const
 	{
-		matrixTemp.setTo(0);
+		size_t leftSize = std::min(prevf.row(),symm.left().split());
 
-		for (size_t aim1=0;aim1<prevf.row();aim1++) {
+		for (size_t aim1=0;aim1<leftSize;aim1++) {
+			for (size_t jj=0;jj<matrixTemp.n_col();++jj) matrixTemp(aim1,jj)=0;
 			for (int k=prevf.getRowPtr(aim1);k<prevf.getRowPtr(aim1+1);k++) {
 				size_t aipm1 = prevf.getCol(k);
+				if (aipm1>=leftSize) continue;
 				size_t aipm1sip = symm.left().pack(aipm1,sip);
 				for (int k2=A.getRowPtr(aipm1sip);k2<A.getRowPtr(aipm1sip+1);k2++) {
 					size_t aip = A.getCol(k2);
@@ -201,13 +229,13 @@ private:
 	{
 		if (auxStorage_(sip,bim1).row()!=0) return;
 
-		assert(prevf.size()>0);
-		size_t prevfRow = prevf[0].row();
-		for (size_t bim2=0;bim2<prevf.size();bim2++) {
-			assert(prevf[bim2].row()==prevfRow);
-		}
+//		assert(prevf.size()>0);
+//		size_t prevfRow = prevf[0].row();
+//		for (size_t bim2=0;bim2<prevf.size();bim2++) {
+//			assert(prevf[bim2].row()==prevfRow);
+//		}
 
-		DenseMatrixType matrixTemp(prevfRow,A.col());
+		DenseMatrixType matrixTemp(symm.left().split(),A.col());
 
 		inner197(matrixTemp,symm,sip,A,prevf[bim1]);
 		SparseMatrixType matrixSparse(matrixTemp);
@@ -232,6 +260,7 @@ private:
 
 	DataType data_;
 	typename ProgramGlobals::Matrix<SparseMatrixType>::Type auxStorage_;
+	typename ProgramGlobals::Matrix<DenseMatrixType>::Type auxStorage2_;
 
 }; // ContractedFactor
 
