@@ -67,7 +67,7 @@ public:
 	typedef ContractedFactor<MatrixProductOperatorType> ContractedFactorType;
 
 	ContractedPart(const MatrixProductStateType& abState,const MatrixProductOperatorType& h)
-	  : dataLeft_(abState.center()),dataRight_(abState.sites()-dataLeft_.size())
+	  : dataLeft_(abState.center()),dataRight_(abState.sites()-dataLeft_.size()-1)
 	{
 		// page 62, equations 192 and 193
 		for (size_t i=0;i<dataLeft_.size();i++) {

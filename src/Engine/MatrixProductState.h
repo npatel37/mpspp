@@ -82,7 +82,7 @@ public:
 		: symmNonconst_(new SymmetryLocalType(io)),
 		  symm_(*symmNonconst_),
 		  nsites_(symm_(0).super().block().size()),
-		  center_(1)
+		  center_(0)
 	{
 		io.rewind();
 		assert(nsites_>0);
