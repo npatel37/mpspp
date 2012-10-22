@@ -90,15 +90,13 @@ public:
 		ContractedPartType contracted(psi,model_.hamiltonian());
 		LeftRightSuperType lrs(psi,contracted);
 
-		infiniteDmrg(lrs);
-
 		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
 
 		size_t direction = TO_THE_RIGHT;
 		if (finiteLoops[0].stepLength<0) direction=TO_THE_LEFT;
 
 		size_t siteToAdd(psi.center()); // left-most site of B
-		if (direction==TO_THE_RIGHT) {
+		if (siteToAdd>0 && direction==TO_THE_RIGHT) {
 			siteToAdd--; // right-most site of A
 		}
 		// now stepCurrent_ is such that sitesIndices_[stepCurrent_] = siteToAdd
@@ -127,14 +125,6 @@ public:
 
 private:
 
-	void infiniteDmrg(LeftRightSuperType& lrs)
-	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need infiniteDmrg here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-	}
-
 	void finiteStep(LeftRightSuperType& lrs,size_t loopIndex)
 	{
 		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
@@ -149,7 +139,7 @@ private:
 //		wft_.setStage(direction);
 
 		int stepFinal = stepCurrent_+stepLength;
-		StepType step(lrs,model_);
+		StepType step(solverParams_,lrs,model_);
 		while(true) {
 			// FIXME: make it an assert below
 			if (size_t(stepCurrent_)>=sitesIndices_.size())

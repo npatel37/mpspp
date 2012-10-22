@@ -51,10 +51,9 @@ namespace Mpspp {
 
 class SymmetryFactor {
 
-	typedef SymmetryComponent SymmetryComponentType;
-
 public:
 
+	typedef SymmetryComponent SymmetryComponentType;
 	typedef typename SymmetryComponentType::IoInputType IoInputType;
 	typedef typename SymmetryComponentType::PairType PairType;
 

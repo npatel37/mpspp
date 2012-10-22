@@ -67,14 +67,7 @@ public:
 		leftSize_ = size()/divisor;
 	}
 
-//	void adjustCorner(size_t corner)
-//	{
-//		std::string str(__FILE__);
-//		str += " " + ttos(__LINE__) + "\n";
-//		str += "Need to write adjustCorner. I cannot go further until this is implemented\n";
-////		throw std::runtime_error(str.c_str());
-//		std::cerr<<str;
-//	}
+	size_t partitions() const { return partition_.size(); }
 
 	size_t partitionSize(size_t i) const
 	{
@@ -105,6 +98,12 @@ public:
 	size_t size() const
 	{
 		return quantumNumbers_.size();
+	}
+
+	size_t qn(size_t state) const
+	{
+		assert(state<quantumNumbers_.size());
+		return quantumNumbers_[state];
 	}
 
 	size_t split() const { return leftSize_; }

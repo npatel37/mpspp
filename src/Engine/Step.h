@@ -56,7 +56,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 namespace Mpspp {
 
 template<typename ModelType,
-		 template<typename,typename> class InternalProductTemplate>
+         template<typename,typename> class InternalProductTemplate>
 class Step {
 
 	typedef typename ModelType::MatrixProductOperatorType MatrixProductOperatorType;
@@ -66,13 +66,19 @@ class Step {
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ModelType::VectorType VectorType;
 	typedef typename ModelType::LeftRightSuperType LeftRightSuperType;
+	typedef typename LeftRightSuperType::SymmetryLocalType SymmetryLocalType;
+	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
+	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
+	static int const MAX_ = 100;
+	
 public:
 
-	Step(LeftRightSuperType& lrs,const ModelType& model)
+	Step(const ParametersSolverType& solverParams,LeftRightSuperType& lrs,const ModelType& model)
 	: progress_("Step",0),
+	  solverParams_(solverParams),
 	  lrs_(lrs),
 	  model_(model)
 	{}
@@ -107,11 +113,7 @@ private:
 		typedef PsimagLite::LanczosOrDavidsonBase<ParametersForSolverType,InternalProductType,VectorType> LanczosOrDavidsonBaseType;
 		typedef typename ModelType::ModelHelperType ModelHelperType;
 
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to set symmetry sector   here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
-		size_t symmetrySector = 0;
+		size_t symmetrySector = getSymmetrySector(direction);
 
 		ReflectionSymmetryType *rs = 0;
 		ModelHelperType modelHelper(lrs_,symmetrySector,currentSite,direction,model_.hamiltonian()(currentSite));
@@ -150,7 +152,67 @@ private:
 		lrs_.updateMps(currentSite,tmpVec,direction);
 	}
 
+	size_t getSymmetrySector(size_t direction) const
+	{
+		size_t center = lrs_.abState().center();
+		size_t sites = lrs_.symmetry()(center).super().block().size();
+		size_t targetQuantumNumber = getQuantumSector(sites,direction);
+		
+		SymmetryComponentType super = lrs_.symmetry()(center).super();
+		for (size_t i=0;i<super.partitions();i++) {
+			size_t state = super.partitionOffset(i);
+			size_t q = super.qn(state);
+			if (q == targetQuantumNumber) return i;
+		}
+		assert(false);
+		return -1;
+	}
+	
+	size_t getQuantumSector(size_t sites,size_t direction) const
+	{
+		return (solverParams_.targetQuantumNumbers.size()>0) ?
+				getQuantumSectorT(sites,direction) :
+				getQuantumSectorUd(sites,direction);
+	}
+
+	size_t getQuantumSectorT(size_t sites,size_t direction) const
+	{
+		std::vector<size_t> targetQuantumNumbers(solverParams_.targetQuantumNumbers.size());
+		for (size_t ii=0;ii<targetQuantumNumbers.size();ii++) 
+			targetQuantumNumbers[ii]=size_t(round(solverParams_.targetQuantumNumbers[ii]*sites));
+		return getQuantumSector(targetQuantumNumbers,direction);
+	}
+
+	size_t getQuantumSectorUd(size_t sites,size_t direction) const
+	{
+		std::vector<size_t> targetQuantumNumbers(2);
+
+		targetQuantumNumbers[0]=solverParams_.electronsUp;
+		targetQuantumNumbers[1]=solverParams_.electronsDown;
+
+		return getQuantumSector(targetQuantumNumbers,direction);
+	}
+
+	size_t getQuantumSector(const std::vector<size_t>& targetQuantumNumbers,size_t direction) const
+	{
+		std::ostringstream msg;
+		msg<<"Integer target quantum numbers are: ";
+		for (size_t ii=0;ii<targetQuantumNumbers.size();ii++)
+			msg<<targetQuantumNumbers[ii]<<" ";
+		progress_.printline(msg,std::cout);
+		//if (direction==INFINITE) io_.printVector(targetQuantumNumbers,"TargetedQuantumNumbers");
+		return encodeQuantumNumber(targetQuantumNumbers);
+	}
+	
+	static size_t encodeQuantumNumber(const std::vector<size_t>& v)
+	{
+		size_t x= v[0] + v[1]*MAX_;
+		if (v.size()==3) x += v[2]*MAX_*MAX_;
+		return x;
+	}
+
 	PsimagLite::ProgressIndicator progress_;
+	const ParametersSolverType& solverParams_;
 	LeftRightSuperType& lrs_;
 	const ModelType& model_;
 }; // Step

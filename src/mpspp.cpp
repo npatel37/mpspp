@@ -26,6 +26,7 @@ const std::string license=
  *
  */
 
+#include <unistd.h>
 #include "ProgramGlobals.h"
 #include "InputCheck.h"
 #include "Provenance.h"

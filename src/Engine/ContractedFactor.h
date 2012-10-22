@@ -156,10 +156,11 @@ private:
 						dataMatrix(ai,aip) += std::conj(Atransp.getValue(k)) * matrix2(aim1,aip);
 					}
 				}
-				std::cerr<<"Testing ai="<<ai<<" out of "<<A.col()<<"\n";
+				//std::cerr<<"Testing ai="<<ai<<" out of "<<A.col()<<"\n";
 			}
 			fullMatrixToCrsMatrix(data_[bi],dataMatrix);
 		}
+
 		auxStorage_.reset(0,0);
 		auxStorage2_.reset(0,0);
 	}
