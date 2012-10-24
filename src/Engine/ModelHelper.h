@@ -80,10 +80,7 @@ public:
 
 	size_t size() const
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need size(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		return lrs_.symmetry()(currentSite_).super().partitionSize(symmetrySector_);
 	}
 
 	size_t symmetrySector() const { return symmetrySector_; }

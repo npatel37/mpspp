@@ -52,6 +52,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "LanczosSolver.h"
 #include "DavidsonSolver.h"
 #include <vector>
+#include "StatePredictor.h"
 
 namespace Mpspp {
 
@@ -69,6 +70,7 @@ class Step {
 	typedef typename LeftRightSuperType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
+	typedef StatePredictor<RealType> StatePredictorType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -80,7 +82,8 @@ public:
 	: progress_("Step",0),
 	  solverParams_(solverParams),
 	  lrs_(lrs),
-	  model_(model)
+	  model_(model),
+	  statePredictor_()
 	{}
 
 	//! Moves the center of orthogonality by one to the right
@@ -141,10 +144,7 @@ private:
 		RealType energyTmp = 0;
 		VectorType tmpVec(lanczosHelper.rank());
 		VectorType initialVector(lanczosHelper.rank());
-		std::string str2(__FILE__);
-		str2 += " " + ttos(__LINE__) + "\n";
-		str2 += "Initial vector must be set here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str2.c_str());
+		statePredictor_.createRandomVector(initialVector,0,initialVector.size());
 
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
@@ -215,6 +215,7 @@ private:
 	const ParametersSolverType& solverParams_;
 	LeftRightSuperType& lrs_;
 	const ModelType& model_;
+	StatePredictorType statePredictor_;
 }; // Step
 
 } // namespace Mpspp
