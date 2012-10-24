@@ -59,7 +59,6 @@ public:
 		: rng_(3433117)
 	{}
 
-
 	template<typename SomeVectorType>
 	void createRandomVector(SomeVectorType& y,size_t offset,size_t final) const
 	{
@@ -79,12 +78,12 @@ public:
 
 private:
 
-	void myRandomT(std::complex<RealType> &value) const
+	void myRandomT(std::complex<RealType>& value) const
 	{
 		value = std::complex<RealType>(rng_() - 0.5, rng_() - 0.5);
 	}
 
-	void myRandomT(RealType &value) const
+	void myRandomT(RealType& value) const
 	{
 		value = rng_() - 0.5;
 	}

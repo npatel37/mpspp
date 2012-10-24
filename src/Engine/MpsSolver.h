@@ -195,7 +195,6 @@ private:
 		progress_.printline(msg2,std::cout);
 	}
 
-
 	const ParametersSolverType& solverParams_;
 	const ModelBaseType& model_;
 	ConcurrencyType& concurrency_;

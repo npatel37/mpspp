@@ -118,6 +118,8 @@ public:
 		return data_[b1];
 	}
 
+	size_t size() const { return data_.size(); }
+
 private:
 
 	//! Eq.(197), page 63

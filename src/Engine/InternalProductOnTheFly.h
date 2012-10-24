@@ -55,7 +55,9 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 namespace Mpspp {
 	template<typename T,typename ModelType>
 	class InternalProductOnTheFly {
+
 	public:
+
 		typedef T HamiltonianElementType;
 		typedef T value_type;
 		typedef typename ModelType::ModelHelperType ModelHelperType;
@@ -68,7 +70,6 @@ namespace Mpspp {
 		{
 			model_ = model;
 			modelHelper_=modelHelper;
-			
 		}
 
 		size_t rank() const { return modelHelper_->size(); }
@@ -84,6 +85,7 @@ namespace Mpspp {
 		void reflectionSector(size_t p) {  }
 
 	private:
+
 		ModelType const *model_;
 		ModelHelperType const *modelHelper_;
 	}; // class InternalProductOnTheFly

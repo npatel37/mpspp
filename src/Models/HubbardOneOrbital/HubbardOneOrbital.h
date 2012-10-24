@@ -169,10 +169,7 @@ public:
 
 	virtual void matrixVectorProduct(VectorType& x,const VectorType& y,const ModelHelperType& modelHelper) const
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need matrixVectorProduct here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		return modelHelper.matrixVectorProduct(x,y);
 	}
 
 	virtual const ParametersSolverType& solverParams() const { return solverParams_; }

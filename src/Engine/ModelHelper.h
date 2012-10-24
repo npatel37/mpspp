@@ -51,6 +51,8 @@ namespace Mpspp {
 template<typename LeftRightSuperType>
 class ModelHelper {
 
+	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
+
 public:
 
 	typedef typename LeftRightSuperType::RealType RealType;
@@ -60,6 +62,7 @@ public:
 	typedef typename LeftRightSuperType::MatrixProductStateType MatrixProductStateType;
 	typedef typename MatrixProductStateType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
+	typedef typename SymmetryFactorType::PairType PairType;
 	typedef typename ContractedPartType::SparseMatrixType SparseMatrixType;
 	typedef typename ProgramGlobals::Vector<ComplexOrRealType>::Type VectorType;
 	typedef typename LeftRightSuperType::MatrixProductOperatorType MatrixProductOperatorType;
@@ -101,6 +104,61 @@ public:
 	const ContractedFactorType& contractedFactorRight() const
 	{
 		return lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
+	}
+
+	//! Eq. (201) but very modified
+	void matrixVectorProduct(VectorType& x,const VectorType& y) const
+	{
+		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
+		size_t total = symmetry_.super().partitionSize(symmetrySector_);
+
+		const ContractedFactorType& cL = contractedFactorLeft();
+		const ContractedFactorType& cR = contractedFactorRight();
+		const SymmetryFactorType& symm = symmetry_;
+		for (size_t blm1=0;blm1<cL.size();blm1++) {
+			const SparseMatrixType& l1 = cL(blm1);
+			for (size_t bl=0;bl<cR.size();bl++) {
+				const SparseMatrixType& w = hamiltonian_(blm1,bl);
+				const SparseMatrixType& r1 = cR(bl);
+				for (size_t i=0;i<total;i++) {
+					PairType ab = symm.super().unpack(i+offset);
+					size_t alm1=0;
+					size_t sigmaL=0;
+					size_t alB=0;
+					if (direction_==TO_THE_RIGHT) {
+						PairType tmpPair1 = symm.left().unpack(ab.first);
+						alm1=tmpPair1.first;
+						sigmaL=tmpPair1.second;
+						alB = ab.second;
+					} else {
+						PairType tmpPair1 = symm.right().unpack(ab.second);
+						alB=tmpPair1.second;
+						sigmaL=tmpPair1.first;
+						alm1=ab.first;
+					}
+
+					for (int k1=l1.getRowPtr(alm1);k1<l1.getRowPtr(alm1+1);k1++) {
+						size_t alm1p=l1.getCol(k1);
+						for (int kw=w.getRowPtr(sigmaL);kw<w.getRowPtr(sigmaL+1);kw++) {
+							size_t sigmaLp=w.getCol(kw);
+							for (int k2=r1.getRowPtr(alB);k2<r1.getRowPtr(alB+1);k2++) {
+								size_t alBp = r1.getCol(k2);
+								size_t j = 0;
+								if (direction_==TO_THE_RIGHT) {
+									size_t tmp1 = symm.left().pack(alm1p,sigmaLp);
+									j = symm.super().pack(tmp1,alBp);
+								} else {
+									size_t tmp1 = symm.right().pack(sigmaLp,alBp);
+									j = symm.super().pack(alm1,tmp1);
+								}
+								if (j<offset || j>=offset+total) continue;
+								x[i] += y[j-offset]*l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2);
+							} // k2 right
+						} // kw Hamiltonian
+					} // k1 left
+				} // symmetry sector
+			} // bl
+		} // blm1
 	}
 
 private:
