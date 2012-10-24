@@ -161,6 +161,75 @@ public:
 		} // blm1
 	}
 
+	//! Used only for stored option
+	void fullHamiltonian(SparseMatrixType& matrix) const
+	{
+		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
+		size_t total = symmetry_.super().partitionSize(symmetrySector_);
+
+		matrix.resize(total,total);
+		const ContractedFactorType& cL = contractedFactorLeft();
+		const ContractedFactorType& cR = contractedFactorRight();
+		const SymmetryFactorType& symm = symmetry_;
+		VectorType v(total,0);
+		size_t counter = 0;
+		for (size_t i=0;i<total;i++) {
+			matrix.setRow(i,counter);
+			for (size_t blm1=0;blm1<cL.size();blm1++) {
+				const SparseMatrixType& l1 = cL(blm1);
+				for (size_t bl=0;bl<cR.size();bl++) {
+					const SparseMatrixType& w = hamiltonian_(blm1,bl);
+					const SparseMatrixType& r1 = cR(bl);
+
+					PairType ab = symm.super().unpack(i+offset);
+					size_t alm1=0;
+					size_t sigmaL=0;
+					size_t alB=0;
+					if (direction_==TO_THE_RIGHT) {
+						PairType tmpPair1 = symm.left().unpack(ab.first);
+						alm1=tmpPair1.first;
+						sigmaL=tmpPair1.second;
+						alB = ab.second;
+					} else {
+						PairType tmpPair1 = symm.right().unpack(ab.second);
+						alB=tmpPair1.second;
+						sigmaL=tmpPair1.first;
+						alm1=ab.first;
+					}
+
+					for (int k1=l1.getRowPtr(alm1);k1<l1.getRowPtr(alm1+1);k1++) {
+						size_t alm1p=l1.getCol(k1);
+						for (int kw=w.getRowPtr(sigmaL);kw<w.getRowPtr(sigmaL+1);kw++) {
+							size_t sigmaLp=w.getCol(kw);
+							for (int k2=r1.getRowPtr(alB);k2<r1.getRowPtr(alB+1);k2++) {
+								size_t alBp = r1.getCol(k2);
+								size_t j = 0;
+								if (direction_==TO_THE_RIGHT) {
+									size_t tmp1 = symm.left().pack(alm1p,sigmaLp);
+									j = symm.super().pack(tmp1,alBp);
+								} else {
+									size_t tmp1 = symm.right().pack(sigmaLp,alBp);
+									j = symm.super().pack(alm1,tmp1);
+								}
+								if (j<offset || j>=offset+total) continue;
+								v[j-offset] += l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2);
+							} // k2 right
+						} // kw Hamiltonian
+					} // k1 left
+				} // bl
+			} // blm1
+			for (size_t j=0;j<v.size();j++) {
+				if (fabs(v[j])<1e-6) continue;
+				matrix.pushCol(j);
+				matrix.pushValue(v[j]);
+				v[j]=0;
+				counter++;
+			}
+		} // symmetry sector
+		matrix.setRow(total,counter);
+		matrix.checkValidity();
+	}
+
 private:
 
 	const LeftRightSuperType& lrs_;
