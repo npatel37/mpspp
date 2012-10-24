@@ -67,16 +67,19 @@ public:
 	typedef ContractedFactor<MatrixProductOperatorType> ContractedFactorType;
 
 	ContractedPart(const MatrixProductStateType& abState,const MatrixProductOperatorType& h)
-	  : dataLeft_(abState.center()),dataRight_(abState.sites()-dataLeft_.size()-1)
+	  : dataLeft_(abState.center()+1),dataRight_(abState.sites()-dataLeft_.size()+1)
 	{
 		// page 62, equations 192 and 193
-		for (size_t i=0;i<dataLeft_.size();i++) {
-			dataLeft_[i].init(abState(i),h(i),i,PART_LEFT,(i>0) ? &dataLeft_[i-1] : 0);
+		assert(dataLeft_.size()>0);
+		dataLeft_[0].init(abState(0),h(0),0,PART_LEFT,0);
+		for (size_t i=1;i<dataLeft_.size();i++) {
+			dataLeft_[i].init(abState(i-1),h(i-1),i,PART_LEFT,&dataLeft_[i-1]);
 			std::cerr<<"Testing: ContracedPart (left) i="<<i<<" out of "<<dataLeft_.size()<<"\n";
 		}
-		size_t center = dataLeft_.size();
-		for (size_t i=0;i<dataRight_.size();i++) {
-			dataRight_[i].init(abState(i+center),h(i+center),i+center,PART_RIGHT,(i>0) ? &dataRight_[i-1] : 0);
+		size_t center = abState.center();
+		dataRight_[0].init(abState(center),h(center),center,PART_RIGHT,0);
+		for (size_t i=1;i<dataRight_.size();i++) {
+			dataRight_[i].init(abState(i+center-1),h(i+center-1),i+center,PART_RIGHT,&dataRight_[i-1]);
 			std::cerr<<"Testing: ContracedPart (right) i="<<i<<" out of "<<dataRight_.size()<<"\n";
 		}
 	}
@@ -93,7 +96,12 @@ public:
 
 	const ContractedFactorType& operator()(size_t currentSite,size_t leftOrRight) const
 	{
-		return (leftOrRight == PART_LEFT) ? dataLeft_[currentSite] : dataRight_[currentSite];
+		if (leftOrRight == PART_LEFT)
+			assert(currentSite<dataLeft_.size());
+		else
+			assert(currentSite<dataRight_.size());
+
+		return (leftOrRight == PART_LEFT) ? dataLeft_[currentSite] : dataRight_[dataRight_.size()-currentSite-1];
 	}
 
 private:

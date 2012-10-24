@@ -78,7 +78,7 @@ public:
 			  size_t leftOrRight,
 			  const ThisType* previous)
 	{
-		DataType prevfFirst;
+		//DataType prevfFirst;
 		const DataType* prevf = 0;
 
 		const SymmetryFactorType& symm = AorB.symm();
@@ -86,8 +86,10 @@ public:
 		if (previous==0) {
 			SparseMatrixType m(1,1);
 			m.makeDiagonal(1,1);
-			prevfFirst.push_back(m);
-			prevf = &prevfFirst;
+			data_.push_back(m);
+			return;
+			//prevfFirst.push_back(m);
+			//prevf = &prevfFirst;
 		} else {
 			prevf = &(previous->data_);
 		}
