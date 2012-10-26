@@ -159,16 +159,6 @@ public:
 		return hamiltonian_;
 	}
 
-	virtual void fullHamiltonian(SparseMatrixType& matrix,const ModelHelperType& modelHelper) const
-	{
-		modelHelper.fullHamiltonian(matrix);
-	}
-
-	virtual void matrixVectorProduct(VectorType& x,const VectorType& y,const ModelHelperType& modelHelper) const
-	{
-		modelHelper.matrixVectorProduct(x,y);
-	}
-
 	virtual const ParametersSolverType& solverParams() const { return solverParams_; }
 
 	virtual const GeometryType& geometry() const { return geometry_; }

@@ -129,23 +129,24 @@ private:
 	{
 		size_t hilbertSize = h.hilbertSize();
 		size_t leftBlockSize = A.row()/hilbertSize;
+		size_t hsize = h(0,0).col();
+		size_t hsize2 = h.n_row();
 
-		data_.resize(prevf.size());
+		data_.resize(hsize2);
 
 		DenseMatrixType dataMatrix(A.col(),A.col());
 
-		size_t hsize = h(0,0).col();
-		auxStorage_.resize(hsize,prevf.size());
-		auxStorage2_.resize(hsize,prevf.size());
+		auxStorage_.resize(hsize,hsize2);
+		auxStorage2_.resize(hsize,hsize2);
 
 		size_t siSize = (leftBlockSize>1) ? hilbertSize : symm.left().split();
 
-		for (size_t bi=0;bi<prevf.size();bi++)
+		for (size_t bi=0;bi<hsize2;bi++)
 			for (size_t si=0;si<siSize;si++)
 				saveMiddle197(symm,si,bi,A,h,prevf,leftOrRight);
 
 
-		for (size_t bi=0;bi<prevf.size();bi++) {
+		for (size_t bi=0;bi<hsize2;bi++) {
 			dataMatrix.setTo(0);
 			for (size_t ai=0;ai<A.col();ai++) {
 				for (int k=Atransp.getRowPtr(ai);k<Atransp.getRowPtr(ai+1);k++) {
@@ -188,10 +189,13 @@ private:
 	{
 		matrix2.setTo(0);
 
-		for (size_t bim1=0;bim1<prevf.size();bim1++) {
+		size_t hsize2 = (leftOrRight==PART_LEFT) ? h.n_row() : h.n_col();
+
+		for (size_t bim1=0;bim1<hsize2;bim1++) {
 			size_t bFirst = (leftOrRight==PART_LEFT) ? bim1  : bi;
 			size_t bSecond =(leftOrRight==PART_LEFT) ? bi : bim1;
 			const SparseMatrixType& wtmp = h(bFirst,bSecond);
+			if (wtmp.row()==0) continue;
 
 			for (int ks=wtmp.getRowPtr(si);ks<wtmp.getRowPtr(si+1);ks++) {
 				size_t sip = wtmp.getCol(ks);
@@ -206,7 +210,7 @@ private:
 					}
 				}
 			}
-			//std::cerr<<"Testing bim1="<<bim1<<" out of "<<prevf.size()<<"\n";
+			//std::cerr<<"Testing bim1="<<bim1<<" out of "<<hsize2<<"\n";
 		}
 	}
 
@@ -234,9 +238,9 @@ private:
 	{
 		if (auxStorage_(sip,bim1).row()!=0) return;
 
-//		assert(prevf.size()>0);
+//		assert(hsize2>0);
 //		size_t prevfRow = prevf[0].row();
-//		for (size_t bim2=0;bim2<prevf.size();bim2++) {
+//		for (size_t bim2=0;bim2<hsize2;bim2++) {
 //			assert(prevf[bim2].row()==prevfRow);
 //		}
 

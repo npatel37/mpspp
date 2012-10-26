@@ -118,7 +118,7 @@ public:
 		for (size_t blm1=0;blm1<cL.size();blm1++) {
 			const SparseMatrixType& l1 = cL(blm1);
 			for (size_t bl=0;bl<cR.size();bl++) {
-				const SparseMatrixType& w = hamiltonian_(blm1,bl);
+				const SparseMatrixType& w =  hamiltonian_(bl,blm1);
 				const SparseMatrixType& r1 = cR(bl);
 				for (size_t i=0;i<total;i++) {
 					PairType ab = symm.super().unpack(i+offset);
@@ -178,7 +178,7 @@ public:
 			for (size_t blm1=0;blm1<cL.size();blm1++) {
 				const SparseMatrixType& l1 = cL(blm1);
 				for (size_t bl=0;bl<cR.size();bl++) {
-					const SparseMatrixType& w = hamiltonian_(blm1,bl);
+					const SparseMatrixType& w = hamiltonian_(bl,blm1);
 					const SparseMatrixType& r1 = cR(bl);
 
 					PairType ab = symm.super().unpack(i+offset);
