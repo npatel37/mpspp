@@ -62,6 +62,7 @@ class ContractedFactor {
 	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type DenseMatrixType;
 	typedef typename MatrixProductStateType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::PairType PairType;
+	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -72,10 +73,20 @@ public:
 
 	typedef typename ProgramGlobals::Vector<SparseMatrixType>::Type DataType;
 
-	void init(const MpsFactorType& AorB,
+	void initRight(const MpsFactorType& AorB,
 			  const MpoFactorType& h,
 			  size_t site,
-			  size_t leftOrRight,
+			  const ThisType* previous)
+	{
+		data_.resize(h.n_row());
+		for (size_t b1=0;b1<data_.size();b1++) {
+			initRight2(data_[b1],AorB,b1,h);
+		}
+	}
+
+	void initLeft(const MpsFactorType& AorB,
+			  const MpoFactorType& h,
+			  size_t site,
 			  const ThisType* previous)
 	{
 		//DataType prevfFirst;
@@ -97,11 +108,11 @@ public:
 		SparseMatrixType AorBtransp;
 		transposeConjugate(AorBtransp,AorB());
 
-		if (leftOrRight==PART_LEFT) {
-			nextF(symm,AorB(),AorBtransp,h,*prevf,leftOrRight);
-		} else {
-			nextF(symm,AorBtransp,AorB(),h,*prevf,leftOrRight);
-		}
+		//if (leftOrRight==PART_LEFT) {
+			nextF(symm,AorB(),AorBtransp,h,*prevf,PART_LEFT);
+//		} else {
+//			nextF(symm,AorBtransp,AorB(),h,*prevf,leftOrRight);
+//		}
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
@@ -123,6 +134,32 @@ public:
 	size_t size() const { return data_.size(); }
 
 private:
+
+	void initRight2(SparseMatrixType& m,const MpsFactorType& AorB,size_t b1,const MpoFactorType& h)
+	{
+		MatrixType m2(AorB().row(),AorB().col());
+		for (size_t a1=0;a1<m2.n_row();a1++) {
+			for (size_t a1p=0;a1p<m2.n_row();a1p++) {
+				m2(a1,a1p)=initRight3(a1,a1p,b1,AorB,h);
+			}
+		}
+		fullMatrixToCrsMatrix(m,m2);
+	}
+
+	ComplexOrRealType initRight3(size_t a1,size_t a1p,size_t b1,const MpsFactorType& AorB,const MpoFactorType& h) const
+	{
+		ComplexOrRealType sum = 0;
+		MatrixType w;
+		crsMatrixToFullMatrix(w,h(b1,0));
+		for (int k=AorB().getRowPtr(a1);k<AorB().getRowPtr(a1+1);k++) {
+			size_t s2 = AorB().getCol(k);
+			for (int kp=AorB().getRowPtr(a1p);kp<AorB().getRowPtr(a1p+1);kp++) {
+				size_t s2p = AorB().getCol(kp);
+				sum += std::conj(AorB().getValue(k)) * w(s2,s2p) * AorB().getValue(kp);
+			}
+		}
+		return sum;
+	}
 
 	//! Eq.(197), page 63
 	void nextF(const SymmetryFactorType& symm,const SparseMatrixType& A,const SparseMatrixType& Atransp,const MpoFactorType& h,const DataType& prevf,size_t leftOrRight)

@@ -134,6 +134,7 @@ private:
 		model_.setSymmetry(symm,0);
 		MatrixProductStateType psi(1,symm);
 		psi.setRandom(0);
+		ContractedPartType contracted(psi,model_.hamiltonian());
 	}
 
 	void finiteStep(LeftRightSuperType& lrs,size_t loopIndex)
