@@ -58,6 +58,9 @@ public:
 	typedef typename SymmetryFactorType::PairType PairType;
 	typedef typename SymmetryFactorType::IoInputType IoInputType;
 
+	SymmetryLocal()
+	{}
+
 	SymmetryLocal(IoInputType& io)
 	{
 		size_t n = 0;
@@ -81,6 +84,13 @@ public:
 	{
 		assert(site<data_.size());
 		return data_[site];
+	}
+
+	void set(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
+	{
+		SymmetryFactorType symmFactor(hilbert,site,quantumNumbers);
+		data_.clear();
+		data_.push_back(symmFactor);
 	}
 
 private:

@@ -65,14 +65,13 @@ typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProduct
 template<typename ModelBaseType,
 template<typename,typename> class InternalProductTemplate,
 typename ConcurrencyType>
-void mainLoop(typename ModelBaseType::MatrixProductOperatorType::MatrixProductStateType& psi,
-const typename ModelBaseType::ParametersSolverType& mpsSolverParams,
+void mainLoop(const typename ModelBaseType::ParametersSolverType& mpsSolverParams,
 const ModelBaseType& model,
 ConcurrencyType& concurrency)
 {
 	Mpspp::MpsSolver<ModelBaseType,InternalProductTemplate> mpsSolver(mpsSolverParams,model,concurrency);
 
-	mpsSolver.computeGroundState(psi);
+	mpsSolver.computeGroundState();
 
 //	const MatrixProductOperatorType& H = model.hamiltonian();
 
@@ -128,18 +127,18 @@ int main(int argc,char *argv[])
 
 	const ModelBaseType& model = modelSelector(mpsSolverParams,io,geometry,concurrency);
 
-	typename MatrixProductStateType::IoInputType ioForMps(mpsSolverParams.initialMps);
+	//typename MatrixProductStateType::IoInputType ioForMps(mpsSolverParams.initialMps);
 
-	MatrixProductStateType psi(ioForMps);
+	//MatrixProductStateType psi(ioForMps);
 
-	std::cerr<<"Testing: mps read from disk successfully\n";
+//	std::cerr<<"Testing: mps read from disk successfully\n";
 
 	if (mpsSolverParams.options.find("InternalProductStored")!=std::string::npos) {
-		mainLoop<ModelBaseType,Mpspp::InternalProductStored,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
+		mainLoop<ModelBaseType,Mpspp::InternalProductStored,ConcurrencyType>(mpsSolverParams,model,concurrency);
 		//} else if (mpsSolverParams.options.find("InternalProductKron")!=std::string::npos) {
 		//	mainLoop<ModelBaseType,Mpspp::InternalProductKron,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
 	} else {
-		mainLoop<ModelBaseType,Mpspp::InternalProductOnTheFly,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
+		mainLoop<ModelBaseType,Mpspp::InternalProductOnTheFly,ConcurrencyType>(mpsSolverParams,model,concurrency);
 	}
 }
 

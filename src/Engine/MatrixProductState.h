@@ -66,17 +66,8 @@ public:
 	typedef typename MpsFactorType::SparseMatrixType SparseMatrixType;
 
 	MatrixProductState(size_t nsites,const SymmetryLocalType& symm)
-	: nsites_(nsites),symmNonconst_(0),symm_(symm),center_(0)
+	: symmNonconst_(0),symm_(symm),nsites_(nsites),center_(0)
 	{}
-
-//	MatrixProductState(size_t nsites)
-//	: nsites_(nsites),symmNonconst_(new SymmetryLocalType()),symm_(*symmNonconst_),center_(0)
-//	{
-//		std::string str(__FILE__);
-//		str += " " + ttos(__LINE__) + "\n";
-//		str += "Need to set data_ here. I cannot go further until this is implemented\n";
-//		throw std::runtime_error(str.c_str());
-//	}
 
 	MatrixProductState(IoInputType& io)
 		: symmNonconst_(new SymmetryLocalType(io)),
@@ -98,6 +89,13 @@ public:
 			delete symmNonconst_;
 			symmNonconst_=0;
 		}
+	}
+
+	void setRandom(size_t site)
+	{
+		MpsFactorType mpsFactor(symm_(site),site);
+		mpsFactor.setRandom(site);
+		data_.resize(1,mpsFactor);
 	}
 
 	size_t center() const

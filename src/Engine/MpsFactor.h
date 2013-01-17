@@ -47,6 +47,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 #include "VectorWithOffset.h"
 #include "ProgramGlobals.h"
+#include "RandomForTests.h"
 
 namespace Mpspp {
 
@@ -63,9 +64,14 @@ public:
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
 	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
 	typedef typename SymmetryFactorType::IoInputType IoInputType;
+	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
+
+	MpsFactor(const SymmetryFactorType& symm,size_t site)
+		: symm_(symm),rng_(0)
+	{}
 
 	MpsFactor(IoInputType& io,const SymmetryFactorType& symm,size_t site)
-	: symm_(symm)
+	: symm_(symm),rng_(0)
 	{
 //		if (site==0 || site+1 ==symm_.super().block().size()) {
 //			std::string str(__FILE__);
@@ -91,6 +97,15 @@ public:
 		this->data_ = other.data_;
 		//this->symm_ = other.symm_;
 		return *this;
+	}
+
+	void setRandom(size_t site)
+	{
+		MatrixType m(symm_.right().size(),symm_.right().size());
+		for (size_t i=0;i<m.n_row();i++)
+			for (size_t j=0;j<m.n_col();j++)
+				m(i,j) = rng_();
+		fullMatrixToCrsMatrix(data_,m);
 	}
 
 	void updateFromVector(const VectorType& v,size_t direction)
@@ -121,6 +136,7 @@ private:
 		}
 	}
 	const SymmetryFactorType& symm_;
+	RandomNumberGeneratorType rng_;
 	SparseMatrixType data_;
 }; // MpsFactor
 

@@ -92,6 +92,8 @@ class HubbardOneOrbital : public ModelBase<ParametersSolverType,
 
 	typedef ParametersModelHubbard<RealType> ParametersModelType;
 
+	static const int MAX_SITES = 100;
+
 public:
 
 	enum {SPIN_UP,SPIN_DOWN};
@@ -104,6 +106,7 @@ public:
 	  io_(io),
 	  geometry_(geometry),
 	  concurrency_(concurrency),
+	  hilbert_(4),
 	  mp_(io),
 	  hamiltonian_(geometry_.numberOfSites())
 	{
@@ -111,18 +114,17 @@ public:
 		RealType tiip1 = 1.0;
 		size_t n = hamiltonian_.size();
 		size_t wdim = 4;
-		size_t hilbert = 4;
 
-		SparseMatrixType identity(hilbert,hilbert);
-		identity.makeDiagonal(hilbert,1.0);
-		SparseMatrixType cup(hilbert,hilbert);
+		SparseMatrixType identity(hilbert_,hilbert_);
+		identity.makeDiagonal(hilbert_,1.0);
+		SparseMatrixType cup(hilbert_,hilbert_);
 		fillDestructionMatrix(cup,SPIN_UP);
-		SparseMatrixType cdaggerUp(hilbert,hilbert);
+		SparseMatrixType cdaggerUp(hilbert_,hilbert_);
 		transposeConjugate(cdaggerUp,cup);
 
-		SparseMatrixType cdown(hilbert,hilbert);
+		SparseMatrixType cdown(hilbert_,hilbert_);
 		fillDestructionMatrix(cdown,SPIN_DOWN);
-		SparseMatrixType cdaggerDown(hilbert,hilbert);
+		SparseMatrixType cdaggerDown(hilbert_,hilbert_);
 		transposeConjugate(cdaggerDown,cdown);
 
 		SparseMatrixType nupndown = (cdaggerUp*cup) * (cdaggerDown*cdown);
@@ -163,6 +165,19 @@ public:
 
 	virtual const GeometryType& geometry() const { return geometry_; }
 
+	virtual void setSymmetry(SymmetryLocalType& symm,size_t site) const
+	{
+		std::vector<size_t> quantumNumbers;
+		quantumNumbers.push_back(0);
+		quantumNumbers.push_back(1);
+		quantumNumbers.push_back(MAX_SITES);
+		quantumNumbers.push_back(1+MAX_SITES);
+		symm.set(hilbert_,site,quantumNumbers);
+//		std::vector<size_t> partition_;
+//		ProgramGlobals::Vector<size_t>::Type permutation_;
+//		ProgramGlobals::Vector<size_t>::Type permutationInverse_;
+	}
+
 private:
 
 	void fillDestructionMatrix(SparseMatrixType& cm,size_t spin) const
@@ -182,6 +197,7 @@ private:
 	InputValidatorType& io_;
 	const GeometryType& geometry_;
 	ConcurrencyType& concurrency_;
+	size_t hilbert_;
 	ParametersModelType mp_;
 	MatrixProductOperatorType hamiltonian_;
 

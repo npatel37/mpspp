@@ -69,6 +69,12 @@ public:
 		std::cerr<<str;
 	}
 
+	SymmetryFactor(size_t hilbert,size_t site,const std::vector<size_t>& quantumNumbers)
+		: left_(hilbert,site,quantumNumbers),
+		  right_(hilbert,site,quantumNumbers),
+		  super_(hilbert,site,quantumNumbers)
+	{}
+
 //	void adjustCorner(size_t corner)
 //	{
 //		super_.adjustCorner(corner);

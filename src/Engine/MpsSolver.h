@@ -66,6 +66,7 @@ class MpsSolver {
 	typedef typename ParametersSolverType::FiniteLoopsType FiniteLoopsType;
 	typedef typename ModelBaseType::LeftRightSuperType LeftRightSuperType;
 	typedef typename LeftRightSuperType::ContractedPartType ContractedPartType;
+	typedef typename ModelBaseType::SymmetryLocalType SymmetryLocalType;
 	typedef Step<ModelBaseType,InternalProductTemplate> StepType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
@@ -85,45 +86,55 @@ public:
 		for (size_t i=0;i<sitesIndices_.size();i++) sitesIndices_[i] = i;
 	}
 
-	void computeGroundState(MatrixProductStateType& psi)
+	void computeGroundState()
 	{
-		ContractedPartType contracted(psi,model_.hamiltonian());
-		LeftRightSuperType lrs(psi,contracted);
+		growLattice();
 
-		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
+//		ContractedPartType contracted(psi,model_.hamiltonian());
+//		LeftRightSuperType lrs(psi,contracted);
 
-		size_t direction = TO_THE_RIGHT;
-		if (finiteLoops[0].stepLength<0) direction=TO_THE_LEFT;
+//		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
 
-		size_t siteToAdd(psi.center()); // left-most site of B
-		if (siteToAdd>0 && direction==TO_THE_RIGHT) {
-			siteToAdd--; // right-most site of A
-		}
-		// now stepCurrent_ is such that sitesIndices_[stepCurrent_] = siteToAdd
-		// so:
-		int sc = PsimagLite::isInVector(sitesIndices_,siteToAdd);
-		// FIXME: make line below an assert instead of a throw
-		if (sc<0) throw std::runtime_error("finiteDmrgLoops(...): internal error: siteIndices_\n");
-		stepCurrent_ = sc;
+//		size_t direction = TO_THE_RIGHT;
+//		if (finiteLoops[0].stepLength<0) direction=TO_THE_LEFT;
 
-		// ok, now we're ready to do the finite loops
-		for (size_t i=0;i<finiteLoops.size();i++)  {
-			std::ostringstream msg;
-			msg<<"Finite loop number "<<i<<" with l="<<finiteLoops[i].stepLength;
-			msg<<" keptStates="<<finiteLoops[i].keptStates;
-			progress_.printline(msg,std::cout);
-			if (i>0) {
-				int sign = finiteLoops[i].stepLength*finiteLoops[i-1].stepLength;
-				if (sign>0) {
-						if (finiteLoops[i].stepLength>0) stepCurrent_++;
-						if (finiteLoops[i].stepLength<0) stepCurrent_--;
-				}
-			}
-			finiteStep(lrs,i);
-		}
+//		size_t siteToAdd(psi.center()); // left-most site of B
+//		if (siteToAdd>0 && direction==TO_THE_RIGHT) {
+//			siteToAdd--; // right-most site of A
+//		}
+//		// now stepCurrent_ is such that sitesIndices_[stepCurrent_] = siteToAdd
+//		// so:
+//		int sc = PsimagLite::isInVector(sitesIndices_,siteToAdd);
+//		// FIXME: make line below an assert instead of a throw
+//		if (sc<0) throw std::runtime_error("finiteDmrgLoops(...): internal error: siteIndices_\n");
+//		stepCurrent_ = sc;
+
+//		// ok, now we're ready to do the finite loops
+//		for (size_t i=0;i<finiteLoops.size();i++)  {
+//			std::ostringstream msg;
+//			msg<<"Finite loop number "<<i<<" with l="<<finiteLoops[i].stepLength;
+//			msg<<" keptStates="<<finiteLoops[i].keptStates;
+//			progress_.printline(msg,std::cout);
+//			if (i>0) {
+//				int sign = finiteLoops[i].stepLength*finiteLoops[i-1].stepLength;
+//				if (sign>0) {
+//						if (finiteLoops[i].stepLength>0) stepCurrent_++;
+//						if (finiteLoops[i].stepLength<0) stepCurrent_--;
+//				}
+//			}
+//			finiteStep(lrs,i);
+//		}
 	}
 
 private:
+
+	void growLattice()
+	{
+		SymmetryLocalType symm;
+		model_.setSymmetry(symm,0);
+		MatrixProductStateType psi(1,symm);
+		psi.setRandom(0);
+	}
 
 	void finiteStep(LeftRightSuperType& lrs,size_t loopIndex)
 	{
