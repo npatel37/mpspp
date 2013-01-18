@@ -86,17 +86,18 @@ public:
 		return data_[site];
 	}
 
-	void set(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
+//	void set(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
+//	{
+//		SymmetryFactorType symmFactor;
+//		symmFactor.growRight(hilbert,site,quantumNumbers);
+//		data_.clear();
+//		data_.push_back(symmFactor);
+//	}
+
+	void growRight(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
 	{
 		SymmetryFactorType symmFactor;
 		symmFactor.growRight(hilbert,site,quantumNumbers);
-		data_.clear();
-		data_.push_back(symmFactor);
-	}
-
-	void growRight(size_t currentSite)
-	{
-		SymmetryFactorType symmFactor(hilbert,site,quantumNumbers);
 		data_.push_back(symmFactor);
 	}
 

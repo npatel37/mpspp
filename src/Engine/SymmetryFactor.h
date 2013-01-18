@@ -74,8 +74,8 @@ public:
 
 	void growRight(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
 	{
-		left_=right_;
-		right_.set(hilbertSize,site,quantumNumbers);
+		right_.grow(hilbert,site,quantumNumbers);
+		if (left_.size()==0) left_=right_;
 		super_.combine(left_,right_);
 	}
 

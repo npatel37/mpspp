@@ -70,15 +70,11 @@ class ContractedFactor {
 
 public:
 
-
 	typedef typename ProgramGlobals::Vector<SparseMatrixType>::Type DataType;
 
-	void initRight(const MpsFactorType& AorB,
-			  const MpoFactorType& h,
-			  size_t site,
-			  const ThisType* previous)
+	ContractedFactor(const MpsFactorType& AorB,const MpoFactorType& h,size_t site)
+		: data_(h.n_row())
 	{
-		data_.resize(h.n_row());
 		for (size_t b1=0;b1<data_.size();b1++) {
 			initRight2(data_[b1],AorB,b1,h);
 		}

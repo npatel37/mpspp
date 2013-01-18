@@ -47,6 +47,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 #include "ProgramGlobals.h"
 #include "IoSimple.h"
+#include "Sort.h"
 
 namespace Mpspp {
 
@@ -65,14 +66,50 @@ public:
 		: leftSize_(0)
 	{}
 
-	SymmetryComponent(size_t hilbert,size_t site,const std::vector<size_t>& quantumNumbers)
-		: leftSize_(hilbert),block_(1,site),quantumNumbers_(quantumNumbers)
-	{}
+	SymmetryComponent(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
+		: leftSize_ (hilbert),block_(1,site),quantumNumbers_(quantumNumbers)
+	{
+		findPermutationAndPartition();
+	}
 
 	SymmetryComponent(IoInputType& io,size_t divisor)
 	{		
 		loadInternal(io);
 		leftSize_ = size()/divisor;
+	}
+
+	void grow(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
+	{
+		SymmetryComponent sc(hilbert,site,quantumNumbers);
+
+		if (leftSize_==0) {
+			*this = sc;
+			return;
+		}
+
+		SymmetryComponent self = *this;
+
+		combine(self,sc);
+	}
+
+	void combine(const SymmetryComponent& left,const SymmetryComponent& right)
+	{
+		block_.clear();
+		blockUnion(block_,left.block_,right.block_); //! B= pS.block Union X
+
+		size_t ns = left.size();
+		size_t ne = right.size();
+
+		quantumNumbers_.clear();
+
+		for (size_t j=0;j<ne;j++) {
+			for (size_t i=0;i<ns;i++) {
+				quantumNumbers_.push_back(left.quantumNumbers_[i]+right.quantumNumbers_[j]);
+			}
+		}
+
+		// order quantum numbers of combined basis:
+		findPermutationAndPartition();
 	}
 
 	size_t partitions() const { return partition_.size(); }
@@ -143,9 +180,42 @@ private:
 			symmLocal_.load(io);*/
 	}
 
-	void adjustCornerLeft()
+	void findPermutationAndPartition()
 	{
 
+		permutation_.resize(size());
+
+		Sort<std::vector<size_t> > sort;
+		sort.sort(quantumNumbers_,permutation_);
+
+		findPartition();
+
+		permutationInverse_.resize(permutation_.size());
+		for (size_t i=0;i<permutationInverse_.size();i++)
+			permutationInverse_[permutation_[i]]=i;
+	}
+
+	//! Finds a partition of the basis given the effecitve quantum numbers
+	//! Find a partition of the basis given the effecitve quantum numbers
+	void findPartition()
+	{
+		size_t qtmp = quantumNumbers_[0]+1;
+		partition_.clear();
+		for (size_t i=0;i<size();i++) {
+			if (quantumNumbers_[i]!=qtmp) {
+				partition_.push_back(i);
+				qtmp = quantumNumbers_[i];
+			}
+		}
+		partition_.push_back(size());
+	}
+
+	//! A = B union C
+	template<typename Block>
+	void blockUnion(Block &A,Block const &B,Block const &C)
+	{
+		A=B;
+		for (size_t i=0;i<C.size();i++) A.push_back(C[i]);
 	}
 
 	size_t leftSize_;

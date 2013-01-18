@@ -100,12 +100,12 @@ public:
 		lrs_.updateContracted(currentSite,lrs_.abState(),TO_THE_LEFT);
 	}
 
-	void growRight(size_t currentSite)
+	void growRight(SymmetryLocalType& symm,size_t currentSite)
 	{
-		model_.growRight(symm,center); // grows symm
+		model_.growRight(symm,currentSite); // grows symm
 		lrs_.growRight(currentSite); // grows B, computes R
 		internalUpdate(currentSite,TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
-		lrs_.updateContracted(currentSite,lrs_.abState(),TO_THE_RIGHT);
+//		lrs_.updateContracted(currentSite,lrs_.abState(),TO_THE_RIGHT);
 	}
 
 	void printReport(std::ostream& os) const
@@ -157,7 +157,7 @@ private:
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
 
-		lrs_.updateMps(currentSite,tmpVec,direction);
+//		lrs_.updateMps(currentSite,tmpVec,direction);
 	}
 
 	size_t getSymmetrySector(size_t direction) const
@@ -195,8 +195,9 @@ private:
 	{
 		std::vector<size_t> targetQuantumNumbers(2);
 
-		targetQuantumNumbers[0]=solverParams_.electronsUp;
-		targetQuantumNumbers[1]=solverParams_.electronsDown;
+		size_t nsites = model_.geometry().numberOfSites();
+		targetQuantumNumbers[0]=static_cast<RealType>(solverParams_.electronsUp*sites)/nsites;
+		targetQuantumNumbers[1]=static_cast<RealType>(solverParams_.electronsDown*sites)/nsites;
 
 		return getQuantumSector(targetQuantumNumbers,direction);
 	}

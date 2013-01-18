@@ -137,12 +137,11 @@ private:
 		LeftRightSuperType lrs(psi,contracted);
 		StepType step(solverParams_,lrs,model_);
 
-		model_.growRight(symm,center);
-		step.growRight(center);
+		step.growRight(symm,center);
 
 		center++;
 		model_.growRight(symm,center);
-		step.growRight(center);
+		step.growRight(symm,center);
 	}
 
 	void finiteStep(LeftRightSuperType& lrs,size_t loopIndex)

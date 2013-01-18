@@ -122,11 +122,11 @@ public:
 //		data_[currentSite].updateFromVector(v,direction);
 //	}
 
-//	const MpsFactorType& operator()(size_t site) const
-//	{
-//		assert(site<data_.size());
-//		return data_[site];
-//	}
+	const MpsFactorType& B(size_t site) const
+	{
+		assert(site<B_.size());
+		return B_[site];
+	}
 
 	const SymmetryLocalType& symmetry() const { return symm_; }
 

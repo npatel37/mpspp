@@ -88,7 +88,8 @@ public:
 
 	void growRight(size_t currentSite)
 	{
-
+		ContractedFactorType cf(abState_.B(currentSite),h_(currentSite),currentSite);
+		R_.push_back(cf);
 	}
 
 //	//! From As (or Bs) and Ws reconstruct *this
@@ -101,15 +102,15 @@ public:
 //		}
 //	}
 
-//	const ContractedFactorType& operator()(size_t currentSite,size_t leftOrRight) const
-//	{
-//		if (leftOrRight == PART_LEFT)
-//			assert(currentSite<dataLeft_.size());
-//		else
-//			assert(currentSite<dataRight_.size());
+	const ContractedFactorType& operator()(size_t currentSite,size_t leftOrRight) const
+	{
+		if (leftOrRight == PART_LEFT)
+			assert(currentSite<L_.size());
+		else
+			assert(currentSite<R_.size());
 
-//		return (leftOrRight == PART_LEFT) ? dataLeft_[currentSite] : dataRight_[dataRight_.size()-currentSite-1];
-//	}
+		return (leftOrRight == PART_LEFT) ? L_[currentSite] : R_[currentSite];
+	}
 
 private:
 
