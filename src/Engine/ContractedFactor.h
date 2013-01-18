@@ -72,6 +72,13 @@ public:
 
 	typedef typename ProgramGlobals::Vector<SparseMatrixType>::Type DataType;
 
+	ContractedFactor()
+	{
+		SparseMatrixType m(1,1);
+		m.makeDiagonal(1,1);
+		data_.push_back(m);
+	}
+
 	ContractedFactor(const MpsFactorType& AorB,const MpoFactorType& h,size_t site)
 		: data_(h.n_row())
 	{

@@ -111,6 +111,11 @@ public:
 	{
 		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
 		size_t total = symmetry_.super().partitionSize(symmetrySector_);
+		size_t nright = symmetry_.right().block().size();
+		assert(nright>0);
+		size_t center = symmetry_.right().block()[nright-1];
+
+		if (center==0) return matrixVectorProduct0(x,y);
 
 		const ContractedFactorType& cL = contractedFactorLeft();
 		const ContractedFactorType& cR = contractedFactorRight();
@@ -130,6 +135,7 @@ public:
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
 						alB = ab.second;
+						if (center==0) alm1=0;
 					} else {
 						PairType tmpPair1 = symm.right().unpack(ab.second);
 						alB=tmpPair1.second;
@@ -166,6 +172,11 @@ public:
 	{
 		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
 		size_t total = symmetry_.super().partitionSize(symmetrySector_);
+		size_t nright = symmetry_.right().block().size();
+		assert(nright>0);
+		size_t center = symmetry_.right().block()[nright-1];
+
+		if (center==0) return fullHamiltonian0(matrix);
 
 		matrix.resize(total,total);
 		const ContractedFactorType& cL = contractedFactorLeft();
@@ -190,6 +201,10 @@ public:
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
 						alB = ab.second;
+						if (center==0) {
+							sigmaL=alm1;
+							alm1=0;
+						}
 					} else {
 						PairType tmpPair1 = symm.right().unpack(ab.second);
 						alB=tmpPair1.second;
@@ -205,7 +220,7 @@ public:
 								size_t alBp = r1.getCol(k2);
 								size_t j = 0;
 								if (direction_==TO_THE_RIGHT) {
-									size_t tmp1 = symm.left().pack(alm1p,sigmaLp);
+									size_t tmp1 = (center==0) ? sigmaLp : symm.left().pack(alm1p,sigmaLp);
 									j = symm.super().pack(tmp1,alBp);
 								} else {
 									size_t tmp1 = symm.right().pack(sigmaLp,alBp);
@@ -231,6 +246,81 @@ public:
 	}
 
 private:
+
+	//! Eq. (201) but very modified
+	void matrixVectorProduct0(VectorType& x,const VectorType& y) const
+	{
+		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
+		size_t total = symmetry_.super().partitionSize(symmetrySector_);
+
+		const ContractedFactorType& cR = contractedFactorRight();
+		const SymmetryFactorType& symm = symmetry_;
+
+		for (size_t bl=0;bl<cR.size();bl++) {
+			const SparseMatrixType& w =  hamiltonian_(bl);
+			const SparseMatrixType& r1 = cR(bl);
+			for (size_t i=0;i<total;i++) {
+				PairType ab = symm.super().unpack(i+offset);
+				size_t a1 = ab.first;
+				size_t sigma1 = ab.second;
+
+				for (int kw=w.getRowPtr(sigma1);kw<w.getRowPtr(sigma1+1);kw++) {
+					size_t sigma1p=w.getCol(kw);
+					for (int k2=r1.getRowPtr(a1);k2<r1.getRowPtr(a1+1);k2++) {
+						size_t a1p = r1.getCol(k2);
+						size_t j = symm.super().pack(a1p,sigma1p);
+						if (j<offset || j>=offset+total) continue;
+						x[i] += y[j-offset]*w.getValue(kw)*r1.getValue(k2);
+					} // k2 right
+				} // kw Hamiltonian
+			} // symmetry sector
+		} // bl
+	}
+
+	//! Used only for stored option
+	void fullHamiltonian0(SparseMatrixType& matrix) const
+	{
+		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
+		size_t total = symmetry_.super().partitionSize(symmetrySector_);
+
+		matrix.resize(total,total);
+		const ContractedFactorType& cR = contractedFactorRight();
+		const SymmetryFactorType& symm = symmetry_;
+		VectorType v(total,0);
+		size_t counter = 0;
+		for (size_t i=0;i<total;i++) {
+			matrix.setRow(i,counter);
+			for (size_t bl=0;bl<cR.size();bl++) {
+				const SparseMatrixType& w = hamiltonian_(bl);
+				const SparseMatrixType& r1 = cR(bl);
+
+				PairType ab = symm.super().unpack(i+offset);
+				size_t a1 = ab.first;
+				size_t sigma1 = ab.second;
+
+				for (int kw=w.getRowPtr(sigma1);kw<w.getRowPtr(sigma1+1);kw++) {
+					size_t sigma1p=w.getCol(kw);
+					for (int k2=r1.getRowPtr(a1);k2<r1.getRowPtr(a1+1);k2++) {
+						size_t a1p = r1.getCol(k2);
+						size_t j = symm.super().pack(a1p,sigma1p);
+						if (j<offset || j>=offset+total) continue;
+						v[j-offset] += w.getValue(kw)*r1.getValue(k2);
+					} // k2 right
+				} // kw Hamiltonian
+			} // bl
+
+			for (size_t j=0;j<v.size();j++) {
+				if (fabs(v[j])<1e-6) continue;
+				matrix.pushCol(j);
+				matrix.pushValue(v[j]);
+				v[j]=0;
+				counter++;
+			}
+		} // symmetry sector
+		matrix.setRow(total,counter);
+		matrix.checkValidity();
+	}
+
 
 	const LeftRightSuperType& lrs_;
 	size_t symmetrySector_;

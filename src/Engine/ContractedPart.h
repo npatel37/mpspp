@@ -90,6 +90,10 @@ public:
 	{
 		ContractedFactorType cf(abState_.B(currentSite),h_(currentSite),currentSite);
 		R_.push_back(cf);
+		if (L_.size()==0) {
+			ContractedFactorType cfL;
+			L_.push_back(cfL);
+		}
 	}
 
 //	//! From As (or Bs) and Ws reconstruct *this

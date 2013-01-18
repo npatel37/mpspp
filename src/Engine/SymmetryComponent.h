@@ -67,7 +67,7 @@ public:
 	{}
 
 	SymmetryComponent(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
-		: leftSize_ (hilbert),block_(1,site),quantumNumbers_(quantumNumbers)
+		: leftSize_(hilbert),block_(1,site),quantumNumbers_(quantumNumbers)
 	{
 		findPermutationAndPartition();
 	}
@@ -80,9 +80,9 @@ public:
 
 	void grow(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
 	{
-		SymmetryComponent sc(hilbert,site,quantumNumbers);
+		SymmetryComponent sc(0,site,quantumNumbers);
 
-		if (leftSize_==0) {
+		if (size()==0) {
 			*this = sc;
 			return;
 		}
@@ -110,6 +110,7 @@ public:
 
 		// order quantum numbers of combined basis:
 		findPermutationAndPartition();
+		leftSize_ = left.size();
 	}
 
 	size_t partitions() const { return partition_.size(); }
@@ -130,6 +131,7 @@ public:
 	{
 		assert(i<permutation_.size());
 		size_t ip = permutation_[i];
+		assert(leftSize_>0);
 		div_t q = div(ip,leftSize_);
 		return PairType(q.rem,q.quot);
 	}
@@ -137,6 +139,7 @@ public:
 	size_t pack(size_t a1,size_t sigma2) const
 	{
 		assert(a1+sigma2*leftSize_<permutationInverse_.size());
+		assert(leftSize_>0);
 		return permutationInverse_[a1+sigma2*leftSize_];
 	}
 

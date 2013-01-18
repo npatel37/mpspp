@@ -62,6 +62,7 @@ namespace Mpspp {
 		typedef typename ModelType::ModelHelperType ModelHelperType;
 		typedef typename ModelHelperType::SparseMatrixType SparseMatrixType;
 		typedef typename ModelHelperType::RealType RealType;
+		typedef typename ProgramGlobals::Matrix<RealType>::Type MatrixType;
 		typedef typename ModelType::ReflectionSymmetryType ReflectionSymmetryType;
 		//typedef typename SparseMatrixType::value_type SparseElementType;
 
@@ -77,6 +78,10 @@ namespace Mpspp {
 			if (!rs) {
 				matrixStored_[0].clear();
 				model->fullHamiltonian(matrixStored_[0],*modelHelper);
+				if (matrixStored_[0].row()<16) {
+					MatrixType m(matrixStored_[0]);
+					std::cout<<m;
+				}
 				assert(isHermitian(matrixStored_[0],true));
 				std::ostringstream msg;
 				msg<<"fullHamiltonian has rank="<<matrixStored_[0].row()<<" nonzeros="<<matrixStored_[0].nonZero();
