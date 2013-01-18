@@ -61,6 +61,10 @@ public:
 	enum {CORNER_LEFT,CORNER_RIGHT};
 	enum {COMPONENT_LEFT,COMPONENT_RIGHT,COMPONENT_SUPER};
 
+	SymmetryComponent()
+		: leftSize_(0)
+	{}
+
 	SymmetryComponent(size_t hilbert,size_t site,const std::vector<size_t>& quantumNumbers)
 		: leftSize_(hilbert),block_(1,site),quantumNumbers_(quantumNumbers)
 	{}

@@ -130,11 +130,19 @@ private:
 
 	void growLattice()
 	{
+		size_t center = 0;
 		SymmetryLocalType symm;
-		model_.setSymmetry(symm,0);
 		MatrixProductStateType psi(1,symm);
-		psi.setRandom(0);
 		ContractedPartType contracted(psi,model_.hamiltonian());
+		LeftRightSuperType lrs(psi,contracted);
+		StepType step(solverParams_,lrs,model_);
+
+		model_.growRight(symm,center);
+		step.growRight(center);
+
+		center++;
+		model_.growRight(symm,center);
+		step.growRight(center);
 	}
 
 	void finiteStep(LeftRightSuperType& lrs,size_t loopIndex)

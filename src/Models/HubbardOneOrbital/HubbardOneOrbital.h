@@ -165,14 +165,14 @@ public:
 
 	virtual const GeometryType& geometry() const { return geometry_; }
 
-	virtual void setSymmetry(SymmetryLocalType& symm,size_t site) const
+	virtual void growRight(SymmetryLocalType& symm,size_t site) const
 	{
 		std::vector<size_t> quantumNumbers;
 		quantumNumbers.push_back(0);
 		quantumNumbers.push_back(1);
 		quantumNumbers.push_back(MAX_SITES);
 		quantumNumbers.push_back(1+MAX_SITES);
-		symm.set(hilbert_,site,quantumNumbers);
+		symm.growRight(hilbert_,site,quantumNumbers);
 //		std::vector<size_t> partition_;
 //		ProgramGlobals::Vector<size_t>::Type permutation_;
 //		ProgramGlobals::Vector<size_t>::Type permutationInverse_;

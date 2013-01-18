@@ -69,19 +69,19 @@ public:
 	: symmNonconst_(0),symm_(symm),nsites_(nsites),center_(0)
 	{}
 
-	MatrixProductState(IoInputType& io)
-		: symmNonconst_(new SymmetryLocalType(io)),
-		  symm_(*symmNonconst_),
-		  nsites_(symm_(0).super().block().size()),
-		  center_(0)
-	{
-		io.rewind();
-		assert(nsites_>0);
-		for (size_t i=0;i<nsites_-1;i++) {
-			MpsFactorType f(io,symm_(i),i);
-			data_.push_back(f);
-		}
-	}
+//	MatrixProductState(IoInputType& io)
+//		: symmNonconst_(new SymmetryLocalType(io)),
+//		  symm_(*symmNonconst_),
+//		  nsites_(symm_(0).super().block().size()),
+//		  center_(0)
+//	{
+//		io.rewind();
+//		assert(nsites_>0);
+//		for (size_t i=0;i<nsites_-1;i++) {
+//			MpsFactorType f(io,symm_(i),i);
+//			data_.push_back(f);
+//		}
+//	}
 
 	~MatrixProductState()
 	{
@@ -91,11 +91,18 @@ public:
 		}
 	}
 
-	void setRandom(size_t site)
+//	void setRandom(size_t site)
+//	{
+//		MpsFactorType mpsFactor(symm_(site),site);
+//		mpsFactor.setRandom(site);
+//		data_.resize(1,mpsFactor);
+//	}
+
+	void growRight(size_t currentSite)
 	{
-		MpsFactorType mpsFactor(symm_(site),site);
-		mpsFactor.setRandom(site);
-		data_.resize(1,mpsFactor);
+		MpsFactorType mpsFactor(symm_(currentSite),currentSite);
+		mpsFactor.setRandom(currentSite);
+		B_.push_back(mpsFactor);
 	}
 
 	size_t center() const
@@ -109,17 +116,17 @@ public:
 		return nsites_;
 	}
 
-	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-	void update(size_t currentSite,const VectorType& v,size_t direction)
-	{
-		data_[currentSite].updateFromVector(v,direction);
-	}
+//	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
+//	void update(size_t currentSite,const VectorType& v,size_t direction)
+//	{
+//		data_[currentSite].updateFromVector(v,direction);
+//	}
 
-	const MpsFactorType& operator()(size_t site) const
-	{
-		assert(site<data_.size());
-		return data_[site];
-	}
+//	const MpsFactorType& operator()(size_t site) const
+//	{
+//		assert(site<data_.size());
+//		return data_[site];
+//	}
 
 	const SymmetryLocalType& symmetry() const { return symm_; }
 
@@ -135,7 +142,8 @@ private:
 	const SymmetryLocalType& symm_;
 	size_t nsites_;
 	size_t center_;
-	typename ProgramGlobals::Vector<MpsFactorType>::Type data_;
+	typename ProgramGlobals::Vector<MpsFactorType>::Type B_;
+	typename ProgramGlobals::Vector<MpsFactorType>::Type A_;
 }; // MatrixProductState
 
 } // namespace Mpspp

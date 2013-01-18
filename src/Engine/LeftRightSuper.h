@@ -88,6 +88,11 @@ public:
 		ab_.update(currentSite,v,direction);
 	}
 
+	void growRight(size_t currentSite)
+	{
+		ab_.growRight(currentSite);
+	}
+
 private:
 
 	PsimagLite::ProgressIndicator progress_;

@@ -100,6 +100,14 @@ public:
 		lrs_.updateContracted(currentSite,lrs_.abState(),TO_THE_LEFT);
 	}
 
+	void growRight(size_t currentSite)
+	{
+		model_.growRight(symm,center); // grows symm
+		lrs_.growRight(currentSite); // grows B, computes R
+		internalUpdate(currentSite,TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
+		lrs_.updateContracted(currentSite,lrs_.abState(),TO_THE_RIGHT);
+	}
+
 	void printReport(std::ostream& os) const
 	{
 		os<<"Nothing to report so far, except that I need a progress indicator\n";

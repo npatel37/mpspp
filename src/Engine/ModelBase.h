@@ -164,7 +164,7 @@ public:
 		modelHelper.matrixVectorProduct(x,y);
 	}
 
-	virtual void setSymmetry(SymmetryLocalType& symm,size_t site) const=0;
+	virtual void growRight(SymmetryLocalType& symm,size_t site) const=0;
 
 }; // ModelBase
 
