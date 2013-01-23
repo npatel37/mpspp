@@ -58,6 +58,8 @@ class MpsFactor {
 
 public:
 
+	enum {TYPE_A,TYPE_B};
+
 	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
 	typedef VectorWithOffset<ComplexOrRealType> VectorWithOffsetType;
 	typedef typename VectorWithOffsetType::VectorType VectorType;
@@ -66,35 +68,37 @@ public:
 	typedef typename SymmetryFactorType::IoInputType IoInputType;
 	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
 
-	MpsFactor(const SymmetryFactorType& symm,size_t site)
-		: symm_(symm),rng_(0)
+	MpsFactor(const SymmetryFactorType& symm,size_t site,size_t aOrB)
+		: symm_(symm),rng_(0),aOrB_(aOrB)
 	{}
 
-	MpsFactor(IoInputType& io,const SymmetryFactorType& symm,size_t site)
-	: symm_(symm),rng_(0)
-	{
-//		if (site==0 || site+1 ==symm_.super().block().size()) {
-//			std::string str(__FILE__);
-//			str += " " + ttos(__LINE__) + "\n";
-//			str += "Needs corner cases. I cannot go further until this is implemented\n";
-//			std::cerr<<str;
-//			return;
-//		}
-		VectorWithOffsetType mpsFactorM;
-		mpsFactorM.load(io,"MpsFactorM");
+//	MpsFactor(IoInputType& io,const SymmetryFactorType& symm,size_t site)
+//	: symm_(symm),rng_(0)
+//	{
+////		if (site==0 || site+1 ==symm_.super().block().size()) {
+////			std::string str(__FILE__);
+////			str += " " + ttos(__LINE__) + "\n";
+////			str += "Needs corner cases. I cannot go further until this is implemented\n";
+////			std::cerr<<str;
+////			return;
+////		}
+//		VectorWithOffsetType mpsFactorM;
+//		mpsFactorM.load(io,"MpsFactorM");
 
-		MatrixType mpsFactor;
-		findMpsFactor1(mpsFactor,mpsFactorM);
+//		MatrixType mpsFactor;
+//		findMpsFactor1(mpsFactor,mpsFactorM);
 
-		std::vector<RealType> s;
-		svd(mpsFactor,s);
+//		std::vector<RealType> s;
+//		svd(mpsFactor,s);
 
-		fullMatrixToCrsMatrix(data_,mpsFactor);
-	}
+//		fullMatrixToCrsMatrix(data_,mpsFactor);
+//	}
 
 	MpsFactor& operator=(const MpsFactor& other)
 	{
 		this->data_ = other.data_;
+//		this->rng_ = other.rng_;
+		this->aOrB_ = other.aOrB_;
 		//this->symm_ = other.symm_;
 		return *this;
 	}
@@ -108,7 +112,7 @@ public:
 		fullMatrixToCrsMatrix(data_,m);
 	}
 
-	void updateFromVector(const VectorType& v,size_t direction)
+	void updateFromVector(const VectorType& v)
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
@@ -122,22 +126,23 @@ public:
 
 private:
 
-	//! MpsFactorM is phi_i
-	//! interpret M^{sigma2}_{a1,a2^B} as  M_(alpha,a2^B)
-	//!  M_(alpha,a2^B) = \sum_{i} phi_i \delta_{P^SE(alpha+a2^B*ns),i}
-	void findMpsFactor1(MatrixType& m,const VectorWithOffsetType& v) const
-	{
-		size_t total = v.effectiveSize();
-		size_t offset = v.offset(0);
-		m.resize( symm_.left().size(),symm_.right().size());
-		for (size_t i=0;i<total;i++) {
-			PairType alphaBeta = symm_.super().unpack(i+offset);
-			m(alphaBeta.first,alphaBeta.second) = v.fastAccess(0,i);
-		}
-	}
+//	//! MpsFactorM is phi_i
+//	//! interpret M^{sigma2}_{a1,a2^B} as  M_(alpha,a2^B)
+//	//!  M_(alpha,a2^B) = \sum_{i} phi_i \delta_{P^SE(alpha+a2^B*ns),i}
+//	void findMpsFactor1(MatrixType& m,const VectorWithOffsetType& v) const
+//	{
+//		size_t total = v.effectiveSize();
+//		size_t offset = v.offset(0);
+//		m.resize( symm_.left().size(),symm_.right().size());
+//		for (size_t i=0;i<total;i++) {
+//			PairType alphaBeta = symm_.super().unpack(i+offset);
+//			m(alphaBeta.first,alphaBeta.second) = v.fastAccess(0,i);
+//		}
+//	}
 	const SymmetryFactorType& symm_;
 	RandomNumberGeneratorType rng_;
 	SparseMatrixType data_;
+	size_t aOrB_;
 }; // MpsFactor
 
 } // namespace Mpspp

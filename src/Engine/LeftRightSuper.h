@@ -78,15 +78,15 @@ public:
 
 	const SymmetryLocalType& symmetry() const { return ab_.symmetry(); }
 
-//	void updateContracted(size_t currentSite,const MatrixProductStateType& abState,size_t direction)
-//	{
-//		contracted_.update(currentSite,abState,direction);
-//	}
+	void updateContracted(size_t currentSite,size_t direction)
+	{
+		contracted_.update(currentSite,ab_,direction);
+	}
 
-//	void updateMps(size_t currentSite,const VectorType& v,size_t direction)
-//	{
-//		ab_.update(currentSite,v,direction);
-//	}
+	void updateMps(size_t currentSite,const VectorType& v,size_t direction)
+	{
+		ab_.update(currentSite,v,direction);
+	}
 
 	void growRight(size_t currentSite)
 	{

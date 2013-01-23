@@ -105,7 +105,7 @@ public:
 		model_.growRight(symm,currentSite); // grows symm
 		lrs_.growRight(currentSite); // grows B, computes R
 		internalUpdate(currentSite,TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
-//		lrs_.updateContracted(currentSite,lrs_.abState(),TO_THE_RIGHT);
+		lrs_.updateContracted(currentSite,TO_THE_RIGHT);
 	}
 
 	void printReport(std::ostream& os) const
@@ -157,7 +157,7 @@ private:
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
 
-//		lrs_.updateMps(currentSite,tmpVec,direction);
+		lrs_.updateMps(currentSite,tmpVec,direction);
 	}
 
 	size_t getSymmetrySector(size_t direction) const

@@ -100,7 +100,7 @@ public:
 
 	void growRight(size_t currentSite)
 	{
-		MpsFactorType mpsFactor(symm_(currentSite),currentSite);
+		MpsFactorType mpsFactor(symm_(currentSite),currentSite,MpsFactorType::TYPE_B);
 		mpsFactor.setRandom(currentSite);
 		B_.push_back(mpsFactor);
 	}
@@ -116,11 +116,14 @@ public:
 		return nsites_;
 	}
 
-//	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-//	void update(size_t currentSite,const VectorType& v,size_t direction)
-//	{
-//		data_[currentSite].updateFromVector(v,direction);
-//	}
+	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
+	void update(size_t currentSite,const VectorType& v,size_t direction)
+	{
+		if (direction==ProgramGlobals::TO_THE_RIGHT)
+			A_[currentSite].updateFromVector(v);
+		else
+			B_[currentSite].updateFromVector(v);
+	}
 
 	const MpsFactorType& B(size_t site) const
 	{

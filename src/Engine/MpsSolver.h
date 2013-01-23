@@ -140,7 +140,7 @@ private:
 		step.growRight(symm,center);
 
 		center++;
-		model_.growRight(symm,center);
+
 		step.growRight(symm,center);
 	}
 

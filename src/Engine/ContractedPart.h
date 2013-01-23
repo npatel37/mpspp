@@ -96,15 +96,15 @@ public:
 		}
 	}
 
-//	//! From As (or Bs) and Ws reconstruct *this
-//	void update(size_t currentSite,const MatrixProductStateType& abState,size_t direction)
-//	{
-//		if (direction==TO_THE_RIGHT) {
-//			updateLeft(currentSite,abState);
-//		} else {
-//			updateRight(currentSite,abState);
-//		}
-//	}
+	//! From As (or Bs) and Ws reconstruct *this
+	void update(size_t currentSite,const MatrixProductStateType& abState,size_t direction)
+	{
+		if (direction==TO_THE_RIGHT) {
+			updateLeft(currentSite,abState);
+		} else {
+			updateRight(currentSite,abState);
+		}
+	}
 
 	const ContractedFactorType& operator()(size_t currentSite,size_t leftOrRight) const
 	{
@@ -118,21 +118,21 @@ public:
 
 private:
 
-//	void updateLeft(size_t currentSite,const MatrixProductStateType& abState)
-//	{
-//		std::string str(__FILE__);
-//		str += " " + ttos(__LINE__) + "\n";
-//		str += "Need to update(...) here. I cannot go further until this is implemented\n";
-//		throw std::runtime_error(str.c_str());
-//	}
+	void updateLeft(size_t currentSite,const MatrixProductStateType& abState)
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to updateLeft(...) here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
 
-//	void updateRight(size_t currentSite,const MatrixProductStateType& abState)
-//	{
-//		std::string str(__FILE__);
-//		str += " " + ttos(__LINE__) + "\n";
-//		str += "Need to update(...) here. I cannot go further until this is implemented\n";
-//		throw std::runtime_error(str.c_str());
-//	}
+	void updateRight(size_t currentSite,const MatrixProductStateType& abState)
+	{
+		std::string str(__FILE__);
+		str += " " + ttos(__LINE__) + "\n";
+		str += "Need to updateRight(...) here. I cannot go further until this is implemented\n";
+		throw std::runtime_error(str.c_str());
+	}
 
 	const MatrixProductStateType& abState_;
 	const MatrixProductOperatorType& h_;
