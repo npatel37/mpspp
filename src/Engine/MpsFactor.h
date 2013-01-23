@@ -69,7 +69,7 @@ public:
 	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
 
 	MpsFactor(const SymmetryFactorType& symm,size_t site,size_t aOrB)
-		: symm_(symm),rng_(0),aOrB_(aOrB)
+		: symm_(symm),site_(site),rng_(0),aOrB_(aOrB)
 	{}
 
 //	MpsFactor(IoInputType& io,const SymmetryFactorType& symm,size_t site)
@@ -97,6 +97,7 @@ public:
 	MpsFactor& operator=(const MpsFactor& other)
 	{
 		this->data_ = other.data_;
+		this->site_ = other.site_;
 //		this->rng_ = other.rng_;
 		this->aOrB_ = other.aOrB_;
 		//this->symm_ = other.symm_;
@@ -112,17 +113,29 @@ public:
 		fullMatrixToCrsMatrix(data_,m);
 	}
 
-	void updateFromVector(const VectorType& v)
+	void updateFromVector(const VectorType& v,size_t symmetrySector)
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to write updateFromVector. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		assert(aOrB_==TYPE_A);
+
+		size_t offset = symm_.super().partitionOffset(symmetrySector);
+		size_t total = symm_.super().partitionSize(symmetrySector);
+		MatrixType m(symm_.left().size(),symm_.right().size());
+		for (size_t i=0;i<total;i++) {
+			PairType ab = symm_.super().unpack(i+offset);
+			size_t a1sigma2 = ab.first;
+			size_t a2 = ab.second;
+			m(a1sigma2,a2) = v[i];
+		}
+		std::vector<RealType> s;
+		svd(m,s);
+		fullMatrixToCrsMatrix(data_,m);
 	}
 
 	const SparseMatrixType& operator()() const { return data_; }
 
 	const SymmetryFactorType& symm() const { return symm_; }
+
+	const size_t type() const { return aOrB_; }
 
 private:
 
@@ -140,6 +153,7 @@ private:
 //		}
 //	}
 	const SymmetryFactorType& symm_;
+	size_t site_;
 	RandomNumberGeneratorType rng_;
 	SparseMatrixType data_;
 	size_t aOrB_;

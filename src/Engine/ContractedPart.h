@@ -90,10 +90,10 @@ public:
 	{
 		ContractedFactorType cf(abState_.B(currentSite),h_(currentSite),currentSite);
 		R_.push_back(cf);
-		if (L_.size()==0) {
-			ContractedFactorType cfL;
-			L_.push_back(cfL);
-		}
+//		if (L_.size()==0) {
+//			ContractedFactorType cfL;
+//			L_.push_back(cfL);
+//		}
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
@@ -120,10 +120,13 @@ private:
 
 	void updateLeft(size_t currentSite,const MatrixProductStateType& abState)
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to updateLeft(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		if (currentSite>=L_.size()) {
+			assert(currentSite==0);
+			ContractedFactorType cf(abState.A(currentSite),h_(currentSite),currentSite);
+			L_.push_back(cf);
+			return;
+		}
+		L_[currentSite].update(abState.A(currentSite));
 	}
 
 	void updateRight(size_t currentSite,const MatrixProductStateType& abState)

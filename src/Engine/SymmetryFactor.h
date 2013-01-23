@@ -60,22 +60,28 @@ public:
 	enum {CORNER_LEFT = SymmetryComponentType::CORNER_LEFT,
 		  CORNER_RIGHT = SymmetryComponentType::CORNER_RIGHT};
 
-	SymmetryFactor(IoInputType& io,size_t nk)
-		: left_(io,nk),right_(io,nk),super_(io,right_.size())
-	{
-		std::string str("SymmetryFactor: super=");
-		str += ttos(super_.size()) + " left=" + ttos(left_.size());
-		str += " right=" + ttos(right_.size()) + "\n";
-		std::cerr<<str;
-	}
+//	SymmetryFactor(IoInputType& io,size_t nk)
+//		: left_(io,nk),right_(io,nk),super_(io,right_.size())
+//	{
+//		std::string str("SymmetryFactor: super=");
+//		str += ttos(super_.size()) + " left=" + ttos(left_.size());
+//		str += " right=" + ttos(right_.size()) + "\n";
+//		std::cerr<<str;
+//	}
 
 	SymmetryFactor()
 	{}
 
-	void growRight(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
+	void growRight(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers,SymmetryFactor* previous)
 	{
+		if (previous==0) {
+			right_.grow(hilbert,site,quantumNumbers);
+			if (left_.size()==0) left_=right_;
+			super_.combine(left_,right_);
+			return;
+		}
+		left_ = previous->super();
 		right_.grow(hilbert,site,quantumNumbers);
-		if (left_.size()==0) left_=right_;
 		super_.combine(left_,right_);
 	}
 

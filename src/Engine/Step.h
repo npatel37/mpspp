@@ -157,7 +157,7 @@ private:
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
 
-		lrs_.updateMps(currentSite,tmpVec,direction);
+		lrs_.updateMps(currentSite,tmpVec,direction,symmetrySector);
 	}
 
 	size_t getSymmetrySector(size_t direction) const

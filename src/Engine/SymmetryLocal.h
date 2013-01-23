@@ -61,24 +61,24 @@ public:
 	SymmetryLocal()
 	{}
 
-	SymmetryLocal(IoInputType& io)
-	{
-		size_t n = 0;
-		io.readline(n,"TotalNumberOfSites=");
-		size_t nk = 0;
-		io.readline(nk,"HilbertOneSite=");
-		assert(n>2);
-		for (size_t i=0;i<n-1;i++) {
-			SymmetryFactorType f(io,nk);
-			data_.push_back(f);
-//			if (i==0) data_.push_back(f); // left corner
-//			if (i==n-3) data_.push_back(f); // right corner
-		}
+//	SymmetryLocal(IoInputType& io)
+//	{
+//		size_t n = 0;
+//		io.readline(n,"TotalNumberOfSites=");
+//		size_t nk = 0;
+//		io.readline(nk,"HilbertOneSite=");
+//		assert(n>2);
+//		for (size_t i=0;i<n-1;i++) {
+//			SymmetryFactorType f(io,nk);
+//			data_.push_back(f);
+////			if (i==0) data_.push_back(f); // left corner
+////			if (i==n-3) data_.push_back(f); // right corner
+//		}
 
-		assert(data_.size()==n-1);
-//		data_[0].adjustCorner(SymmetryFactorType::CORNER_LEFT);
-//		data_[n-1].adjustCorner(SymmetryFactorType::CORNER_RIGHT);
-	}
+//		assert(data_.size()==n-1);
+////		data_[0].adjustCorner(SymmetryFactorType::CORNER_LEFT);
+////		data_[n-1].adjustCorner(SymmetryFactorType::CORNER_RIGHT);
+//	}
 
 	const SymmetryFactorType& operator()(size_t site) const
 	{
@@ -97,7 +97,9 @@ public:
 	void growRight(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
 	{
 		SymmetryFactorType symmFactor;
-		symmFactor.growRight(hilbert,site,quantumNumbers);
+		SymmetryFactorType *previous = 0;
+		if (data_.size()>0) previous = &data_[data_.size()-1];
+		symmFactor.growRight(hilbert,site,quantumNumbers,previous);
 		data_.push_back(symmFactor);
 	}
 

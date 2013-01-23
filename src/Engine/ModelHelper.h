@@ -96,34 +96,35 @@ public:
 
 	const SymmetryFactorType& symmetry() const { return symmetry_; }
 
-	const ContractedFactorType& contractedFactorLeft() const
-	{
-		return lrs_.contracted()(currentSite_,ProgramGlobals::PART_LEFT);
-	}
+//	const ContractedFactorType& contractedFactorLeft() const
+//	{
+//		return lrs_.contracted()(currentSite_,ProgramGlobals::PART_LEFT);
+//	}
 
-	const ContractedFactorType& contractedFactorRight() const
-	{
-		return lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
-	}
+//	const ContractedFactorType& contractedFactorRight() const
+//	{
+//		return lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
+//	}
 
 	//! Eq. (201) but very modified
 	void matrixVectorProduct(VectorType& x,const VectorType& y) const
 	{
 		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
 		size_t total = symmetry_.super().partitionSize(symmetrySector_);
-		size_t nright = symmetry_.right().block().size();
-		assert(nright>0);
-		size_t center = symmetry_.right().block()[nright-1];
+//		size_t nright = symmetry_.right().block().size();
+//		assert(nright>0);
+//		size_t center = symmetry_.right().block()[nright-1];
 
-		if (center==0) return matrixVectorProduct0(x,y);
+		if (currentSite_==0) return matrixVectorProduct0(x,y);
 
-		const ContractedFactorType& cL = contractedFactorLeft();
-		const ContractedFactorType& cR = contractedFactorRight();
+		const ContractedFactorType& cL = lrs_.contracted()(currentSite_-1,ProgramGlobals::PART_LEFT);
+		const ContractedFactorType& cR = lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
 		const SymmetryFactorType& symm = symmetry_;
 		for (size_t blm1=0;blm1<cL.size();blm1++) {
 			const SparseMatrixType& l1 = cL(blm1);
 			for (size_t bl=0;bl<cR.size();bl++) {
 				const SparseMatrixType& w =  hamiltonian_(bl,blm1);
+				if (w.row()==0) continue;
 				const SparseMatrixType& r1 = cR(bl);
 				for (size_t i=0;i<total;i++) {
 					PairType ab = symm.super().unpack(i+offset);
@@ -135,7 +136,6 @@ public:
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
 						alB = ab.second;
-						if (center==0) alm1=0;
 					} else {
 						PairType tmpPair1 = symm.right().unpack(ab.second);
 						alB=tmpPair1.second;
@@ -172,15 +172,15 @@ public:
 	{
 		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
 		size_t total = symmetry_.super().partitionSize(symmetrySector_);
-		size_t nright = symmetry_.right().block().size();
-		assert(nright>0);
-		size_t center = symmetry_.right().block()[nright-1];
+//		size_t nright = symmetry_.right().block().size();
+//		assert(nright>0);
+//		size_t center = symmetry_.right().block()[nright-1];
 
-		if (center==0) return fullHamiltonian0(matrix);
+		if (currentSite_==0) return fullHamiltonian0(matrix);
 
 		matrix.resize(total,total);
-		const ContractedFactorType& cL = contractedFactorLeft();
-		const ContractedFactorType& cR = contractedFactorRight();
+		const ContractedFactorType& cL = lrs_.contracted()(currentSite_-1,ProgramGlobals::PART_LEFT);
+		const ContractedFactorType& cR = lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
 		const SymmetryFactorType& symm = symmetry_;
 		VectorType v(total,0);
 		size_t counter = 0;
@@ -190,6 +190,7 @@ public:
 				const SparseMatrixType& l1 = cL(blm1);
 				for (size_t bl=0;bl<cR.size();bl++) {
 					const SparseMatrixType& w = hamiltonian_(bl,blm1);
+					if (w.row()==0) continue;
 					const SparseMatrixType& r1 = cR(bl);
 
 					PairType ab = symm.super().unpack(i+offset);
@@ -201,10 +202,6 @@ public:
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
 						alB = ab.second;
-						if (center==0) {
-							sigmaL=alm1;
-							alm1=0;
-						}
 					} else {
 						PairType tmpPair1 = symm.right().unpack(ab.second);
 						alB=tmpPair1.second;
@@ -220,7 +217,7 @@ public:
 								size_t alBp = r1.getCol(k2);
 								size_t j = 0;
 								if (direction_==TO_THE_RIGHT) {
-									size_t tmp1 = (center==0) ? sigmaLp : symm.left().pack(alm1p,sigmaLp);
+									size_t tmp1 =  symm.left().pack(alm1p,sigmaLp);
 									j = symm.super().pack(tmp1,alBp);
 								} else {
 									size_t tmp1 = symm.right().pack(sigmaLp,alBp);
@@ -253,11 +250,12 @@ private:
 		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
 		size_t total = symmetry_.super().partitionSize(symmetrySector_);
 
-		const ContractedFactorType& cR = contractedFactorRight();
+		const ContractedFactorType& cR = lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
 		const SymmetryFactorType& symm = symmetry_;
 
 		for (size_t bl=0;bl<cR.size();bl++) {
 			const SparseMatrixType& w1 =  hamiltonian_(bl);
+			if (w1.row()==0) continue;
 			SparseMatrixType w;
 			transposeConjugate(w,w1);
 			const SparseMatrixType& r1 = cR(bl);
@@ -286,7 +284,7 @@ private:
 		size_t total = symmetry_.super().partitionSize(symmetrySector_);
 
 		matrix.resize(total,total);
-		const ContractedFactorType& cR = contractedFactorRight();
+		const ContractedFactorType& cR = lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
 		const SymmetryFactorType& symm = symmetry_;
 		VectorType v(total,0);
 		size_t counter = 0;
@@ -294,6 +292,7 @@ private:
 			matrix.setRow(i,counter);
 			for (size_t bl=0;bl<cR.size();bl++) {
 				const SparseMatrixType& w1 = hamiltonian_(bl);
+				if (w1.row()==0) continue;
 				SparseMatrixType w;
 				transposeConjugate(w,w1);
 				const SparseMatrixType& r1 = cR(bl);

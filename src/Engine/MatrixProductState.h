@@ -117,12 +117,27 @@ public:
 	}
 
 	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-	void update(size_t currentSite,const VectorType& v,size_t direction)
+	void update(size_t currentSite,const VectorType& v,size_t direction,size_t symmetrySector)
 	{
-		if (direction==ProgramGlobals::TO_THE_RIGHT)
-			A_[currentSite].updateFromVector(v);
-		else
-			B_[currentSite].updateFromVector(v);
+		if (direction==ProgramGlobals::TO_THE_RIGHT) {
+			if (currentSite>=A_.size()) {
+				MpsFactorType mpsFactor(symm_(currentSite),currentSite,MpsFactorType::TYPE_A);
+				mpsFactor.updateFromVector(v,symmetrySector);
+				A_.push_back(mpsFactor);
+				return;
+			}
+			assert(currentSite<A_.size());
+			A_[currentSite].updateFromVector(v,symmetrySector);
+		} else {
+			assert(currentSite<B_.size());
+			B_[currentSite].updateFromVector(v,symmetrySector);
+		}
+	}
+
+	const MpsFactorType& A(size_t site) const
+	{
+		assert(site<A_.size());
+		return A_[site];
 	}
 
 	const MpsFactorType& B(size_t site) const

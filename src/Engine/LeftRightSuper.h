@@ -83,9 +83,9 @@ public:
 		contracted_.update(currentSite,ab_,direction);
 	}
 
-	void updateMps(size_t currentSite,const VectorType& v,size_t direction)
+	void updateMps(size_t currentSite,const VectorType& v,size_t direction,size_t symmetrySector)
 	{
-		ab_.update(currentSite,v,direction);
+		ab_.update(currentSite,v,direction,symmetrySector);
 	}
 
 	void growRight(size_t currentSite)

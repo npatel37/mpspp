@@ -72,12 +72,12 @@ public:
 
 	typedef typename ProgramGlobals::Vector<SparseMatrixType>::Type DataType;
 
-	ContractedFactor()
-	{
-		SparseMatrixType m(1,1);
-		m.makeDiagonal(1,1);
-		data_.push_back(m);
-	}
+//	ContractedFactor()
+//	{
+//		SparseMatrixType m(1,1);
+//		m.makeDiagonal(1,1);
+//		data_.push_back(m);
+//	}
 
 	ContractedFactor(const MpsFactorType& AorB,const MpoFactorType& h,size_t site)
 		: data_(h.n_row())
@@ -119,9 +119,9 @@ public:
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
-	void update(const MpsFactorType& AorB,size_t direction)
+	void update(const MpsFactorType& AorB)
 	{
-		if (direction==TO_THE_RIGHT) {
+		if (AorB.type()==MpsFactorType::TYPE_A) {
 			updateLeft(AorB);
 		} else {
 			updateRight(AorB);
