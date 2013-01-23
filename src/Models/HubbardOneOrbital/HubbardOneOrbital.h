@@ -113,7 +113,7 @@ public:
 		// FIXME: CONNECT WITH THE GEOMETRY HERE!!
 		RealType tiip1 = 1.0;
 		size_t n = hamiltonian_.size();
-		size_t wdim = 4;
+		size_t wdim = 6;
 
 		SparseMatrixType identity(hilbert_,hilbert_);
 		identity.makeDiagonal(hilbert_,1.0);
@@ -132,26 +132,34 @@ public:
 		MpoFactorType mleft(wdim);
 		mleft(0) = mp_.hubbardU[0]* nupndown;
 		mleft(1) = tiip1 * cdaggerUp;
-		mleft(2) = tiip1 * cdaggerDown;
-		mleft(3) = identity;
+		mleft(2) = -tiip1 * cup;
+		mleft(3) = tiip1 * cdaggerDown;
+		mleft(4) = -tiip1 * cdown;
+		mleft(5) = identity;
 		hamiltonian_(0)=mleft;
 
 		for (size_t i=1;i<n-1;i++) {
 			MpoFactorType m(wdim,wdim);
 			m(0,0) = identity;
 			m(1,0) = cup;
-			m(2,0) = cdown;
-			m(3,0) = mp_.hubbardU[i]* nupndown;
-			m(3,1) = tiip1 * cdaggerUp;
-			m(3,2) = tiip1 * cdaggerDown;
-			m(3,2) = identity;
+			m(2,0) = cdaggerUp;
+			m(3,0) = cdown;
+			m(4,0) = cdaggerDown;
+			m(5,0) = mp_.hubbardU[i]* nupndown;
+			m(5,1) = tiip1 * cdaggerUp;
+			m(5,2) = -tiip1 * cup;
+			m(5,3) = tiip1 * cdaggerDown;
+			m(5,4) = -tiip1 * cdown;
+			m(5,5) = identity;
 			hamiltonian_(i)=m;
 		}
 
 		MpoFactorType mright(wdim);
-		mright(3) = mp_.hubbardU[n-1]* nupndown;
+		mright(5) = mp_.hubbardU[n-1]* nupndown;
+		mright(4) = cdaggerDown;
+		mright(3) = cdown;
+		mright(2) = cdaggerUp;
 		mright(1) = cup;
-		mright(2) = cdown;
 		mright(0) = identity;
 		hamiltonian_(n-1)=mright;
 	}
