@@ -88,7 +88,7 @@ public:
 
 	void growRight(size_t currentSite)
 	{
-		ContractedFactorType cf(abState_.B(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_RIGHT);
+		ContractedFactorType cf(abState_.B(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_RIGHT,0);
 		R_.push_back(cf);
 //		if (L_.size()==0) {
 //			ContractedFactorType cfL;
@@ -126,8 +126,9 @@ private:
 	void updateLeft(size_t currentSite,const MatrixProductStateType& abState)
 	{
 		if (currentSite>=L_.size()) {
-			assert(currentSite==0);
-			ContractedFactorType cf(abState.A(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_LEFT);
+			ContractedFactorType* dataPrev = 0;
+			if (L_.size()>0) dataPrev = &(L_[L_.size()-1]);
+			ContractedFactorType cf(abState.A(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_LEFT,dataPrev);
 			L_.push_back(cf);
 			return;
 		}

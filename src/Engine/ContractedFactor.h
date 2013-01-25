@@ -79,14 +79,14 @@ public:
 //		data_.push_back(m);
 //	}
 
-	ContractedFactor(const MpsFactorType& AorB,const MpoFactorType& h,size_t site,size_t leftOrRight)
+	ContractedFactor(const MpsFactorType& AorB,const MpoFactorType& h,size_t site,size_t leftOrRight,ThisType* dataPrev)
 		: data_(h.n_row()),site_(site),leftOrRight_(leftOrRight)
 	{
 		for (size_t b1=0;b1<data_.size();b1++) {
 			if (leftOrRight == PART_RIGHT) {
-				initLeft2(data_[b1],AorB,b1,h);
-			} else {
 				initRight2(data_[b1],AorB,b1,h);
+			} else {
+				initLeft2(data_[b1],AorB,b1,h,dataPrev);
 			}
 		}
 	}
@@ -151,21 +151,58 @@ private:
 		contractedFactor0(m,AorB,b1,h);
 	}
 
-	void initLeft2(SparseMatrixType& m,const MpsFactorType& AorB,size_t b,const MpoFactorType& h)
+	void initLeft2(SparseMatrixType& m,const MpsFactorType& AorB,size_t b,const MpoFactorType& h,ThisType* dataPrev)
 	{
 		if (site_==0) {
 			contractedFactor0(m,AorB,b,h);
 			return;
 		}
-		SparseMatrixType tmp;
+
+		assert(dataPrev!=0);
 		const SparseMatrixType& A = AorB();
-//		contractedFactor(tmp,AorB,b,h);
+		MatrixType tmp(A.col(),A.col());
 		for (size_t a2=0;a2<A.col();a2++) {
 			for (size_t a2p=0;a2p<A.col();a2p++) {
-
+				tmp(a2,a2p) = initLeft3(AorB,b,h,a2,a2p,dataPrev->data_);
 			}
 		}
+		fullMatrixToCrsMatrix(m,tmp);
 
+	}
+
+	ComplexOrRealType initLeft3(const MpsFactorType& AorB,size_t b,const MpoFactorType& h,size_t a2,size_t a2p,const DataType& dataPrev)
+	{
+		ComplexOrRealType sum2 = 0;
+		const SymmetryFactorType& symm = AorB.symm();
+		const SparseMatrixType& A = AorB();
+
+		for (size_t b1=0;b1<h.n_row();b1++) {
+			const SparseMatrixType& l1 = dataPrev[b1];
+			const SparseMatrixType& w = h(b1,b);
+			size_t hilbertSize = w.row();
+			for (size_t a1=0;a1<l1.row();a1++) {
+				for (int k=l1.getRowPtr(a1);k<l1.getRowPtr(a1+1);k++) {
+					size_t a1p = l1.getCol(k);
+					ComplexOrRealType sum = 0;
+					for (size_t sigma2=0;sigma2<hilbertSize;sigma2++) {
+						size_t j = symm.left().pack(a1,sigma2);
+						for (int k2=A.getRowPtr(j);k2<A.getRowPtr(j+1);k2++) {
+//							size_t a2 = A.getCol(k2);
+							for (int kp=w.getRowPtr(sigma2);kp<w.getRowPtr(sigma2+1);kp++) {
+								size_t sigma2p = w.getCol(kp);
+								size_t jp = symm.left().pack(a1p,sigma2p);
+								for (int k3=A.getRowPtr(jp);k3<A.getRowPtr(jp+1);k3++) {
+//									size_t a2p = A.getCol(k3);
+									sum += A.getValue(k2)*w.getValue(kp)*A.getValue(k3);
+								} // k3
+							} // kp
+						} // k2
+					} // sigma2
+					sum2 += sum*l1.getValue(k);
+				} // k
+			} // a1
+		} // b1
+		return sum2;
 	}
 
 	void contractedFactor0(SparseMatrixType& m,const MpsFactorType& AorB,size_t b1,const MpoFactorType& h)
