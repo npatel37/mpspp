@@ -59,7 +59,7 @@ public:
 
 	MpoFactor(size_t wdim1,size_t wdim2) : data_(wdim1,wdim2) {}
 
-	MpoFactor(size_t wdim1) : data_(wdim1,1) {}
+//	MpoFactor(size_t wdim1) : data_(wdim1,1) {}
 
 	const SparseMatrixType& operator()(size_t i,size_t j) const
 	{
@@ -73,27 +73,27 @@ public:
 		return data_(i,j);
 	}
 
-	const SparseMatrixType& operator()(size_t i) const
-	{
-		assert(i<n_row() && 0<n_col());
-		return data_(i,0);
-	}
+//	const SparseMatrixType& operator()(size_t i) const
+//	{
+//		assert(i<n_row() && 0<n_col());
+//		return data_(i,0);
+//	}
 
-	SparseMatrixType& operator()(size_t i)
-	{
-		assert(i<n_row() && 0<n_col());
-		return data_(i,0);
-	}
+//	SparseMatrixType& operator()(size_t i)
+//	{
+//		assert(i<n_row() && 0<n_col());
+//		return data_(i,0);
+//	}
 
 	size_t n_row() const { return data_.n_row(); }
 
 	size_t n_col() const { return data_.n_col(); }
 
-	size_t hilbertSize() const
-	{
-		assert(data_.n_row()>0 && data_.n_col()>0);
-		return data_(0,0).row();
-	}
+//	size_t hilbertSize() const
+//	{
+//		assert(data_.n_row()>0 && data_.n_col()>0);
+//		return data_(0,0).row();
+//	}
 
 private:
 

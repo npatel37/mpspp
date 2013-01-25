@@ -110,7 +110,7 @@ public:
 	{
 		if (leftOrRight == PART_LEFT) {
 			assert(currentSite<L_.size());
-			std::cout<<L_;
+//			std::cout<<L_;
 		} else {
 			assert(currentSite<R_.size());
 		}

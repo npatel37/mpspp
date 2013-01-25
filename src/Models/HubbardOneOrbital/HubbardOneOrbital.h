@@ -129,14 +129,14 @@ public:
 
 		SparseMatrixType nupndown = (cdaggerUp*cup) * (cdaggerDown*cdown);
 
-		MpoFactorType mleft(wdim);
+		MpoFactorType mleft(1,wdim);
 		RealType mysign = 1;
-		mleft(0) = mp_.hubbardU[0]* nupndown;
-		mleft(1) = tiip1 * cdaggerUp;
-		mleft(2) = mysign * tiip1 * cup;
-		mleft(3) = tiip1 * cdaggerDown;
-		mleft(4) = mysign * tiip1 * cdown;
-		mleft(5) = identity;
+		mleft(0,0) = mp_.hubbardU[0]* nupndown;
+		mleft(0,1) = tiip1 * cdaggerUp;
+		mleft(0,2) = mysign * tiip1 * cup;
+		mleft(0,3) = tiip1 * cdaggerDown;
+		mleft(0,4) = mysign * tiip1 * cdown;
+		mleft(0,5) = identity;
 		hamiltonian_(0)=mleft;
 
 		for (size_t i=1;i<n-1;i++) {
@@ -155,13 +155,13 @@ public:
 			hamiltonian_(i)=m;
 		}
 
-		MpoFactorType mright(wdim);
-		mright(5) = mp_.hubbardU[n-1]* nupndown;
-		mright(4) = cdaggerDown;
-		mright(3) = cdown;
-		mright(2) = cdaggerUp;
-		mright(1) = cup;
-		mright(0) = identity;
+		MpoFactorType mright(wdim,1);
+		mright(5,0) = mp_.hubbardU[n-1]* nupndown;
+		mright(4,0) = cdaggerDown;
+		mright(3,0) = cdown;
+		mright(2,0) = cdaggerUp;
+		mright(1,0) = cup;
+		mright(0,0) = identity;
 		hamiltonian_(n-1)=mright;
 	}
 

@@ -258,7 +258,7 @@ private:
 		const SymmetryFactorType& symm = symmetry_;
 
 		for (size_t bl=0;bl<cR.size();bl++) {
-			const SparseMatrixType& w =  hamiltonian_(bl);
+			const SparseMatrixType& w =  hamiltonian_(0,bl);
 			if (w.row()==0) continue;
 //			SparseMatrixType w;
 //			transposeConjugate(w,w1);
@@ -295,7 +295,7 @@ private:
 		for (size_t i=0;i<total;i++) {
 			matrix.setRow(i,counter);
 			for (size_t bl=0;bl<cR.size();bl++) {
-				const SparseMatrixType& w = hamiltonian_(bl);
+				const SparseMatrixType& w = hamiltonian_(0,bl);
 				if (w.row()==0) continue;
 //				SparseMatrixType w;
 //				transposeConjugate(w,w1);

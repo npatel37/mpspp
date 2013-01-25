@@ -264,7 +264,7 @@ struct ParametersMpsSolver {
 	std::string model;
 	std::vector<RealType> targetQuantumNumbers;
 	size_t electronsUp,electronsDown;
-	std::string initialMps;
+//	std::string initialMps;
 //	RealType tolerance;
 //	DmrgCheckPoint checkpoint;
 	size_t nthreads;
@@ -361,7 +361,7 @@ struct ParametersMpsSolver {
 			throw std::runtime_error(s.c_str());
 		}
 
-		io.readline(initialMps,"InitialMps=");
+//		io.readline(initialMps,"InitialMps=");
 //		tolerance = -1.0;
 //		try {
 //			io.readline(tolerance,"TruncationTolerance=");
