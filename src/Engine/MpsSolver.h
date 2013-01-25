@@ -136,7 +136,8 @@ private:
 		LeftRightSuperType lrs(psi,contracted);
 		StepType step(solverParams_,lrs,model_);
 
-		for (size_t center=0;center<model_.geometry().numberOfSites();center++) {
+		size_t nsites = model_.geometry().numberOfSites();
+		for (size_t center=0;center<nsites-1;center++) {
 			step.growRight(symm,center);
 		}
 	}

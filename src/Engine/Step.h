@@ -167,12 +167,13 @@ private:
 		size_t targetQuantumNumber = getQuantumSector(sites,direction);
 		
 		SymmetryComponentType super = lrs_.symmetry()(center).super();
-		for (size_t i=0;i<super.partitions();i++) {
+		for (size_t i=0;i<super.partitions()-1;i++) {
 			size_t state = super.partitionOffset(i);
 			size_t q = super.qn(state);
 			if (q == targetQuantumNumber) return i;
 		}
 		assert(false);
+		throw std::runtime_error("getSymmetrySector\n");
 		return -1;
 	}
 	

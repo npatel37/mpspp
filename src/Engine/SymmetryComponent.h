@@ -72,24 +72,30 @@ public:
 		findPermutationAndPartition();
 	}
 
-	SymmetryComponent(IoInputType& io,size_t divisor)
-	{		
-		loadInternal(io);
-		leftSize_ = size()/divisor;
+//	SymmetryComponent(IoInputType& io,size_t divisor)
+//	{
+//		loadInternal(io);
+//		leftSize_ = size()/divisor;
+//	}
+
+	void setSite(size_t site)
+	{
+		assert(block_.size()==1);
+		block_[0] = site;
 	}
 
-	void grow(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
+	void grow(size_t site,const std::vector<size_t>& quantumNumbers)
 	{
 		SymmetryComponent sc(0,site,quantumNumbers);
 
-		if (size()==0) {
+//		if (size()==0) {
 			*this = sc;
-			return;
-		}
+//			return;
+//		}
 
-		SymmetryComponent self = *this;
+//		SymmetryComponent self = *this;
 
-		combine(self,sc);
+//		combine(self,sc);
 	}
 
 	void combine(const SymmetryComponent& left,const SymmetryComponent& right)

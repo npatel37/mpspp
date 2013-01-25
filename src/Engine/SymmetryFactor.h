@@ -75,13 +75,15 @@ public:
 	void growRight(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers,SymmetryFactor* previous)
 	{
 		if (previous==0) {
-			right_.grow(hilbert,site,quantumNumbers);
+			assert(site==0);
+			right_.grow(site,quantumNumbers);
 			if (left_.size()==0) left_=right_;
+			right_.setSite(site+1);
 			super_.combine(left_,right_);
 			return;
 		}
 		left_ = previous->super();
-		right_.grow(hilbert,site,quantumNumbers);
+		right_.grow(site+1,quantumNumbers);
 		super_.combine(left_,right_);
 	}
 

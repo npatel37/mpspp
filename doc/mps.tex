@@ -41,21 +41,22 @@ tbw
 \maketitle
 
 \section{\label{sec:intro}Introduction}
-$|\psi\rangle=\sum_{\sigma_1,\sigma_2} \sum_{a_1} B^{\sigma_1}_{a_1} B^{\sigma_2}_{a_1}|\sigma_1\sigma_2\rangle$
+\subsection{Lattice growth to the right}
+%$|\psi\rangle=\sum_{\sigma_1,\sigma_2} \sum_{a_1} B^{\sigma_1}_{a_1} B^{\sigma_2}_{a_1}|\sigma_1\sigma_2\rangle$
 \begin{equation}
 R_{b_1}^{a_1,a'_1} =  \sum_{\sigma_2,\sigma'_2} B^{\sigma_2 *}_{a_1}
-W^{\sigma_2,\sigma'_{2}}_{b_1} B^{\sigma'_2}_{a'_1}
+W^{\sigma_2,\sigma'_{2}}_{b_1,1} B^{\sigma'_2}_{a'_1}
 \end{equation}
 
 \begin{equation}
-\sum_{\sigma'_1,a'_1,b_1} W^{\sigma_1,\sigma'_1}_{b_1} R_{b_1}^{a_1,a'_1} M^{\sigma'_1}_{a'_1} - \lambda M^{\sigma_1}_{a_1}=0
+\sum_{\sigma'_1,a'_1,b_1} W^{\sigma_1,\sigma'_1}_{1,b_1} R_{b_1}^{a_1,a'_1} M^{\sigma'_1}_{a'_1} - \lambda M^{\sigma_1}_{a_1}=0
 \end{equation}
 
 Obtain $A_{\sigma_1,a'_1}$ with an SVD: $M^{\sigma_1}_{a_1} = \sum_{a'_1} A_{\sigma_1,a'_1} S_{a'_1} (V^\dagger)_{a'_1,a_1}$.
 Compute $L^{a_1,a'_1}_{b_1} = \sum_{\sigma_1,\sigma'_1} A^{\sigma_1 *}_{a_1} W^{\sigma_1,\sigma'_1}_{b_1} A^{\sigma'_1}_{a'_1}$.
 \begin{equation}
 R_{b_2}^{a_2,a'_2} =  \sum_{\sigma_3,\sigma'_3} B^{\sigma_3 *}_{a_2}
-W^{\sigma_3,\sigma'_3}_{b_2} B^{\sigma'_3}_{a'_2},
+W^{\sigma_3,\sigma'_3}_{b_2,1} B^{\sigma'_3}_{a'_2},
 \end{equation}
 and from
 \begin{equation}
@@ -68,6 +69,12 @@ M^{\sigma_2}_{a_1,a^B_2}=M_{(a1\sigma_2)a^B_2}=\sum_{a^{'A}_2} A_{(a1,\sigma_2),
 \begin{equation}
 L^{a_2,a'_2}_{b_2} = \sum_{a_1,b_1,a'_1} L^{a_1,a'_1}_{b_1} \sum_{\sigma_2\sigma'_2} A^{\sigma_2 *}_{a_1,a_2} W^{\sigma_2\sigma'_2}_{b_1,b_2}A^{\sigma'_2}_{a'_1,a'_2}
 \end{equation}
+
+\subsection{Sweep to the left}
+
+
+
+
 \end{document}
 %
 % ****** End of file apssamp.tex ******
