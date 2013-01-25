@@ -123,8 +123,10 @@ public:
 		for (size_t blm1=0;blm1<cL.size();blm1++) {
 			const SparseMatrixType& l1 = cL(blm1);
 			for (size_t bl=0;bl<cR.size();bl++) {
-				const SparseMatrixType& w =  hamiltonian_(bl,blm1);
+				const SparseMatrixType& w =  hamiltonian_(blm1,bl);
 				if (w.row()==0) continue;
+//				SparseMatrixType w;
+//				transposeConjugate(w,w1);
 				const SparseMatrixType& r1 = cR(bl);
 				for (size_t i=0;i<total;i++) {
 					PairType ab = symm.super().unpack(i+offset);
@@ -189,8 +191,10 @@ public:
 			for (size_t blm1=0;blm1<cL.size();blm1++) {
 				const SparseMatrixType& l1 = cL(blm1);
 				for (size_t bl=0;bl<cR.size();bl++) {
-					const SparseMatrixType& w = hamiltonian_(bl,blm1);
+					const SparseMatrixType& w = hamiltonian_(blm1,bl);
 					if (w.row()==0) continue;
+//					SparseMatrixType w;
+//					transposeConjugate(w,w1);
 					const SparseMatrixType& r1 = cR(bl);
 
 					PairType ab = symm.super().unpack(i+offset);
@@ -254,10 +258,10 @@ private:
 		const SymmetryFactorType& symm = symmetry_;
 
 		for (size_t bl=0;bl<cR.size();bl++) {
-			const SparseMatrixType& w1 =  hamiltonian_(bl);
-			if (w1.row()==0) continue;
-			SparseMatrixType w;
-			transposeConjugate(w,w1);
+			const SparseMatrixType& w =  hamiltonian_(bl);
+			if (w.row()==0) continue;
+//			SparseMatrixType w;
+//			transposeConjugate(w,w1);
 			const SparseMatrixType& r1 = cR(bl);
 			for (size_t i=0;i<total;i++) {
 				PairType ab = symm.super().unpack(i+offset);
@@ -291,10 +295,10 @@ private:
 		for (size_t i=0;i<total;i++) {
 			matrix.setRow(i,counter);
 			for (size_t bl=0;bl<cR.size();bl++) {
-				const SparseMatrixType& w1 = hamiltonian_(bl);
-				if (w1.row()==0) continue;
-				SparseMatrixType w;
-				transposeConjugate(w,w1);
+				const SparseMatrixType& w = hamiltonian_(bl);
+				if (w.row()==0) continue;
+//				SparseMatrixType w;
+//				transposeConjugate(w,w1);
 				const SparseMatrixType& r1 = cR(bl);
 
 				PairType ab = symm.super().unpack(i+offset);

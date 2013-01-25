@@ -88,7 +88,7 @@ public:
 
 	void growRight(size_t currentSite)
 	{
-		ContractedFactorType cf(abState_.B(currentSite),h_(currentSite),currentSite);
+		ContractedFactorType cf(abState_.B(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_RIGHT);
 		R_.push_back(cf);
 //		if (L_.size()==0) {
 //			ContractedFactorType cfL;
@@ -108,13 +108,18 @@ public:
 
 	const ContractedFactorType& operator()(size_t currentSite,size_t leftOrRight) const
 	{
-		if (leftOrRight == PART_LEFT)
+		if (leftOrRight == PART_LEFT) {
 			assert(currentSite<L_.size());
-		else
+			std::cout<<L_;
+		} else {
 			assert(currentSite<R_.size());
+		}
 
 		return (leftOrRight == PART_LEFT) ? L_[currentSite] : R_[currentSite];
 	}
+
+	template<typename MatrixProductOperatorType_>
+	friend std::ostream& operator<<(std::ostream& os,const ContractedPart<MatrixProductOperatorType_>& contractedPart);
 
 private:
 
@@ -122,7 +127,7 @@ private:
 	{
 		if (currentSite>=L_.size()) {
 			assert(currentSite==0);
-			ContractedFactorType cf(abState.A(currentSite),h_(currentSite),currentSite);
+			ContractedFactorType cf(abState.A(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_LEFT);
 			L_.push_back(cf);
 			return;
 		}
@@ -143,6 +148,18 @@ private:
 	typename ProgramGlobals::Vector<ContractedFactorType>::Type L_;
 
 }; // ContractedPart
+
+template<typename MatrixProductOperatorType>
+std::ostream& operator<<(std::ostream& os,const ContractedPart<MatrixProductOperatorType>& contractedPart)
+{
+	os<<"ContractedPart: right size="<<contractedPart.R_.size()<<"\n";
+	for (size_t i=0;i<contractedPart.R_.size();i++)
+		os<<contractedPart.R_[i];
+	os<<"ContractedPart: left size="<<contractedPart.L_.size()<<"\n";
+	for (size_t i=0;i<contractedPart.L_.size();i++)
+		os<<contractedPart.L_[i];
+	return os;
+}
 
 } // namespace Mpspp
 

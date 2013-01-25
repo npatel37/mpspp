@@ -100,6 +100,7 @@ public:
 
 	void growRight(size_t currentSite)
 	{
+		center_ = currentSite;
 		MpsFactorType mpsFactor(symm_(currentSite),currentSite,MpsFactorType::TYPE_B);
 		mpsFactor.setRandom(currentSite);
 		B_.push_back(mpsFactor);
