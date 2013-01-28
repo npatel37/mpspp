@@ -94,12 +94,6 @@ public:
 		contracted_.growRight(currentSite);
 	}
 
-	void moveLeft(size_t currentSite)
-	{
-		ab_.moveLeft(currentSite);
-		contracted_.moveLeft(currentSite);
-	}
-
 private:
 
 	PsimagLite::ProgressIndicator progress_;

@@ -76,11 +76,6 @@ public:
 		R_.push_back(cf);
 	}
 
-	void moveLeft(size_t currentSite)
-	{
-		std::cout<<"moveLeft\n";
-	}
-
 	//! From As (or Bs) and Ws reconstruct *this
 	void update(size_t currentSite,const MatrixProductStateType& abState,size_t direction)
 	{
@@ -117,12 +112,16 @@ private:
 			L_.push_back(cf);
 			return;
 		}
-		L_[currentSite].update(abState.A(currentSite));
+		assert(currentSite<L_.size());
+		assert(currentSite>0);
+		L_[currentSite].update(abState.A(currentSite),h_(currentSite),L_[currentSite-1]);
 	}
 
 	void updateRight(size_t currentSite,const MatrixProductStateType& abState)
 	{
-		L_[currentSite].update(abState.B(currentSite));
+		assert(currentSite<R_.size());
+		assert(currentSite>0);
+		R_[currentSite-1].update(abState.B(currentSite),h_(currentSite),R_[currentSite]);
 	}
 
 	const MatrixProductStateType& abState_;

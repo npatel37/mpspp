@@ -50,19 +50,18 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
-template<typename RealType>
+template<typename RealType,typename VectorType>
 class StatePredictor {
 
 public:
 
 	StatePredictor()
-		: rng_(3433117)
+		: rng_(3433117),symmetrySector_(0)
 	{}
 
-	template<typename SomeVectorType>
-	void createRandomVector(SomeVectorType& y,size_t offset,size_t final) const
+	void createRandomVector(VectorType& y,size_t offset,size_t final)
 	{
-		typedef typename SomeVectorType::value_type ComplexOrRealType;
+		typedef typename VectorType::value_type ComplexOrRealType;
 		ComplexOrRealType tmp;
 		typename ProgramGlobals::Real<ComplexOrRealType>::Type atmp=0;
 		y.resize(final-offset);
@@ -73,8 +72,18 @@ public:
 		}
 		atmp = 1.0 / sqrt (atmp);
 		for (size_t i=offset;i<final;i++) y[i] *= atmp;
-
+		vectorSaved_=y;
 	}
+
+	void push(const VectorType& v,size_t symmetrySector)
+	{
+		vectorSaved_ = v;
+		symmetrySector_ = symmetrySector;
+	}
+
+	const VectorType& vector() const { return vectorSaved_; }
+
+	size_t symmSector() const { return symmetrySector_; }
 
 private:
 
@@ -89,6 +98,8 @@ private:
 	}
 
 	PsimagLite::Random48<RealType> rng_;
+	VectorType vectorSaved_;
+	size_t symmetrySector_;
 }; // StatePredictor
 
 } // namespace Mpspp

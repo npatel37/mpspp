@@ -91,12 +91,14 @@ public:
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
-	void update(const MpsFactorType& AorB)
+	void update(const MpsFactorType& AorB,const MpoFactorType& h,const ThisType& dataPrev)
 	{
-		if (AorB.type()==MpsFactorType::TYPE_A) {
-			updateLeft(AorB);
+		if (leftOrRight_ == PART_RIGHT) {
+			assert(AorB.type()==MpsFactorType::TYPE_B);
+			updateRight(AorB,h,dataPrev.data_);
 		} else {
-			updateRight(AorB);
+			assert(AorB.type()==MpsFactorType::TYPE_A);
+			updateLeft(AorB);
 		}
 	}
 
@@ -262,12 +264,91 @@ private:
 		throw std::runtime_error(str.c_str());
 	}
 
-	void updateRight(const MpsFactorType& B)
+	void updateRight(const MpsFactorType& B,const MpoFactorType& h,const DataType& dataPrev)
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to updateRight(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		assert(leftOrRight_ == PART_RIGHT);
+		assert(B.type()==MpsFactorType::TYPE_B);
+		SparseMatrixType Btranspose;
+		transposeConjugate(Btranspose,B());
+		for (size_t blm2=0;blm2<data_.size();blm2++)
+			updateRight(data_[blm2],blm2,B,Btranspose,h,dataPrev);
+	}
+
+	void updateRight(SparseMatrixType& m,size_t blm2,const MpsFactorType& B,const SparseMatrixType& Btranspose, const MpoFactorType& h,const DataType& dataPrev)
+	{
+		size_t someSize = B().row();
+		m.resize(someSize,someSize);
+
+		size_t counter = 0;
+		std::vector<size_t> cols(m.row(),0);
+		std::vector<ComplexOrRealType> values(m.row(),0.0);
+
+		for (size_t alm2=0;alm2<m.row();alm2++) {
+			m.setRow(alm2,counter);
+			updateRight(values,cols,alm2,blm2,B,Btranspose,h,dataPrev);
+			for (size_t i=0;i<cols.size();i++) {
+				if (cols[i]==0) continue;
+				cols[i]=0;
+				m.pushCol(i);
+				m.pushValue(values[i]);
+				values[i]=0;
+				counter++;
+			}
+		}
+		m.setRow(m.row(),counter);
+	}
+
+	void updateRight(std::vector<ComplexOrRealType>& values,
+					 std::vector<size_t>& cols,
+					 size_t alm2,
+					 size_t blm2,
+					 const MpsFactorType& B,
+					 const SparseMatrixType& Btranspose,
+					 const MpoFactorType& h,
+					 const DataType& dataPrev)
+	{
+		size_t hilbert = h(0,0).row();
+		const SymmetryFactorType& symm = B.symm();
+		const SparseMatrixType& Bmatrix = B();
+
+		for (int kb=Bmatrix.getRowPtr(i);kb<Bmatrix.getRowPtr(i+1);kb++) {
+			PairType sigmalm1alm1 = symm.right().unpack(Bmatrix.getCol(kb));
+			size_t sigmalm1 = sigmalm1alm1.first;
+			size_t alm1 = sigmalm1alm1.second;
+			for (size_t blm1=0;blm1<dataPrev.size();blm1++) {
+				const SparseMatrixType& w = h(blm2,blm1);
+				if (w.row()==0) continue;
+				for (int k=w.getRowPtr(sigmalm1);k<w.getRowPtr(sigmalm1+1);k++) {
+					size_t sigmaplm1 = w.getCol(k);
+					for (int kprev=dataPrev[blm1].getRowPtr(alm1);kprev<dataPrev[blm1].getRowPtr(alm1+1);kprev++) {
+						size_t aplm1 = dataPrev.getCol(kprev);
+						size_t i = symm.right().pack(sigmaplm1,aplm1);
+						for (int kb2=Btranspose.getRowPtr(i);kb2<Btranspose.getRowPtr(i+1);kb2++) {
+					}
+				}
+		for (size_t sigmalm1=0;sigmalm1<hilbert;sigmalm1++) {
+			size_t i = symm.right().pack(sigmalm1,alm2);
+
+				size_t alm1 = Bmatrix.getCol(kb);
+
+					const SparseMatrixType& w = h(blm2,blm1);
+					if (w.row()==0) continue;
+
+					for (int kprev=dataPrev[blm1].getRowPtr(alm1);kprev<dataPrev[blm1].getRowPtr(alm1+1);kprev++) {
+						size_t aplm1 = dataPrev[blm1].getCol(kprev);
+						for (int kb2=Btranspose.getRowPtr(aplm1);kb2<Btranspose.getRowPtr(aplm1+1);kb2++) {
+							PairType sigmaplm1aplm2 = symm.right().unpack(Btranspose.getCol(kb2));
+							size_t aplm2 = sigmaplm1aplm2.second;
+							for (int k=w.getRowPtr(sigmalm1);k<w.getRowPtr(sigmalm1+1);k++) {
+								if (sigmaplm1aplm2.first != size_t(w.getCol(k))) continue;
+								values[aplm2] += std::conj(Bmatrix.getValue(kb))*w.getValue(k)*Btranspose.getValue(kb2) * dataPrev[blm1].getValue(kprev);
+								cols[aplm2]=1;
+							} // k
+						} // kb2
+					} // kprev
+				} // blm1
+			} // kb
+		} //sigmalm1
 	}
 
 	std::string partToString() const

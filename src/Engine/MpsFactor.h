@@ -118,14 +118,20 @@ public:
 		MatrixType m(symm_.left().size(),symm_.right().size());
 
 
-		computeMatrix(m,v,symmetrySector);
+		size_t offset = symm_.super().partitionOffset(symmetrySector);
+		size_t total = symm_.super().partitionSize(symmetrySector);
+		for (size_t i=0;i<total;i++) {
+			PairType ab = symm_.super().unpack(i+offset);
+			if (aOrB_==TYPE_A) {
+				m(ab.first,ab.second) = v[i];
+			} else {
+				m(ab.second,ab.first) = v[i];
+			}
+		}
 
-		MatrixType mtranspose;
-
-		if (aOrB_==TYPE_B)
-			transposeConjugate(mtranspose,m);
-
-		doSvd((aOrB_==TYPE_A) ? m : mtranspose);
+		std::vector<RealType> s;
+		svd(m,s);
+		fullMatrixToCrsMatrix(data_,m);
 	}
 
 	const SparseMatrixType& operator()() const { return data_; }
@@ -135,27 +141,6 @@ public:
 	const size_t type() const { return aOrB_; }
 
 private:
-
-	void computeMatrix(MatrixType& m,const VectorType& v,size_t symmetrySector)
-	{
-		assert(aOrB_==TYPE_A);
-
-		size_t offset = symm_.super().partitionOffset(symmetrySector);
-		size_t total = symm_.super().partitionSize(symmetrySector);
-		for (size_t i=0;i<total;i++) {
-			PairType ab = symm_.super().unpack(i+offset);
-			size_t a1sigma2 = ab.first;
-			size_t a2 = ab.second;
-			m(a1sigma2,a2) = v[i];
-		}
-	}
-
-	void doSvd(MatrixType& m)
-	{
-		std::vector<RealType> s;
-		svd(m,s);
-		fullMatrixToCrsMatrix(data_,m);
-	}
 
 	const SymmetryFactorType& symm_;
 	size_t site_;

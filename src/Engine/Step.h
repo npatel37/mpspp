@@ -70,7 +70,7 @@ class Step {
 	typedef typename LeftRightSuperType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
-	typedef StatePredictor<RealType> StatePredictorType;
+	typedef StatePredictor<RealType,VectorType> StatePredictorType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -99,8 +99,15 @@ public:
 		std::vector<size_t> quantumNumbers;
 		size_t hilbert = 0;
 		model_.getOneSite(hilbert,quantumNumbers,currentSite);
+
+		size_t nsites = model_.geometry().numberOfSites();
+		if (currentSite+2==nsites) {
+			symm.moveLeft(hilbert,currentSite,quantumNumbers);
+			lrs_.updateMps(currentSite,statePredictor_.vector(),TO_THE_LEFT,statePredictor_.symmSector());
+			lrs_.updateContracted(currentSite,TO_THE_LEFT);
+		}
+
 		symm.moveLeft(hilbert,currentSite,quantumNumbers);
-		lrs_.moveLeft(currentSite); // computes A, computes L
 		internalUpdate(currentSite,TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
 		lrs_.updateContracted(currentSite,TO_THE_LEFT);
 	}
@@ -133,6 +140,7 @@ private:
 		typedef typename ModelType::ModelHelperType ModelHelperType;
 
 		size_t symmetrySector = getSymmetrySector(direction);
+		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
 
 		ReflectionSymmetryType *rs = 0;
 		ModelHelperType modelHelper(lrs_,symmetrySector,currentSite,direction,model_.hamiltonian()(currentSite));
@@ -166,6 +174,7 @@ private:
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
 
 		lrs_.updateMps(currentSite,tmpVec,direction,symmetrySector);
+		statePredictor_.push(tmpVec,symmetrySector);
 	}
 
 	size_t getSymmetrySector(size_t direction) const

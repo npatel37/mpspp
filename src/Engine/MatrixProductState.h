@@ -99,11 +99,6 @@ public:
 		B_.push_back(mpsFactor);
 	}
 
-	void moveLeft(size_t currentSite)
-	{
-		center_ = currentSite;
-	}
-
 	size_t center() const
 	{
 		return center_;
@@ -118,6 +113,7 @@ public:
 	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
 	void update(size_t currentSite,const VectorType& v,size_t direction,size_t symmetrySector)
 	{
+		center_ = currentSite;
 		if (direction==ProgramGlobals::TO_THE_RIGHT) {
 			if (currentSite>=A_.size()) {
 				MpsFactorType mpsFactor(symm_(currentSite),currentSite,MpsFactorType::TYPE_A);
