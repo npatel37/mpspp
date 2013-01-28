@@ -91,19 +91,17 @@ public:
 		}
 	}
 
-//	void setRandom(size_t site)
-//	{
-//		MpsFactorType mpsFactor(symm_(site),site);
-//		mpsFactor.setRandom(site);
-//		data_.resize(1,mpsFactor);
-//	}
-
 	void growRight(size_t currentSite)
 	{
 		center_ = currentSite;
 		MpsFactorType mpsFactor(symm_(currentSite),currentSite,MpsFactorType::TYPE_B);
 		mpsFactor.setRandom(currentSite);
 		B_.push_back(mpsFactor);
+	}
+
+	void moveLeft(size_t currentSite)
+	{
+		center_ = currentSite;
 	}
 
 	size_t center() const

@@ -258,7 +258,7 @@ private:
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to update(...) here. I cannot go further until this is implemented\n";
+		str += "Need to updateLeft(...) here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 	}
 
@@ -266,7 +266,7 @@ private:
 	{
 		std::string str(__FILE__);
 		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to update(...) here. I cannot go further until this is implemented\n";
+		str += "Need to updateRight(...) here. I cannot go further until this is implemented\n";
 		throw std::runtime_error(str.c_str());
 	}
 

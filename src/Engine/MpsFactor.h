@@ -115,20 +115,17 @@ public:
 
 	void updateFromVector(const VectorType& v,size_t symmetrySector)
 	{
-		assert(aOrB_==TYPE_A);
-
-		size_t offset = symm_.super().partitionOffset(symmetrySector);
-		size_t total = symm_.super().partitionSize(symmetrySector);
 		MatrixType m(symm_.left().size(),symm_.right().size());
-		for (size_t i=0;i<total;i++) {
-			PairType ab = symm_.super().unpack(i+offset);
-			size_t a1sigma2 = ab.first;
-			size_t a2 = ab.second;
-			m(a1sigma2,a2) = v[i];
-		}
-		std::vector<RealType> s;
-		svd(m,s);
-		fullMatrixToCrsMatrix(data_,m);
+
+
+		computeMatrix(m,v,symmetrySector);
+
+		MatrixType mtranspose;
+
+		if (aOrB_==TYPE_B)
+			transposeConjugate(mtranspose,m);
+
+		doSvd((aOrB_==TYPE_A) ? m : mtranspose);
 	}
 
 	const SparseMatrixType& operator()() const { return data_; }
@@ -139,19 +136,27 @@ public:
 
 private:
 
-//	//! MpsFactorM is phi_i
-//	//! interpret M^{sigma2}_{a1,a2^B} as  M_(alpha,a2^B)
-//	//!  M_(alpha,a2^B) = \sum_{i} phi_i \delta_{P^SE(alpha+a2^B*ns),i}
-//	void findMpsFactor1(MatrixType& m,const VectorWithOffsetType& v) const
-//	{
-//		size_t total = v.effectiveSize();
-//		size_t offset = v.offset(0);
-//		m.resize( symm_.left().size(),symm_.right().size());
-//		for (size_t i=0;i<total;i++) {
-//			PairType alphaBeta = symm_.super().unpack(i+offset);
-//			m(alphaBeta.first,alphaBeta.second) = v.fastAccess(0,i);
-//		}
-//	}
+	void computeMatrix(MatrixType& m,const VectorType& v,size_t symmetrySector)
+	{
+		assert(aOrB_==TYPE_A);
+
+		size_t offset = symm_.super().partitionOffset(symmetrySector);
+		size_t total = symm_.super().partitionSize(symmetrySector);
+		for (size_t i=0;i<total;i++) {
+			PairType ab = symm_.super().unpack(i+offset);
+			size_t a1sigma2 = ab.first;
+			size_t a2 = ab.second;
+			m(a1sigma2,a2) = v[i];
+		}
+	}
+
+	void doSvd(MatrixType& m)
+	{
+		std::vector<RealType> s;
+		svd(m,s);
+		fullMatrixToCrsMatrix(data_,m);
+	}
+
 	const SymmetryFactorType& symm_;
 	size_t site_;
 	RandomNumberGeneratorType rng_;

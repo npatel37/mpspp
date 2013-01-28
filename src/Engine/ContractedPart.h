@@ -68,32 +68,17 @@ public:
 
 	ContractedPart(const MatrixProductStateType& abState,const MatrixProductOperatorType& h)
 		: abState_(abState),h_(h)
-	  //: dataLeft_(abState.center()+1),dataRight_(abState.sites()-dataLeft_.size()+1)
-	{
-		// page 62, equations 192 and 193
-//		assert(dataLeft_.size()>0);
-//		dataLeft_[0].init(abState(0),h(0),0,PART_LEFT,0);
-//		for (size_t i=1;i<dataLeft_.size();i++) {
-//			dataLeft_[i].init(abState(i-1),h(i-1),i,PART_LEFT,&dataLeft_[i-1]);
-//			std::cerr<<"Testing: ContracedPart (left) i="<<i<<" out of "<<dataLeft_.size()<<"\n";
-//		}
-//		size_t center = abState.center();
-//		std::cerr<<"ContractedPart center="<<center<<"\n";
-//		dataRight_[center].initRight(abState(center),h(center),center,0);
-//		for (size_t i=1;i<dataRight_.size();i++) {
-//			dataRight_[i].init(abState(i+center-1),h(i+center-1),i+center,PART_RIGHT,&dataRight_[i-1]);
-//			std::cerr<<"Testing: ContracedPart (right) i="<<i<<" out of "<<dataRight_.size()<<"\n";
-//		}
-	}
+	{}
 
 	void growRight(size_t currentSite)
 	{
 		ContractedFactorType cf(abState_.B(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_RIGHT,0);
 		R_.push_back(cf);
-//		if (L_.size()==0) {
-//			ContractedFactorType cfL;
-//			L_.push_back(cfL);
-//		}
+	}
+
+	void moveLeft(size_t currentSite)
+	{
+		std::cout<<"moveLeft\n";
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
@@ -137,10 +122,7 @@ private:
 
 	void updateRight(size_t currentSite,const MatrixProductStateType& abState)
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to updateRight(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		L_[currentSite].update(abState.B(currentSite));
 	}
 
 	const MatrixProductStateType& abState_;

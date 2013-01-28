@@ -100,9 +100,9 @@ public:
 		size_t hilbert = 0;
 		model_.getOneSite(hilbert,quantumNumbers,currentSite);
 		symm.moveLeft(hilbert,currentSite,quantumNumbers);
-//		lrs_.moveLeft(currentSite); // computes A, computes L
-//		internalUpdate(currentSite,TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
-//		lrs_.updateContracted(currentSite,TO_THE_LEFT);
+		lrs_.moveLeft(currentSite); // computes A, computes L
+		internalUpdate(currentSite,TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
+		lrs_.updateContracted(currentSite,TO_THE_LEFT);
 	}
 
 	void growRight(SymmetryLocalType& symm,size_t currentSite)
