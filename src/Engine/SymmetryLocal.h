@@ -86,13 +86,16 @@ public:
 		return data_[site];
 	}
 
-//	void set(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
-//	{
-//		SymmetryFactorType symmFactor;
-//		symmFactor.growRight(hilbert,site,quantumNumbers);
-//		data_.clear();
-//		data_.push_back(symmFactor);
-//	}
+	void moveLeft(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
+	{
+		assert(site>0);
+		assert(data_.size()>site);
+//		std::cout<<"center="<<center<<"\n";
+		SymmetryFactorType *previous =  &data_[site-1];
+		SymmetryFactorType symmFactor = data_[site];
+		symmFactor.moveLeft(hilbert,site,quantumNumbers,previous);
+		data_[site] = symmFactor;
+	}
 
 	void growRight(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
 	{

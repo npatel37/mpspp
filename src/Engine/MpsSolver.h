@@ -140,6 +140,10 @@ private:
 		for (size_t center=0;center<nsites-1;center++) {
 			step.growRight(symm,center);
 		}
+		for (size_t i=0;i<nsites-1;i++) {
+			size_t center = nsites-2-i;
+			step.moveLeft(symm,center);
+		}
 	}
 
 	void finiteStep(LeftRightSuperType& lrs,size_t loopIndex)

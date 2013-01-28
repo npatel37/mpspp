@@ -87,15 +87,7 @@ public:
 	void grow(size_t site,const std::vector<size_t>& quantumNumbers)
 	{
 		SymmetryComponent sc(0,site,quantumNumbers);
-
-//		if (size()==0) {
-			*this = sc;
-//			return;
-//		}
-
-//		SymmetryComponent self = *this;
-
-//		combine(self,sc);
+		*this = sc;
 	}
 
 	void combine(const SymmetryComponent& left,const SymmetryComponent& right)

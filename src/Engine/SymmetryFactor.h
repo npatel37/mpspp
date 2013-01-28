@@ -87,12 +87,14 @@ public:
 		super_.combine(left_,right_);
 	}
 
-//	void adjustCorner(size_t corner)
-//	{
-//		super_.adjustCorner(corner);
-//		left_.adjustCorner(corner);
-//		right_.adjustCorner(corner);
-//	}
+	void moveLeft(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers,SymmetryFactor* previous)
+	{
+		left_ = previous->left();
+		SymmetryComponent onesite(0,site,quantumNumbers);
+		SymmetryComponent rightCopy = right_;
+		right_.combine(onesite,rightCopy);
+		super_.combine(left_,right_);
+	}
 
 	const SymmetryComponentType& super() const { return super_; }
 

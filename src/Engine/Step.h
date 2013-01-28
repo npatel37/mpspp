@@ -94,15 +94,23 @@ public:
 	}
 
 	//! Moves the center of orthogonality by one to the left
-	void moveLeft(size_t currentSite)
+	void moveLeft(SymmetryLocalType& symm,size_t currentSite)
 	{
-		internalUpdate(currentSite,TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
-		lrs_.updateContracted(currentSite,lrs_.abState(),TO_THE_LEFT);
+		std::vector<size_t> quantumNumbers;
+		size_t hilbert = 0;
+		model_.getOneSite(hilbert,quantumNumbers,currentSite);
+		symm.moveLeft(hilbert,currentSite,quantumNumbers);
+//		lrs_.moveLeft(currentSite); // computes A, computes L
+//		internalUpdate(currentSite,TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
+//		lrs_.updateContracted(currentSite,TO_THE_LEFT);
 	}
 
 	void growRight(SymmetryLocalType& symm,size_t currentSite)
 	{
-		model_.growRight(symm,currentSite); // grows symm
+		std::vector<size_t> quantumNumbers;
+		size_t hilbert = 0;
+		model_.getOneSite(hilbert,quantumNumbers,currentSite);
+		symm.growRight(hilbert,currentSite,quantumNumbers); // grows symm
 		lrs_.growRight(currentSite); // grows B, computes R
 		internalUpdate(currentSite,TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
 		lrs_.updateContracted(currentSite,TO_THE_RIGHT);
