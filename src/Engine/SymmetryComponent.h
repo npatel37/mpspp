@@ -87,6 +87,11 @@ public:
 		block_[0] = site;
 	}
 
+	void setComponent(size_t comp)
+	{
+		type_=comp;
+	}
+
 	void grow(size_t site,const std::vector<size_t>& quantumNumbers)
 	{
 		SymmetryComponent sc(type_,0,site,quantumNumbers);
@@ -132,7 +137,10 @@ public:
 	{
 		assert(i<permutation_.size());
 		size_t ip = permutation_[i];
-		assert(leftSize_>0);
+		if (leftSize_==0 && type_==COMPONENT_LEFT)
+			return PairType(0,i);
+		if (leftSize_==0 && type_==COMPONENT_RIGHT)
+			return PairType(i,0);
 		div_t q = div(ip,leftSize_);
 		return PairType(q.rem,q.quot);
 	}
@@ -140,7 +148,14 @@ public:
 	size_t pack(size_t a1,size_t a2) const
 	{
 		assert(a1+a2*leftSize_<permutationInverse_.size());
-		assert(leftSize_>0);
+		if (leftSize_==0 && type_==COMPONENT_LEFT) {
+			assert(a1==0);
+			return permutationInverse_[a2];
+		}
+		if (leftSize_==0 && type_==COMPONENT_RIGHT) {
+			assert(a2==0);
+			return permutationInverse_[a1];
+		}
 		return permutationInverse_[a1+a2*leftSize_];
 	}
 

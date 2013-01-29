@@ -102,7 +102,7 @@ public:
 		size_t nsites = model_.geometry().numberOfSites();
 		if (currentSite+2==nsites) {
 			//symm.moveLeft(currentSite,quantumNumbers);
-			lrs_.updateMps(currentSite,statePredictor_.vector(),TO_THE_LEFT,statePredictor_.symmSector(),symm);
+			internalUpdate(currentSite,TO_THE_LEFT,symm); // <-- From cL and cR construct a new B, only B changes here
 			lrs_.updateContracted(currentSite,TO_THE_LEFT,symm);
 			return;
 		}
@@ -117,7 +117,8 @@ public:
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 		symm.growRight(currentSite,quantumNumbers); // grows symm
-		lrs_.growRight(currentSite,symm); // grows B, computes R
+		size_t nsites = model_.geometry().numberOfSites();
+		lrs_.growRight(currentSite,symm,nsites); // grows B, computes R
 		internalUpdate(currentSite,TO_THE_RIGHT,symm); // <--  From cL and cR construct a new A, only A changes here
 		lrs_.updateContracted(currentSite,TO_THE_RIGHT,symm);
 	}
@@ -142,7 +143,8 @@ private:
 		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
 
 		ReflectionSymmetryType *rs = 0;
-		ModelHelperType modelHelper(lrs_,symmetrySector,currentSite,direction,model_.hamiltonian()(currentSite),symm(currentSite));
+		size_t hamiltonianSite = (direction == TO_THE_RIGHT) ? currentSite : currentSite + 1;
+		ModelHelperType modelHelper(lrs_,symmetrySector,currentSite,direction,model_.hamiltonian()(hamiltonianSite),symm(currentSite));
 		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 
 		RealType eps=ProgramGlobals::LanczosTolerance;

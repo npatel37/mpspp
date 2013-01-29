@@ -116,7 +116,7 @@ public:
 //		assert(nright>0);
 //		size_t center = symmetry_.right().block()[nright-1];
 
-		if (currentSite_==0) return matrixVectorProduct0(x,y);
+		if (currentSite_==0 && direction_==TO_THE_RIGHT) return matrixVectorProduct0(x,y);
 
 		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ -1 : currentSite_;
 
@@ -181,27 +181,28 @@ public:
 //		assert(nright>0);
 //		size_t center = symmetry_.right().block()[nright-1];
 
-		if (currentSite_==0) return fullHamiltonian0(matrix);
+		//if (currentSite_==0 && direction_==TO_THE_RIGHT) return fullHamiltonian0(matrix);
 
-		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ -1 : currentSite_;
+		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
+		size_t rightIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
 
 		matrix.resize(total,total);
 		const ContractedFactorType& cL = lrs_.contracted()(leftIndex,ProgramGlobals::PART_LEFT);
-		const ContractedFactorType& cR = lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
+		const ContractedFactorType& cR = lrs_.contracted()(rightIndex,ProgramGlobals::PART_RIGHT);
 		const SymmetryFactorType& symm = symmetry_;
 		VectorType v(total,0);
 		size_t counter = 0;
 		for (size_t i=0;i<total;i++) {
 			matrix.setRow(i,counter);
 			for (size_t blm1=0;blm1<hamiltonian_.n_row();blm1++) {
-				const SparseMatrixType& l1 = cL(blm1);
+
 				for (size_t bl=0;bl<hamiltonian_.n_col();bl++) {
-					const SparseMatrixType& w = (direction_ == TO_THE_RIGHT) ? hamiltonian_(blm1,bl) : hamiltonian_(bl,blm1);
+					const SparseMatrixType& w = hamiltonian_(blm1,bl);
 					if (w.row()==0) continue;
 //					SparseMatrixType w;
 //					transposeConjugate(w,w1);
 					const SparseMatrixType& r1 = cR(bl);
-
+					const SparseMatrixType& l1 = cL(blm1);
 					PairType ab = symm.super().unpack(i+offset);
 					size_t alm1=0;
 					size_t sigmaL=0;
@@ -286,52 +287,52 @@ private:
 		} // bl
 	}
 
-	//! Used only for stored option
-	void fullHamiltonian0(SparseMatrixType& matrix) const
-	{
-		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
-		size_t total = symmetry_.super().partitionSize(symmetrySector_);
+//	//! Used only for stored option
+//	void fullHamiltonian0(SparseMatrixType& matrix) const
+//	{
+//		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
+//		size_t total = symmetry_.super().partitionSize(symmetrySector_);
 
-		matrix.resize(total,total);
-		const ContractedFactorType& cR = lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
-		const SymmetryFactorType& symm = symmetry_;
-		VectorType v(total,0);
-		size_t counter = 0;
-		for (size_t i=0;i<total;i++) {
-			matrix.setRow(i,counter);
-			for (size_t bl=0;bl<cR.size();bl++) {
-				const SparseMatrixType& w = hamiltonian_(0,bl);
-				if (w.row()==0) continue;
-//				SparseMatrixType w;
-//				transposeConjugate(w,w1);
-				const SparseMatrixType& r1 = cR(bl);
+//		matrix.resize(total,total);
+//		const ContractedFactorType& cR = lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
+//		const SymmetryFactorType& symm = symmetry_;
+//		VectorType v(total,0);
+//		size_t counter = 0;
+//		for (size_t i=0;i<total;i++) {
+//			matrix.setRow(i,counter);
+//			for (size_t bl=0;bl<cR.size();bl++) {
+//				const SparseMatrixType& w = hamiltonian_(0,bl);
+//				if (w.row()==0) continue;
+////				SparseMatrixType w;
+////				transposeConjugate(w,w1);
+//				const SparseMatrixType& r1 = cR(bl);
 
-				PairType ab = symm.super().unpack(i+offset);
-				size_t a1 = ab.first;
-				size_t sigma1 = ab.second;
+//				PairType ab = symm.super().unpack(i+offset);
+//				size_t a1 = ab.first;
+//				size_t sigma1 = ab.second;
 
-				for (int kw=w.getRowPtr(sigma1);kw<w.getRowPtr(sigma1+1);kw++) {
-					size_t sigma1p=w.getCol(kw);
-					for (int k2=r1.getRowPtr(a1);k2<r1.getRowPtr(a1+1);k2++) {
-						size_t a1p = r1.getCol(k2);
-						size_t j = symm.super().pack(a1p,sigma1p);
-						if (j<offset || j>=offset+total) continue;
-						v[j-offset] += w.getValue(kw)*r1.getValue(k2);
-					} // k2 right
-				} // kw Hamiltonian
-			} // bl
+//				for (int kw=w.getRowPtr(sigma1);kw<w.getRowPtr(sigma1+1);kw++) {
+//					size_t sigma1p=w.getCol(kw);
+//					for (int k2=r1.getRowPtr(a1);k2<r1.getRowPtr(a1+1);k2++) {
+//						size_t a1p = r1.getCol(k2);
+//						size_t j = symm.super().pack(a1p,sigma1p);
+//						if (j<offset || j>=offset+total) continue;
+//						v[j-offset] += w.getValue(kw)*r1.getValue(k2);
+//					} // k2 right
+//				} // kw Hamiltonian
+//			} // bl
 
-			for (size_t j=0;j<v.size();j++) {
-				if (fabs(v[j])<1e-6) continue;
-				matrix.pushCol(j);
-				matrix.pushValue(v[j]);
-				v[j]=0;
-				counter++;
-			}
-		} // symmetry sector
-		matrix.setRow(total,counter);
-		matrix.checkValidity();
-	}
+//			for (size_t j=0;j<v.size();j++) {
+//				if (fabs(v[j])<1e-6) continue;
+//				matrix.pushCol(j);
+//				matrix.pushValue(v[j]);
+//				v[j]=0;
+//				counter++;
+//			}
+//		} // symmetry sector
+//		matrix.setRow(total,counter);
+//		matrix.checkValidity();
+//	}
 
 
 	const LeftRightSuperType& lrs_;

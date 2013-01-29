@@ -88,10 +88,10 @@ public:
 		ab_.update(currentSite,v,direction,symmetrySector,symm);
 	}
 
-	void growRight(size_t currentSite,const SymmetryLocalType& symm)
+	void growRight(size_t currentSite,const SymmetryLocalType& symm,size_t nsites)
 	{
 		ab_.growRight(currentSite,symm);
-		contracted_.growRight(currentSite,symm);
+		contracted_.growRight(currentSite,symm,nsites);
 	}
 
 private:

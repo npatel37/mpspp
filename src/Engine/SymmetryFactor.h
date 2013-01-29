@@ -83,11 +83,13 @@ public:
 			assert(site==0);
 			right_.grow(site,quantumNumbers);
 			if (left_.size()==0) left_=right_;
+			left_.setComponent(SymmetryComponentType::COMPONENT_LEFT);
 			right_.setSite(site+1);
 			super_.combine(left_,right_);
 			return;
 		}
 		left_ = previous->super();
+		left_.setComponent(SymmetryComponentType::COMPONENT_LEFT);
 		right_.grow(site+1,quantumNumbers);
 		super_.combine(left_,right_);
 	}

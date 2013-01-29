@@ -71,10 +71,20 @@ public:
 		: abState_(abState),h_(h)
 	{}
 
-	void growRight(size_t currentSite,const SymmetryLocalType& symm)
+	void growRight(size_t currentSite,const SymmetryLocalType& symm,size_t nsites)
 	{
 		ContractedFactorType cf(abState_.B(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_RIGHT,0,symm(currentSite));
 		R_.push_back(cf);
+
+		if (currentSite+2==nsites) {
+			ContractedFactorType cf3(currentSite,ProgramGlobals::PART_RIGHT);
+			R_.push_back(cf3);
+		}
+
+		if (currentSite>0) return;
+
+		ContractedFactorType cf2(currentSite,ProgramGlobals::PART_LEFT);
+		L_.push_back(cf2);
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
@@ -106,9 +116,9 @@ private:
 
 	void updateLeft(size_t currentSite,const MatrixProductStateType& abState,const SymmetryLocalType& symm)
 	{
-		if (currentSite>=L_.size()) {
-			ContractedFactorType* dataPrev = 0;
-			if (L_.size()>0) dataPrev = &(L_[L_.size()-1]);
+		assert(L_.size()>0);
+		if (currentSite+1>=L_.size()) {
+			ContractedFactorType* dataPrev = &(L_[L_.size()-1]);
 			ContractedFactorType cf(abState.A(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_LEFT,dataPrev,symm(currentSite));
 			L_.push_back(cf);
 			return;
@@ -120,9 +130,8 @@ private:
 
 	void updateRight(size_t currentSite,const MatrixProductStateType& abState,const SymmetryLocalType& symm)
 	{
-		assert(currentSite<R_.size());
-		assert(currentSite>0);
-		R_[currentSite-1].update(abState.B(currentSite),h_(currentSite),R_[currentSite],symm(currentSite));
+		assert(currentSite+1<R_.size());
+		R_[currentSite].update(abState.B(currentSite),h_(currentSite),R_[currentSite+1],symm(currentSite));
 	}
 
 	const MatrixProductStateType& abState_;

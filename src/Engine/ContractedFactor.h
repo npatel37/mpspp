@@ -95,6 +95,13 @@ public:
 		}
 	}
 
+	ContractedFactor(size_t site,
+					 size_t leftOrRight)
+		: data_(1),site_(site),leftOrRight_(leftOrRight)
+	{
+		data_[0].makeDiagonal(1,1);
+	}
+
 	//! From As (or Bs) and Ws reconstruct *this
 	void update(const MpsFactorType& AorB,const MpoFactorType& h,const ThisType& dataPrev,const SymmetryFactorType& symm)
 	{
