@@ -55,6 +55,7 @@ class SymmetryLocal {
 public:
 
 	typedef SymmetryFactor SymmetryFactorType;
+	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 	typedef typename SymmetryFactorType::PairType PairType;
 	typedef typename SymmetryFactorType::IoInputType IoInputType;
 
@@ -86,23 +87,21 @@ public:
 		return data_[site];
 	}
 
-	void moveLeft(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
+	void moveLeft(size_t site,const std::vector<size_t>& quantumNumbers)
 	{
-		assert(site>0);
-		assert(data_.size()>site);
-//		std::cout<<"center="<<center<<"\n";
-		SymmetryFactorType *previous =  &data_[site-1];
+		assert(site+1<data_.size());
 		SymmetryFactorType symmFactor = data_[site];
-		symmFactor.moveLeft(hilbert,site,quantumNumbers,previous);
+		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_LEFT,0,site,quantumNumbers);
+		symmFactor.moveLeft(data_[site].left(),onesite,data_[site+1].right());
 		data_[site] = symmFactor;
 	}
 
-	void growRight(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
+	void growRight(size_t site,const std::vector<size_t>& quantumNumbers)
 	{
 		SymmetryFactorType symmFactor;
 		SymmetryFactorType *previous = 0;
 		if (data_.size()>0) previous = &data_[data_.size()-1];
-		symmFactor.growRight(hilbert,site,quantumNumbers,previous);
+		symmFactor.growRight(site,quantumNumbers,previous);
 		data_.push_back(symmFactor);
 	}
 

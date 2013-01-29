@@ -307,11 +307,10 @@ private:
 					 const MpoFactorType& h,
 					 const DataType& dataPrev)
 	{
-		size_t hilbert = h(0,0).row();
 		const SymmetryFactorType& symm = B.symm();
 		const SparseMatrixType& Bmatrix = B();
 
-		for (int kb=Bmatrix.getRowPtr(i);kb<Bmatrix.getRowPtr(i+1);kb++) {
+		for (int kb=Bmatrix.getRowPtr(alm2);kb<Bmatrix.getRowPtr(alm2+1);kb++) {
 			PairType sigmalm1alm1 = symm.right().unpack(Bmatrix.getCol(kb));
 			size_t sigmalm1 = sigmalm1alm1.first;
 			size_t alm1 = sigmalm1alm1.second;
@@ -321,34 +320,17 @@ private:
 				for (int k=w.getRowPtr(sigmalm1);k<w.getRowPtr(sigmalm1+1);k++) {
 					size_t sigmaplm1 = w.getCol(k);
 					for (int kprev=dataPrev[blm1].getRowPtr(alm1);kprev<dataPrev[blm1].getRowPtr(alm1+1);kprev++) {
-						size_t aplm1 = dataPrev.getCol(kprev);
+						size_t aplm1 = dataPrev[blm1].getCol(kprev);
 						size_t i = symm.right().pack(sigmaplm1,aplm1);
 						for (int kb2=Btranspose.getRowPtr(i);kb2<Btranspose.getRowPtr(i+1);kb2++) {
-					}
-				}
-		for (size_t sigmalm1=0;sigmalm1<hilbert;sigmalm1++) {
-			size_t i = symm.right().pack(sigmalm1,alm2);
-
-				size_t alm1 = Bmatrix.getCol(kb);
-
-					const SparseMatrixType& w = h(blm2,blm1);
-					if (w.row()==0) continue;
-
-					for (int kprev=dataPrev[blm1].getRowPtr(alm1);kprev<dataPrev[blm1].getRowPtr(alm1+1);kprev++) {
-						size_t aplm1 = dataPrev[blm1].getCol(kprev);
-						for (int kb2=Btranspose.getRowPtr(aplm1);kb2<Btranspose.getRowPtr(aplm1+1);kb2++) {
-							PairType sigmaplm1aplm2 = symm.right().unpack(Btranspose.getCol(kb2));
-							size_t aplm2 = sigmaplm1aplm2.second;
-							for (int k=w.getRowPtr(sigmalm1);k<w.getRowPtr(sigmalm1+1);k++) {
-								if (sigmaplm1aplm2.first != size_t(w.getCol(k))) continue;
-								values[aplm2] += std::conj(Bmatrix.getValue(kb))*w.getValue(k)*Btranspose.getValue(kb2) * dataPrev[blm1].getValue(kprev);
-								cols[aplm2]=1;
-							} // k
+							size_t aplm2 = Btranspose.getCol(kb2);
+							values[aplm2] += std::conj(Bmatrix.getValue(kb))*w.getValue(k)*Btranspose.getValue(kb2) * dataPrev[blm1].getValue(kprev);
+							cols[aplm2]=1;
 						} // kb2
 					} // kprev
-				} // blm1
-			} // kb
-		} //sigmalm1
+				} // k
+			} // blm1
+		} // kb
 	}
 
 	std::string partToString() const

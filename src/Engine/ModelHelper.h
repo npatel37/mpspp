@@ -117,7 +117,9 @@ public:
 
 		if (currentSite_==0) return matrixVectorProduct0(x,y);
 
-		const ContractedFactorType& cL = lrs_.contracted()(currentSite_-1,ProgramGlobals::PART_LEFT);
+		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ -1 : currentSite_;
+
+		const ContractedFactorType& cL = lrs_.contracted()(leftIndex,ProgramGlobals::PART_LEFT);
 		const ContractedFactorType& cR = lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
 		const SymmetryFactorType& symm = symmetry_;
 		for (size_t blm1=0;blm1<cL.size();blm1++) {
@@ -180,8 +182,10 @@ public:
 
 		if (currentSite_==0) return fullHamiltonian0(matrix);
 
+		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ -1 : currentSite_;
+
 		matrix.resize(total,total);
-		const ContractedFactorType& cL = lrs_.contracted()(currentSite_-1,ProgramGlobals::PART_LEFT);
+		const ContractedFactorType& cL = lrs_.contracted()(leftIndex,ProgramGlobals::PART_LEFT);
 		const ContractedFactorType& cR = lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
 		const SymmetryFactorType& symm = symmetry_;
 		VectorType v(total,0);

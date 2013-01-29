@@ -97,17 +97,17 @@ public:
 	void moveLeft(SymmetryLocalType& symm,size_t currentSite)
 	{
 		std::vector<size_t> quantumNumbers;
-		size_t hilbert = 0;
-		model_.getOneSite(hilbert,quantumNumbers,currentSite);
+		model_.getOneSite(quantumNumbers,currentSite);
 
 		size_t nsites = model_.geometry().numberOfSites();
 		if (currentSite+2==nsites) {
-			symm.moveLeft(hilbert,currentSite,quantumNumbers);
+			//symm.moveLeft(currentSite,quantumNumbers);
 			lrs_.updateMps(currentSite,statePredictor_.vector(),TO_THE_LEFT,statePredictor_.symmSector());
 			lrs_.updateContracted(currentSite,TO_THE_LEFT);
+			return;
 		}
 
-		symm.moveLeft(hilbert,currentSite,quantumNumbers);
+		symm.moveLeft(currentSite,quantumNumbers);
 		internalUpdate(currentSite,TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
 		lrs_.updateContracted(currentSite,TO_THE_LEFT);
 	}
@@ -115,9 +115,8 @@ public:
 	void growRight(SymmetryLocalType& symm,size_t currentSite)
 	{
 		std::vector<size_t> quantumNumbers;
-		size_t hilbert = 0;
-		model_.getOneSite(hilbert,quantumNumbers,currentSite);
-		symm.growRight(hilbert,currentSite,quantumNumbers); // grows symm
+		model_.getOneSite(quantumNumbers,currentSite);
+		symm.growRight(currentSite,quantumNumbers); // grows symm
 		lrs_.growRight(currentSite); // grows B, computes R
 		internalUpdate(currentSite,TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
 		lrs_.updateContracted(currentSite,TO_THE_RIGHT);

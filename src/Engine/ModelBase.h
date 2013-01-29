@@ -164,7 +164,7 @@ public:
 		modelHelper.matrixVectorProduct(x,y);
 	}
 
-	virtual void getOneSite(size_t& hilbert,std::vector<size_t>& quantumNumbers,size_t site) const=0;
+	virtual void getOneSite(std::vector<size_t>& quantumNumbers,size_t site) const=0;
 
 }; // ModelBase
 

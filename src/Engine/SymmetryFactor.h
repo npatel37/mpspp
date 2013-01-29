@@ -70,9 +70,14 @@ public:
 //	}
 
 	SymmetryFactor()
+		: left_(SymmetryComponentType::COMPONENT_LEFT),
+		  right_(SymmetryComponentType::COMPONENT_RIGHT),
+		  super_(SymmetryComponentType::COMPONENT_SUPER)
 	{}
 
-	void growRight(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers,SymmetryFactor* previous)
+	void growRight(size_t site,
+				   const std::vector<size_t>& quantumNumbers,
+				   SymmetryFactor* previous)
 	{
 		if (previous==0) {
 			assert(site==0);
@@ -87,12 +92,12 @@ public:
 		super_.combine(left_,right_);
 	}
 
-	void moveLeft(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers,SymmetryFactor* previous)
+	void moveLeft(const SymmetryComponentType& oldLeft,
+				  const SymmetryComponentType& onesite,
+				  const SymmetryComponentType& oldRight)
 	{
-		left_ = previous->left();
-		SymmetryComponent onesite(0,site,quantumNumbers);
-		SymmetryComponent rightCopy = right_;
-		right_.combine(onesite,rightCopy);
+		left_ = oldLeft;
+		right_.combine(onesite,oldRight);
 		super_.combine(left_,right_);
 	}
 

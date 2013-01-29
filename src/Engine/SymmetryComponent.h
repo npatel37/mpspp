@@ -62,12 +62,15 @@ public:
 	enum {CORNER_LEFT,CORNER_RIGHT};
 	enum {COMPONENT_LEFT,COMPONENT_RIGHT,COMPONENT_SUPER};
 
-	SymmetryComponent()
-		: leftSize_(0)
+	SymmetryComponent(size_t type)
+		: type_(type),leftSize_(0)
 	{}
 
-	SymmetryComponent(size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
-		: leftSize_(hilbert),block_(1,site),quantumNumbers_(quantumNumbers)
+	SymmetryComponent(size_t type,size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
+		: type_(type),
+		  leftSize_(hilbert),
+		  block_(1,site),
+		  quantumNumbers_(quantumNumbers)
 	{
 		findPermutationAndPartition();
 	}
@@ -86,7 +89,7 @@ public:
 
 	void grow(size_t site,const std::vector<size_t>& quantumNumbers)
 	{
-		SymmetryComponent sc(0,site,quantumNumbers);
+		SymmetryComponent sc(type_,0,site,quantumNumbers);
 		*this = sc;
 	}
 
@@ -134,11 +137,11 @@ public:
 		return PairType(q.rem,q.quot);
 	}
 
-	size_t pack(size_t a1,size_t sigma2) const
+	size_t pack(size_t a1,size_t a2) const
 	{
-		assert(a1+sigma2*leftSize_<permutationInverse_.size());
+		assert(a1+a2*leftSize_<permutationInverse_.size());
 		assert(leftSize_>0);
-		return permutationInverse_[a1+sigma2*leftSize_];
+		return permutationInverse_[a1+a2*leftSize_];
 	}
 
 	size_t size() const
@@ -219,6 +222,7 @@ private:
 		for (size_t i=0;i<C.size();i++) A.push_back(C[i]);
 	}
 
+	size_t type_;
 	size_t leftSize_;
 	std::vector<size_t> block_;
 	std::vector<size_t> quantumNumbers_;

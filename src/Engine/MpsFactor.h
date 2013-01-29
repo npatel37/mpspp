@@ -115,8 +115,11 @@ public:
 
 	void updateFromVector(const VectorType& v,size_t symmetrySector)
 	{
-		MatrixType m(symm_.left().size(),symm_.right().size());
+		size_t row = symm_.left().size();
+		size_t col = symm_.right().size();
+		if (aOrB_==TYPE_B) std::swap(row,col);
 
+		MatrixType m(row,col);
 
 		size_t offset = symm_.super().partitionOffset(symmetrySector);
 		size_t total = symm_.super().partitionSize(symmetrySector);

@@ -174,9 +174,8 @@ public:
 
 	virtual const GeometryType& geometry() const { return geometry_; }
 
-	virtual void getOneSite(size_t& hilbert,std::vector<size_t>& quantumNumbers,size_t site) const
+	virtual void getOneSite(std::vector<size_t>& quantumNumbers,size_t site) const
 	{
-		hilbert = hilbert_;
 		quantumNumbers.push_back(0);
 		quantumNumbers.push_back(1);
 		quantumNumbers.push_back(MAX_SITES);
