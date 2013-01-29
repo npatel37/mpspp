@@ -65,8 +65,8 @@ public:
 	typedef typename MpsFactorType::VectorType VectorType;
 	typedef typename MpsFactorType::SparseMatrixType SparseMatrixType;
 
-	MatrixProductState(size_t nsites,const SymmetryLocalType& symm)
-	: symmNonconst_(0),symm_(symm),nsites_(nsites),center_(0)
+	MatrixProductState(size_t nsites)
+	: nsites_(nsites),center_(0)
 	{}
 
 //	MatrixProductState(IoInputType& io)
@@ -85,17 +85,17 @@ public:
 
 	~MatrixProductState()
 	{
-		if (symmNonconst_) {
-			delete symmNonconst_;
-			symmNonconst_=0;
-		}
+		for (size_t i=0;i<A_.size();i++)
+			if (A_[i]) delete A_[i];
+		for (size_t i=0;i<B_.size();i++)
+			if (B_[i]) delete B_[i];
 	}
 
-	void growRight(size_t currentSite)
+	void growRight(size_t currentSite,const SymmetryLocalType& symm)
 	{
 		center_ = currentSite;
-		MpsFactorType mpsFactor(symm_(currentSite),currentSite,MpsFactorType::TYPE_B);
-		mpsFactor.setRandom(currentSite);
+		MpsFactorType* mpsFactor = new MpsFactorType(currentSite,MpsFactorType::TYPE_B);
+		mpsFactor->setRandom(currentSite,symm(currentSite));
 		B_.push_back(mpsFactor);
 	}
 
@@ -111,37 +111,37 @@ public:
 	}
 
 	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-	void update(size_t currentSite,const VectorType& v,size_t direction,size_t symmetrySector)
+	void update(size_t currentSite,const VectorType& v,size_t direction,size_t symmetrySector,const SymmetryLocalType& symm)
 	{
 		center_ = currentSite;
 		if (direction==ProgramGlobals::TO_THE_RIGHT) {
 			if (currentSite>=A_.size()) {
-				MpsFactorType mpsFactor(symm_(currentSite),currentSite,MpsFactorType::TYPE_A);
-				mpsFactor.updateFromVector(v,symmetrySector);
+				MpsFactorType* mpsFactor = new MpsFactorType(currentSite,MpsFactorType::TYPE_A);
+				mpsFactor->updateFromVector(v,symmetrySector,symm(currentSite));
 				A_.push_back(mpsFactor);
 				return;
 			}
 			assert(currentSite<A_.size());
-			A_[currentSite].updateFromVector(v,symmetrySector);
+			A_[currentSite]->updateFromVector(v,symmetrySector,symm(currentSite));
 		} else {
 			assert(currentSite<B_.size());
-			B_[currentSite].updateFromVector(v,symmetrySector);
+			B_[currentSite]->updateFromVector(v,symmetrySector,symm(currentSite));
 		}
 	}
 
 	const MpsFactorType& A(size_t site) const
 	{
 		assert(site<A_.size());
-		return A_[site];
+		return *(A_[site]);
 	}
 
 	const MpsFactorType& B(size_t site) const
 	{
 		assert(site<B_.size());
-		return B_[site];
+		return *(B_[site]);
 	}
 
-	const SymmetryLocalType& symmetry() const { return symm_; }
+//	const SymmetryLocalType& symmetry() const { return symm_; }
 
 private:
 
@@ -151,12 +151,11 @@ private:
 	// assignment
 	MatrixProductState& operator=(const MatrixProductState& other);
 
-	SymmetryLocalType* symmNonconst_;
-	const SymmetryLocalType& symm_;
+//	const SymmetryLocalType& symm_;
 	size_t nsites_;
 	size_t center_;
-	typename ProgramGlobals::Vector<MpsFactorType>::Type B_;
-	typename ProgramGlobals::Vector<MpsFactorType>::Type A_;
+	typename ProgramGlobals::Vector<MpsFactorType*>::Type B_;
+	typename ProgramGlobals::Vector<MpsFactorType*>::Type A_;
 }; // MatrixProductState
 
 } // namespace Mpspp

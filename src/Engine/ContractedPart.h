@@ -54,6 +54,7 @@ template<typename MatrixProductOperatorType>
 class ContractedPart {
 
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+	typedef typename MatrixProductStateType::SymmetryLocalType SymmetryLocalType;
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
 	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
 
@@ -70,19 +71,19 @@ public:
 		: abState_(abState),h_(h)
 	{}
 
-	void growRight(size_t currentSite)
+	void growRight(size_t currentSite,const SymmetryLocalType& symm)
 	{
-		ContractedFactorType cf(abState_.B(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_RIGHT,0);
+		ContractedFactorType cf(abState_.B(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_RIGHT,0,symm(currentSite));
 		R_.push_back(cf);
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
-	void update(size_t currentSite,const MatrixProductStateType& abState,size_t direction)
+	void update(size_t currentSite,const MatrixProductStateType& abState,size_t direction,const SymmetryLocalType& symm)
 	{
 		if (direction==TO_THE_RIGHT) {
-			updateLeft(currentSite,abState);
+			updateLeft(currentSite,abState,symm);
 		} else {
-			updateRight(currentSite,abState);
+			updateRight(currentSite,abState,symm);
 		}
 	}
 
@@ -103,25 +104,25 @@ public:
 
 private:
 
-	void updateLeft(size_t currentSite,const MatrixProductStateType& abState)
+	void updateLeft(size_t currentSite,const MatrixProductStateType& abState,const SymmetryLocalType& symm)
 	{
 		if (currentSite>=L_.size()) {
 			ContractedFactorType* dataPrev = 0;
 			if (L_.size()>0) dataPrev = &(L_[L_.size()-1]);
-			ContractedFactorType cf(abState.A(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_LEFT,dataPrev);
+			ContractedFactorType cf(abState.A(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_LEFT,dataPrev,symm(currentSite));
 			L_.push_back(cf);
 			return;
 		}
 		assert(currentSite<L_.size());
 		assert(currentSite>0);
-		L_[currentSite].update(abState.A(currentSite),h_(currentSite),L_[currentSite-1]);
+		L_[currentSite].update(abState.A(currentSite),h_(currentSite),L_[currentSite-1],symm(currentSite));
 	}
 
-	void updateRight(size_t currentSite,const MatrixProductStateType& abState)
+	void updateRight(size_t currentSite,const MatrixProductStateType& abState,const SymmetryLocalType& symm)
 	{
 		assert(currentSite<R_.size());
 		assert(currentSite>0);
-		R_[currentSite-1].update(abState.B(currentSite),h_(currentSite),R_[currentSite]);
+		R_[currentSite-1].update(abState.B(currentSite),h_(currentSite),R_[currentSite],symm(currentSite));
 	}
 
 	const MatrixProductStateType& abState_;

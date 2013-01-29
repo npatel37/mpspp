@@ -72,18 +72,19 @@ public:
 				size_t symmetrySector,
 				size_t currentSite,
 				size_t direction,
-				const MpoFactorType& hamiltonian)
+				const MpoFactorType& hamiltonian,
+				const SymmetryFactorType& symmetry)
 	: lrs_(lrs),
 	  symmetrySector_(symmetrySector),
 	  currentSite_(currentSite),
 	  direction_(direction),
 	  hamiltonian_(hamiltonian),
-	  symmetry_(lrs_.symmetry()(currentSite_))
+	  symmetry_(symmetry)
 	{}
 
 	size_t size() const
 	{
-		return lrs_.symmetry()(currentSite_).super().partitionSize(symmetrySector_);
+		return symmetry_.super().partitionSize(symmetrySector_);
 	}
 
 	size_t symmetrySector() const { return symmetrySector_; }
@@ -195,7 +196,7 @@ public:
 			for (size_t blm1=0;blm1<hamiltonian_.n_row();blm1++) {
 				const SparseMatrixType& l1 = cL(blm1);
 				for (size_t bl=0;bl<hamiltonian_.n_col();bl++) {
-					const SparseMatrixType& w = hamiltonian_(blm1,bl);
+					const SparseMatrixType& w = (direction_ == TO_THE_RIGHT) ? hamiltonian_(blm1,bl) : hamiltonian_(bl,blm1);
 					if (w.row()==0) continue;
 //					SparseMatrixType w;
 //					transposeConjugate(w,w1);

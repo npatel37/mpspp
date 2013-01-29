@@ -68,8 +68,8 @@ public:
 	typedef typename SymmetryFactorType::IoInputType IoInputType;
 	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
 
-	MpsFactor(const SymmetryFactorType& symm,size_t site,size_t aOrB)
-		: symm_(symm),site_(site),rng_(0),aOrB_(aOrB)
+	MpsFactor(size_t site,size_t aOrB)
+		: site_(site),rng_(0),aOrB_(aOrB)
 	{}
 
 //	MpsFactor(IoInputType& io,const SymmetryFactorType& symm,size_t site)
@@ -94,37 +94,37 @@ public:
 //		fullMatrixToCrsMatrix(data_,mpsFactor);
 //	}
 
-	MpsFactor& operator=(const MpsFactor& other)
-	{
-		this->data_ = other.data_;
-		this->site_ = other.site_;
-//		this->rng_ = other.rng_;
-		this->aOrB_ = other.aOrB_;
-		//this->symm_ = other.symm_;
-		return *this;
-	}
+//	MpsFactor& operator=(const MpsFactor& other)
+//	{
+//		this->data_ = other.data_;
+//		this->site_ = other.site_;
+////		this->rng_ = other.rng_;
+//		this->aOrB_ = other.aOrB_;
+//		this->symm_ = other.symm_;
+//		return *this;
+//	}
 
-	void setRandom(size_t site)
+	void setRandom(size_t site,const SymmetryFactorType& symm)
 	{
-		MatrixType m(symm_.right().size(),symm_.right().size());
+		MatrixType m(symm.right().size(),symm.right().size());
 		for (size_t i=0;i<m.n_row();i++)
 			for (size_t j=0;j<m.n_col();j++)
 				m(i,j) = rng_();
 		fullMatrixToCrsMatrix(data_,m);
 	}
 
-	void updateFromVector(const VectorType& v,size_t symmetrySector)
+	void updateFromVector(const VectorType& v,size_t symmetrySector,const SymmetryFactorType& symm)
 	{
-		size_t row = symm_.left().size();
-		size_t col = symm_.right().size();
+		size_t row = symm.left().size();
+		size_t col = symm.right().size();
 		if (aOrB_==TYPE_B) std::swap(row,col);
 
 		MatrixType m(row,col);
 
-		size_t offset = symm_.super().partitionOffset(symmetrySector);
-		size_t total = symm_.super().partitionSize(symmetrySector);
+		size_t offset = symm.super().partitionOffset(symmetrySector);
+		size_t total = symm.super().partitionSize(symmetrySector);
 		for (size_t i=0;i<total;i++) {
-			PairType ab = symm_.super().unpack(i+offset);
+			PairType ab = symm.super().unpack(i+offset);
 			if (aOrB_==TYPE_A) {
 				m(ab.first,ab.second) = v[i];
 			} else {
@@ -139,13 +139,12 @@ public:
 
 	const SparseMatrixType& operator()() const { return data_; }
 
-	const SymmetryFactorType& symm() const { return symm_; }
+//	const SymmetryFactorType& symm() const { return symm_; }
 
 	const size_t type() const { return aOrB_; }
 
 private:
 
-	const SymmetryFactorType& symm_;
 	size_t site_;
 	RandomNumberGeneratorType rng_;
 	SparseMatrixType data_;

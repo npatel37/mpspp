@@ -102,14 +102,14 @@ public:
 		size_t nsites = model_.geometry().numberOfSites();
 		if (currentSite+2==nsites) {
 			//symm.moveLeft(currentSite,quantumNumbers);
-			lrs_.updateMps(currentSite,statePredictor_.vector(),TO_THE_LEFT,statePredictor_.symmSector());
-			lrs_.updateContracted(currentSite,TO_THE_LEFT);
+			lrs_.updateMps(currentSite,statePredictor_.vector(),TO_THE_LEFT,statePredictor_.symmSector(),symm);
+			lrs_.updateContracted(currentSite,TO_THE_LEFT,symm);
 			return;
 		}
 
 		symm.moveLeft(currentSite,quantumNumbers);
-		internalUpdate(currentSite,TO_THE_LEFT); // <-- From cL and cR construct a new B, only B changes here
-		lrs_.updateContracted(currentSite,TO_THE_LEFT);
+		internalUpdate(currentSite,TO_THE_LEFT,symm); // <-- From cL and cR construct a new B, only B changes here
+		lrs_.updateContracted(currentSite,TO_THE_LEFT,symm);
 	}
 
 	void growRight(SymmetryLocalType& symm,size_t currentSite)
@@ -117,9 +117,9 @@ public:
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 		symm.growRight(currentSite,quantumNumbers); // grows symm
-		lrs_.growRight(currentSite); // grows B, computes R
-		internalUpdate(currentSite,TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
-		lrs_.updateContracted(currentSite,TO_THE_RIGHT);
+		lrs_.growRight(currentSite,symm); // grows B, computes R
+		internalUpdate(currentSite,TO_THE_RIGHT,symm); // <--  From cL and cR construct a new A, only A changes here
+		lrs_.updateContracted(currentSite,TO_THE_RIGHT,symm);
 	}
 
 	void printReport(std::ostream& os) const
@@ -129,7 +129,7 @@ public:
 
 private:
 
-	void internalUpdate(size_t currentSite,size_t direction)
+	void internalUpdate(size_t currentSite,size_t direction,SymmetryLocalType& symm)
 	{
 		const ParametersSolverType& solverParams = model_.solverParams();
 
@@ -138,11 +138,11 @@ private:
 		typedef PsimagLite::LanczosOrDavidsonBase<ParametersForSolverType,InternalProductType,VectorType> LanczosOrDavidsonBaseType;
 		typedef typename ModelType::ModelHelperType ModelHelperType;
 
-		size_t symmetrySector = getSymmetrySector(direction);
+		size_t symmetrySector = getSymmetrySector(direction,symm);
 		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
 
 		ReflectionSymmetryType *rs = 0;
-		ModelHelperType modelHelper(lrs_,symmetrySector,currentSite,direction,model_.hamiltonian()(currentSite));
+		ModelHelperType modelHelper(lrs_,symmetrySector,currentSite,direction,model_.hamiltonian()(currentSite),symm(currentSite));
 		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 
 		RealType eps=ProgramGlobals::LanczosTolerance;
@@ -172,17 +172,17 @@ private:
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
 
-		lrs_.updateMps(currentSite,tmpVec,direction,symmetrySector);
+		lrs_.updateMps(currentSite,tmpVec,direction,symmetrySector,symm);
 		statePredictor_.push(tmpVec,symmetrySector);
 	}
 
-	size_t getSymmetrySector(size_t direction) const
+	size_t getSymmetrySector(size_t direction,SymmetryLocalType& symm) const
 	{
 		size_t center = lrs_.abState().center();
-		size_t sites = lrs_.symmetry()(center).super().block().size();
+		size_t sites = symm(center).super().block().size();
 		size_t targetQuantumNumber = getQuantumSector(sites,direction);
 		
-		SymmetryComponentType super = lrs_.symmetry()(center).super();
+		SymmetryComponentType super = symm(center).super();
 		for (size_t i=0;i<super.partitions()-1;i++) {
 			size_t state = super.partitionOffset(i);
 			size_t q = super.qn(state);

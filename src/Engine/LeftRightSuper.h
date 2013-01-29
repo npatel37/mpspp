@@ -76,22 +76,22 @@ public:
 
 	const ContractedPartType& contracted() const { return contracted_; }
 
-	const SymmetryLocalType& symmetry() const { return ab_.symmetry(); }
+//	const SymmetryLocalType& symmetry() const { return ab_.symmetry(); }
 
-	void updateContracted(size_t currentSite,size_t direction)
+	void updateContracted(size_t currentSite,size_t direction,const SymmetryLocalType& symm)
 	{
-		contracted_.update(currentSite,ab_,direction);
+		contracted_.update(currentSite,ab_,direction,symm);
 	}
 
-	void updateMps(size_t currentSite,const VectorType& v,size_t direction,size_t symmetrySector)
+	void updateMps(size_t currentSite,const VectorType& v,size_t direction,size_t symmetrySector,const SymmetryLocalType& symm)
 	{
-		ab_.update(currentSite,v,direction,symmetrySector);
+		ab_.update(currentSite,v,direction,symmetrySector,symm);
 	}
 
-	void growRight(size_t currentSite)
+	void growRight(size_t currentSite,const SymmetryLocalType& symm)
 	{
-		ab_.growRight(currentSite);
-		contracted_.growRight(currentSite);
+		ab_.growRight(currentSite,symm);
+		contracted_.growRight(currentSite,symm);
 	}
 
 private:

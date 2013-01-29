@@ -131,7 +131,7 @@ private:
 	void growLattice()
 	{
 		SymmetryLocalType symm;
-		MatrixProductStateType psi(1,symm);
+		MatrixProductStateType psi(1);
 		ContractedPartType contracted(psi,model_.hamiltonian());
 		LeftRightSuperType lrs(psi,contracted);
 		StepType step(solverParams_,lrs,model_);
