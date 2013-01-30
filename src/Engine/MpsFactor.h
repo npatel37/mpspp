@@ -94,16 +94,6 @@ public:
 //		fullMatrixToCrsMatrix(data_,mpsFactor);
 //	}
 
-//	MpsFactor& operator=(const MpsFactor& other)
-//	{
-//		this->data_ = other.data_;
-//		this->site_ = other.site_;
-////		this->rng_ = other.rng_;
-//		this->aOrB_ = other.aOrB_;
-//		this->symm_ = other.symm_;
-//		return *this;
-//	}
-
 	void setRandom(size_t site,const SymmetryFactorType& symm)
 	{
 		MatrixType m(symm.right().size(),symm.right().size());
