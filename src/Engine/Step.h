@@ -86,13 +86,6 @@ public:
 	  statePredictor_()
 	{}
 
-	//! Moves the center of orthogonality by one to the right
-	void moveRight(size_t currentSite)
-	{
-		internalUpdate(currentSite,TO_THE_RIGHT); // <--  From cL and cR construct a new A, only A changes here
-		lrs_.updateContracted(currentSite,lrs_.abState(),TO_THE_RIGHT);
-	}
-
 	//! Moves the center of orthogonality by one to the left
 	void moveLeft(SymmetryLocalType& symm,size_t currentSite)
 	{
@@ -112,7 +105,7 @@ public:
 		lrs_.updateContracted(currentSite,TO_THE_LEFT,symm);
 	}
 
-	//! Moves the center of orthogonality by one to the left
+	//! Moves the center of orthogonality by one to the right
 	void moveRight(SymmetryLocalType& symm,size_t currentSite)
 	{
 		std::vector<size_t> quantumNumbers;

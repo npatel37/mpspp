@@ -88,70 +88,55 @@ public:
 
 	void computeGroundState()
 	{
-		growLattice();
-
-//		ContractedPartType contracted(psi,model_.hamiltonian());
-//		LeftRightSuperType lrs(psi,contracted);
-
-//		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
-
-//		size_t direction = TO_THE_RIGHT;
-//		if (finiteLoops[0].stepLength<0) direction=TO_THE_LEFT;
-
-//		size_t siteToAdd(psi.center()); // left-most site of B
-//		if (siteToAdd>0 && direction==TO_THE_RIGHT) {
-//			siteToAdd--; // right-most site of A
-//		}
-//		// now stepCurrent_ is such that sitesIndices_[stepCurrent_] = siteToAdd
-//		// so:
-//		int sc = PsimagLite::isInVector(sitesIndices_,siteToAdd);
-//		// FIXME: make line below an assert instead of a throw
-//		if (sc<0) throw std::runtime_error("finiteDmrgLoops(...): internal error: siteIndices_\n");
-//		stepCurrent_ = sc;
-
-//		// ok, now we're ready to do the finite loops
-//		for (size_t i=0;i<finiteLoops.size();i++)  {
-//			std::ostringstream msg;
-//			msg<<"Finite loop number "<<i<<" with l="<<finiteLoops[i].stepLength;
-//			msg<<" keptStates="<<finiteLoops[i].keptStates;
-//			progress_.printline(msg,std::cout);
-//			if (i>0) {
-//				int sign = finiteLoops[i].stepLength*finiteLoops[i-1].stepLength;
-//				if (sign>0) {
-//						if (finiteLoops[i].stepLength>0) stepCurrent_++;
-//						if (finiteLoops[i].stepLength<0) stepCurrent_--;
-//				}
-//			}
-//			finiteStep(lrs,i);
-//		}
-	}
-
-private:
-
-	void growLattice()
-	{
 		SymmetryLocalType symm;
 		MatrixProductStateType psi(1);
 		ContractedPartType contracted(psi,model_.hamiltonian());
 		LeftRightSuperType lrs(psi,contracted);
 		StepType step(solverParams_,lrs,model_);
 
+		size_t center = 0;
+
+		growLattice(step,center,symm);
+
+		finiteLoops(step,center,symm);
+	}
+
+private:
+
+	void growLattice(StepType& step,size_t& center,SymmetryLocalType& symm)
+	{
 		size_t nsites = model_.geometry().numberOfSites();
-		for (size_t center=0;center<nsites-1;center++) {
+
+		for (size_t i=0;i<nsites-1;i++) {
+			center=i;
 			step.growRight(symm,center);
 			printProgress(symm,center);
 		}
+	}
 
-		for (size_t i=0;i<nsites-1;i++) {
-			size_t center = nsites-2-i;
-			step.moveLeft(symm,center);
-			printProgress(symm,center);
-		}
+	void finiteLoops(StepType& step,size_t& center,SymmetryLocalType& symm)
+	{
+		size_t nsites = model_.geometry().numberOfSites();
 
-		for (size_t i=0;i<nsites-1;i++) {
-			size_t center = i;
-			step.moveRight(symm,center);
-			printProgress(symm,center);
+		for (size_t finiteLoop=0;finiteLoop<solverParams_.finiteLoops.size();finiteLoop++) {
+			FiniteLoop fl = solverParams_.finiteLoops[finiteLoop];
+			size_t counter = abs(fl.stepLength);
+			while(true) {
+				if (fl.stepLength<0) {
+					step.moveLeft(symm,center);
+					printProgress(symm,center);
+					if (center==0) break;
+					if (counter==0) break;
+					center--;
+				} else {
+					step.moveRight(symm,center);
+					printProgress(symm,center);
+					if (center+2==nsites) break;
+					center++;
+					if (counter==0) break;
+					counter--;
+				}
+			}
 		}
 	}
 
