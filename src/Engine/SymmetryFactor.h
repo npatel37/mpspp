@@ -94,6 +94,16 @@ public:
 		super_.combine(left_,right_);
 	}
 
+	void moveRight(const SymmetryComponentType& oldLeft,
+				  const SymmetryComponentType& onesite,
+				  const SymmetryComponentType& oldRight)
+	{
+
+		left_.combine(oldLeft,onesite);
+		right_ = oldRight;
+		super_.combine(left_,right_);
+	}
+
 	void moveLeft(const SymmetryComponentType& oldLeft,
 				  const SymmetryComponentType& onesite,
 				  const SymmetryComponentType& oldRight)

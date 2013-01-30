@@ -90,7 +90,12 @@ public:
 			if (leftOrRight == PART_RIGHT) {
 				initRight2(data_[b1],AorB,b1,h);
 			} else {
-				initLeft2(data_[b1],AorB,Atranspose,b1,h,dataPrev,symm);
+				if (site_==0) {
+					contractedFactor0(data_[b1],AorB,b1,h);
+					continue;
+				}
+				assert(dataPrev!=0);
+				initLeft2(data_[b1],AorB,Atranspose,b1,h,dataPrev->data_,symm);
 			}
 		}
 	}
@@ -110,7 +115,7 @@ public:
 			updateRight(AorB,h,dataPrev.data_,symm);
 		} else {
 			assert(AorB.type()==MpsFactorType::TYPE_A);
-			updateLeft(AorB);
+			updateLeft(AorB,h,dataPrev.data_,symm);
 		}
 	}
 
@@ -182,17 +187,10 @@ private:
 				   const SparseMatrixType& Atranspose,
 				   size_t b,
 				   const MpoFactorType& h,
-				   ThisType* dataPrev,
+				   const DataType& dataPrev,
 				   const SymmetryFactorType& symm)
 	{
-		if (site_==0) {
-			contractedFactor0(m,AorB,b,h);
-			return;
-		}
-
 		std::cerr<<"Start initLeft2\n";
-
-		assert(dataPrev!=0);
 
 //		const SymmetryFactorType& symm = AorB.symm();
 		const SparseMatrixType& A = AorB();
@@ -205,7 +203,7 @@ private:
 		for (size_t a2=0;a2<Atranspose.row();a2++) {
 			m.setRow(a2,counter);
 			for (size_t b1=0;b1<h.n_row();b1++) {
-				const SparseMatrixType& l1 = dataPrev->data_[b1];
+				const SparseMatrixType& l1 = dataPrev[b1];
 				const SparseMatrixType& w = h(b1,b);
 				if (w.row()==0) continue;
 //				size_t hilbertSize = w.row();
@@ -274,12 +272,14 @@ private:
 		return sum;
 	}
 
-	void updateLeft(const MpsFactorType& A)
+	void updateLeft(const MpsFactorType& A,const MpoFactorType& h,const DataType& dataPrev,const SymmetryFactorType& symm)
 	{
-		std::string str(__FILE__);
-		str += " " + ttos(__LINE__) + "\n";
-		str += "Need to updateLeft(...) here. I cannot go further until this is implemented\n";
-		throw std::runtime_error(str.c_str());
+		assert(leftOrRight_ == PART_LEFT);
+		assert(A.type()==MpsFactorType::TYPE_A);
+		SparseMatrixType Atranspose;
+		transposeConjugate(Atranspose,A());
+		for (size_t b1=0;b1<data_.size();b1++)
+			initLeft2(data_[b1],A,Atranspose,b1,h,dataPrev,symm);
 	}
 
 	void updateRight(const MpsFactorType& B,const MpoFactorType& h,const DataType& dataPrev,const SymmetryFactorType& symm)

@@ -125,13 +125,13 @@ private:
 		}
 		assert(currentSite<L_.size());
 		assert(currentSite>0);
-		L_[currentSite].update(abState.A(currentSite),h_(currentSite),L_[currentSite-1],symm(currentSite));
+		L_[currentSite].update(abState.A(currentSite-1),h_(currentSite-1),L_[currentSite-1],symm(currentSite-1));
 	}
 
 	void updateRight(size_t currentSite,const MatrixProductStateType& abState,const SymmetryLocalType& symm)
 	{
 		assert(currentSite+1<R_.size());
-		R_[currentSite].update(abState.B(currentSite),h_(currentSite),R_[currentSite+1],symm(currentSite));
+		R_[currentSite].update(abState.B(currentSite),h_(currentSite+1),R_[currentSite+1],symm(currentSite));
 	}
 
 	const MatrixProductStateType& abState_;

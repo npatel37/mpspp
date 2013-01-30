@@ -96,6 +96,15 @@ public:
 		data_[site] = symmFactor;
 	}
 
+	void moveRight(size_t site,const std::vector<size_t>& quantumNumbers)
+	{
+		assert(site>0);
+		SymmetryFactorType symmFactor;
+		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_RIGHT,0,site,quantumNumbers);
+		symmFactor.moveRight(data_[site-1].left(),onesite,data_[site].right());
+		data_[site] = symmFactor;
+	}
+
 	void growRight(size_t site,const std::vector<size_t>& quantumNumbers)
 	{
 		SymmetryFactorType symmFactor;

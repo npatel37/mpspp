@@ -112,6 +112,25 @@ public:
 		lrs_.updateContracted(currentSite,TO_THE_LEFT,symm);
 	}
 
+	//! Moves the center of orthogonality by one to the left
+	void moveRight(SymmetryLocalType& symm,size_t currentSite)
+	{
+		std::vector<size_t> quantumNumbers;
+		model_.getOneSite(quantumNumbers,currentSite);
+
+		if (currentSite==0) {
+			//symm.moveLeft(currentSite,quantumNumbers);
+			internalUpdate(currentSite,TO_THE_RIGHT,symm);  // <--  From cL and cR construct a new A, only A changes here
+			//lrs_.updateContracted(currentSite,TO_THE_RIGHT,symm);
+			return;
+		}
+
+		symm.moveRight(currentSite,quantumNumbers);
+		internalUpdate(currentSite,TO_THE_RIGHT,symm); // <-- From cL and cR construct a new B, only B changes here
+		lrs_.updateContracted(currentSite,TO_THE_RIGHT,symm);
+	}
+
+
 	void growRight(SymmetryLocalType& symm,size_t currentSite)
 	{
 		std::vector<size_t> quantumNumbers;
