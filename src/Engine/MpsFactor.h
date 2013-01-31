@@ -97,9 +97,15 @@ public:
 	void setRandom(size_t site,const SymmetryFactorType& symm)
 	{
 		MatrixType m(symm.right().size(),symm.right().size());
-		for (size_t i=0;i<m.n_row();i++)
-			for (size_t j=0;j<m.n_col();j++)
+		typename MatrixType::value_type tmp = 0;
+		for (size_t i=0;i<m.n_row();i++) {
+			for (size_t j=0;j<m.n_col();j++) {
 				m(i,j) = rng_();
+				tmp += std::conj(m(i,j))*m(i,j);
+			}
+		}
+		tmp = 1.0/sqrt(tmp);
+		m *= tmp;
 		fullMatrixToCrsMatrix(data_,m);
 	}
 

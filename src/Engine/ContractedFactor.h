@@ -202,29 +202,31 @@ private:
 
 		for (size_t a2=0;a2<Atranspose.row();a2++) {
 			m.setRow(a2,counter);
-			for (size_t b1=0;b1<h.n_row();b1++) {
-				const SparseMatrixType& l1 = dataPrev[b1];
-				const SparseMatrixType& w = h(b1,b);
-				if (w.row()==0) continue;
-//				size_t hilbertSize = w.row();
-				for (int k3=Atranspose.getRowPtr(a2);k3<Atranspose.getRowPtr(a2+1);k3++) {
-					PairType a1sigma2 = symm.left().unpack(Atranspose.getCol(k3));
-					size_t a1 = a1sigma2.first;
-					size_t sigma2 = a1sigma2.second;
+			for (int k3=Atranspose.getRowPtr(a2);k3<Atranspose.getRowPtr(a2+1);k3++) {
+				PairType a1sigma2 = symm.left().unpack(Atranspose.getCol(k3));
+				size_t a1 = a1sigma2.first;
+				size_t sigma2 = a1sigma2.second;
+
+				for (size_t b1=0;b1<h.n_row();b1++) {
+					const SparseMatrixType& w = h(b1,b);
+					if (w.row()==0) continue;
+					const SparseMatrixType& l1 = dataPrev[b1];
+
 					for (int k=l1.getRowPtr(a1);k<l1.getRowPtr(a1+1);k++) {
 						size_t a1p = l1.getCol(k);
+						ComplexOrRealType tmp= l1.getValue(k)*std::conj(Atranspose.getValue(k3));
 						for (int kp=w.getRowPtr(sigma2);kp<w.getRowPtr(sigma2+1);kp++) {
 							size_t sigma2p = w.getCol(kp);
 							size_t j = symm.left().pack(a1p,sigma2p);
 							for (int k2=A.getRowPtr(j);k2<A.getRowPtr(j+1);k2++) {
 								size_t a2p = A.getCol(k2);
-								values[a2p] += l1.getValue(k)*std::conj(Atranspose.getValue(k3))*w.getValue(kp)*A.getValue(k2);
+								values[a2p] += tmp*w.getValue(kp)*A.getValue(k2);
 								cols[a2p]=1;
 							} // k2
 						} // kp
 					} // k
-				} //k3
-			} // b1
+				} //b1
+			} // k3
 			for (size_t i=0;i<cols.size();i++) {
 				if (cols[i]==0) continue;
 				cols[i]=0;
