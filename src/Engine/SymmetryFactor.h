@@ -77,20 +77,19 @@ public:
 
 	void growRight(size_t site,
 				   const std::vector<size_t>& quantumNumbers,
-				   SymmetryFactor* previous)
+				   SymmetryFactor* previous,
+				   size_t nsites)
 	{
-		if (previous==0) {
-			assert(site==0);
-			right_.grow(site,quantumNumbers);
-			if (left_.size()==0) left_=right_;
-			left_.setComponent(SymmetryComponentType::COMPONENT_LEFT);
-			right_.setSite(site+1);
-			super_.combine(left_,right_);
-			return;
+		if (previous!=0) {
+			SymmetryComponentType onesiteRight(SymmetryComponentType::COMPONENT_RIGHT,0,site-1,quantumNumbers);
+			left_.combine(previous->left(),onesiteRight);
+		} else {
+			std::vector<size_t> qn(1,0);
+			SymmetryComponentType onesiteLeft(SymmetryComponentType::COMPONENT_LEFT,0,site,qn);
+			left_ = onesiteLeft;
 		}
-		left_ = previous->super();
-		left_.setComponent(SymmetryComponentType::COMPONENT_LEFT);
-		right_.grow(site+1,quantumNumbers);
+		right_.grow(site,quantumNumbers,nsites,(site+1<nsites) ? quantumNumbers.size() : 0);
+
 		super_.combine(left_,right_);
 	}
 
@@ -98,7 +97,6 @@ public:
 				  const SymmetryComponentType& onesite,
 				  const SymmetryComponentType& oldRight)
 	{
-
 		left_.combine(oldLeft,onesite);
 		right_ = oldRight;
 		super_.combine(left_,right_);
@@ -119,12 +117,23 @@ public:
 
 	const SymmetryComponentType& right() const { return right_; }
 
+	friend std::ostream& operator<<(std::ostream& os,const SymmetryFactor& symm);
+
 private:
 
 	SymmetryComponentType left_;
 	SymmetryComponentType right_;
 	SymmetryComponentType super_;
 }; // SymmetryFactor
+
+
+std::ostream& operator<<(std::ostream& os,const SymmetryFactor& symm)
+{
+	os<<symm.left_<<" ";
+	os<<symm.right_<<" ";
+	os<<symm.super_<<"\n";
+	return os;
+}
 
 } // namespace Mpspp
 

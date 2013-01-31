@@ -72,37 +72,44 @@ public:
 
 	typedef typename ProgramGlobals::Vector<SparseMatrixType>::Type DataType;
 
-	ContractedFactor(const MpsFactorType& AorB,
-					 const MpoFactorType& h,
-					 size_t site,
-					 size_t leftOrRight,
-					 ThisType* dataPrev,
-					 const SymmetryFactorType& symm)
-		: data_(h.n_col()),site_(site),leftOrRight_(leftOrRight)
-	{
-		if (leftOrRight == PART_RIGHT && site>0) data_.resize(h.n_row());
+//	ContractedFactor(const MpsFactorType& AorB,
+//					 const MpoFactorType& h,
+//					 size_t site,
+//					 size_t leftOrRight,
+//					 ThisType* dataPrev,
+//					 const SymmetryFactorType& symm)
+//		: data_(h.n_col()),site_(site),leftOrRight_(leftOrRight)
+//	{
+//		if (leftOrRight == PART_RIGHT && site>0) data_.resize(h.n_row());
 
-		SparseMatrixType Atranspose;
-		transposeConjugate(Atranspose,AorB());
-		std::cout<<"ContractedFactor ctor, part="<<partToString();
-		std::cout<<" site="<<site<<" size="<<data_.size()<<"\n";
-		for (size_t b1=0;b1<data_.size();b1++) {
-			if (leftOrRight == PART_RIGHT) {
-				initRight2(data_[b1],AorB,b1,h);
-			} else {
-				if (site_==0) {
-					contractedFactor0(data_[b1],AorB,b1,h);
-					continue;
-				}
-				assert(dataPrev!=0);
-				initLeft2(data_[b1],AorB,Atranspose,b1,h,dataPrev->data_,symm);
-			}
-		}
+//		SparseMatrixType Atranspose;
+//		transposeConjugate(Atranspose,AorB());
+//		std::cout<<"ContractedFactor ctor, part="<<partToString();
+//		std::cout<<" site="<<site<<" size="<<data_.size()<<"\n";
+//		for (size_t b1=0;b1<data_.size();b1++) {
+//			if (leftOrRight == PART_RIGHT) {
+//				initRight2(data_[b1],AorB,b1,h);
+//			} else {
+//				if (site_==0) {
+//					contractedFactor0(data_[b1],AorB,b1,h);
+//					continue;
+//				}
+//				assert(dataPrev!=0);
+//				initLeft2(data_[b1],AorB,Atranspose,b1,h,dataPrev->data_,symm);
+//			}
+//		}
+//	}
+
+	void build(const MpsFactorType& AorB,const MpoFactorType& h,const ThisType& prev,const SymmetryFactorType& symm)
+	{
+		assert(AorB.type()==MpsFactorType::TYPE_B);
+		assert(leftOrRight_==PART_RIGHT);
+		data_.resize(h.n_row());
+		updateRight(AorB,h,prev.data_,symm);
 	}
 
-	ContractedFactor(size_t site,
-					 size_t leftOrRight)
-		: data_(1),site_(site),leftOrRight_(leftOrRight)
+	ContractedFactor(size_t leftOrRight)
+		: data_(1),leftOrRight_(leftOrRight)
 	{
 		data_[0].makeDiagonal(1,1);
 	}
@@ -138,49 +145,49 @@ private:
 		contractedFactor0(m,AorB,b1,h);
 	}
 
-	void initLeft2old(SparseMatrixType& m,const MpsFactorType& AorB,size_t b,const MpoFactorType& h,ThisType* dataPrev)
-	{
-		if (site_==0) {
-			contractedFactor0(m,AorB,b,h);
-			return;
-		}
+//	void initLeft2old(SparseMatrixType& m,const MpsFactorType& AorB,size_t b,const MpoFactorType& h,ThisType* dataPrev)
+//	{
+//		if (site_==0) {
+//			contractedFactor0(m,AorB,b,h);
+//			return;
+//		}
 
-		std::cerr<<"Start initLeft2\n";
+//		std::cerr<<"Start initLeft2\n";
 
-		assert(dataPrev!=0);
+//		assert(dataPrev!=0);
 
-		const SymmetryFactorType& symm = AorB.symm();
-		const SparseMatrixType& A = AorB();
-		MatrixType tmp(A.col(),A.col());
+//		const SymmetryFactorType& symm = AorB.symm();
+//		const SparseMatrixType& A = AorB();
+//		MatrixType tmp(A.col(),A.col());
 
-		for (size_t b1=0;b1<h.n_row();b1++) {
-			const SparseMatrixType& l1 = dataPrev->data_[b1];
-			const SparseMatrixType& w = h(b1,b);
-			size_t hilbertSize = w.row();
-			for (size_t a1=0;a1<l1.row();a1++) {
-				for (int k=l1.getRowPtr(a1);k<l1.getRowPtr(a1+1);k++) {
-					size_t a1p = l1.getCol(k);
-					for (size_t sigma2=0;sigma2<hilbertSize;sigma2++) {
-						size_t j = symm.left().pack(a1,sigma2);
-						for (int k2=A.getRowPtr(j);k2<A.getRowPtr(j+1);k2++) {
-							size_t a2 = A.getCol(k2);
-							for (int kp=w.getRowPtr(sigma2);kp<w.getRowPtr(sigma2+1);kp++) {
-								size_t sigma2p = w.getCol(kp);
-								size_t jp = symm.left().pack(a1p,sigma2p);
-								for (int k3=A.getRowPtr(jp);k3<A.getRowPtr(jp+1);k3++) {
-									size_t a2p = A.getCol(k3);
-									tmp(a2,a2p) += l1.getValue(k)*A.getValue(k2)*w.getValue(kp)*A.getValue(k3);
-								} // k3
-							} // kp
-						} // k2
-					} // sigma2
-				} // k
-			} // a1
-		} // b1
+//		for (size_t b1=0;b1<h.n_row();b1++) {
+//			const SparseMatrixType& l1 = dataPrev->data_[b1];
+//			const SparseMatrixType& w = h(b1,b);
+//			size_t hilbertSize = w.row();
+//			for (size_t a1=0;a1<l1.row();a1++) {
+//				for (int k=l1.getRowPtr(a1);k<l1.getRowPtr(a1+1);k++) {
+//					size_t a1p = l1.getCol(k);
+//					for (size_t sigma2=0;sigma2<hilbertSize;sigma2++) {
+//						size_t j = symm.left().pack(a1,sigma2);
+//						for (int k2=A.getRowPtr(j);k2<A.getRowPtr(j+1);k2++) {
+//							size_t a2 = A.getCol(k2);
+//							for (int kp=w.getRowPtr(sigma2);kp<w.getRowPtr(sigma2+1);kp++) {
+//								size_t sigma2p = w.getCol(kp);
+//								size_t jp = symm.left().pack(a1p,sigma2p);
+//								for (int k3=A.getRowPtr(jp);k3<A.getRowPtr(jp+1);k3++) {
+//									size_t a2p = A.getCol(k3);
+//									tmp(a2,a2p) += l1.getValue(k)*A.getValue(k2)*w.getValue(kp)*A.getValue(k3);
+//								} // k3
+//							} // kp
+//						} // k2
+//					} // sigma2
+//				} // k
+//			} // a1
+//		} // b1
 
-		fullMatrixToCrsMatrix(m,tmp);
-		std::cerr<<"End initLeft2\n";
-	}
+//		fullMatrixToCrsMatrix(m,tmp);
+//		std::cerr<<"End initLeft2\n";
+//	}
 
 	void initLeft2(SparseMatrixType& m,
 				   const MpsFactorType& AorB,
@@ -366,7 +373,6 @@ private:
 	}
 
 	DataType data_;
-	size_t site_;
 	size_t leftOrRight_;
 
 }; // ContractedFactor
@@ -376,8 +382,9 @@ std::ostream& operator<<(std::ostream& os,const ContractedFactor<MatrixProductOp
 {
 	os<<"SparseMatrices= "<<contractedFactor.data_.size()<<"\n";
 	for (size_t i=0;i<contractedFactor.data_.size();i++) {
-		os<<contractedFactor.data_[i];
+		os<<contractedFactor.data_[i].row()<<"x"<<contractedFactor.data_[i].col()<<"    ";
 	}
+	os<<"\n";
 	return os;
 }
 

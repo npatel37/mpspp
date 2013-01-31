@@ -76,8 +76,6 @@ public:
 
 	const ContractedPartType& contracted() const { return contracted_; }
 
-//	const SymmetryLocalType& symmetry() const { return ab_.symmetry(); }
-
 	void updateContracted(size_t currentSite,size_t direction,const SymmetryLocalType& symm)
 	{
 		contracted_.update(currentSite,ab_,direction,symm);

@@ -92,10 +92,19 @@ public:
 		type_=comp;
 	}
 
-	void grow(size_t site,const std::vector<size_t>& quantumNumbers)
+	void grow(size_t site,const std::vector<size_t>& quantumNumbers,size_t nsites,size_t leftSize)
 	{
-		SymmetryComponent sc(type_,0,site,quantumNumbers);
-		*this = sc;
+		assert(type_==COMPONENT_RIGHT);
+		SymmetryComponent sc1(type_,0,site,quantumNumbers);
+		SymmetryComponent sc(type_);
+		*this = sc1;
+		size_t site1 = site+1;
+		for (size_t i=site1;i<nsites;i++) {
+			SymmetryComponent sc2(type_,0,i,quantumNumbers);
+			sc.combine(*this,sc2);
+			*this = sc;
+		}
+		this->leftSize_ = leftSize;
 	}
 
 	void combine(const SymmetryComponent& left,const SymmetryComponent& right)
@@ -117,6 +126,19 @@ public:
 		// order quantum numbers of combined basis:
 		findPermutationAndPartition();
 		leftSize_ = left.size();
+	}
+
+	std::string typeToString() const
+	{
+		switch (type_) {
+		case COMPONENT_LEFT:
+			return "left";
+		case COMPONENT_RIGHT:
+			return "right";
+		case COMPONENT_SUPER:
+			return "super";
+		}
+		return "unknown";
 	}
 
 	size_t partitions() const { return partition_.size(); }
@@ -173,6 +195,8 @@ public:
 	size_t split() const { return leftSize_; }
 
 	const std::vector<size_t>& block() const { return block_; }
+
+	friend std::ostream& operator<<(std::ostream& os,const SymmetryComponent& symm);
 
 private:
 
@@ -247,6 +271,13 @@ private:
 
 
 }; // SymmetryComponent
+
+std::ostream& operator<<(std::ostream& os,const SymmetryComponent& symm)
+{
+	os<<"type="<<symm.typeToString()<<" leftSize_= "<<symm.leftSize_<<" size= "<<symm.quantumNumbers_.size();
+	os<<" ";
+	return os;
+}
 
 } // namespace Mpspp
 

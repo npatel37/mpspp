@@ -97,15 +97,11 @@ public:
 	void setRandom(size_t site,const SymmetryFactorType& symm)
 	{
 		MatrixType m(symm.right().size(),symm.right().size());
-		typename MatrixType::value_type tmp = 0;
 		for (size_t i=0;i<m.n_row();i++) {
 			for (size_t j=0;j<m.n_col();j++) {
 				m(i,j) = rng_();
-				tmp += std::conj(m(i,j))*m(i,j);
 			}
 		}
-		tmp = 1.0/sqrt(tmp);
-		m *= tmp;
 		fullMatrixToCrsMatrix(data_,m);
 	}
 
@@ -133,11 +129,17 @@ public:
 		fullMatrixToCrsMatrix(data_,m);
 	}
 
+	std::string typeToString() const
+	{
+		return (aOrB_==TYPE_A) ? "A" : "B";
+	}
+
 	const SparseMatrixType& operator()() const { return data_; }
 
-//	const SymmetryFactorType& symm() const { return symm_; }
-
 	const size_t type() const { return aOrB_; }
+
+	template<typename ComplexOrRealType2,typename SymmetryLocalType2>
+	friend std::ostream& operator<<(std::ostream& os,const MpsFactor<ComplexOrRealType2,SymmetryLocalType2>& mps);
 
 private:
 
@@ -146,6 +148,14 @@ private:
 	SparseMatrixType data_;
 	size_t aOrB_;
 }; // MpsFactor
+
+template<typename ComplexOrRealType,typename SymmetryLocalType>
+std::ostream& operator<<(std::ostream& os,const MpsFactor<ComplexOrRealType,SymmetryLocalType>& mps)
+{
+	os<<"site= "<<mps.site_<<" type= "<<mps.typeToString();
+	os<<" rows= "<<mps.data_.row()<<" cols="<<mps.data_.col()<<"\n";
+	return os;
+}
 
 } // namespace Mpspp
 

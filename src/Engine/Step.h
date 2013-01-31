@@ -119,20 +119,15 @@ public:
 		}
 
 		symm.moveRight(currentSite,quantumNumbers);
-		internalUpdate(currentSite,TO_THE_RIGHT,symm); // <-- From cL and cR construct a new B, only B changes here
+		internalUpdate(currentSite,TO_THE_RIGHT,symm); // <--  <--  From cL and cR construct a new A, only A changes here
 		lrs_.updateContracted(currentSite,TO_THE_RIGHT,symm);
 	}
 
 
 	void growRight(SymmetryLocalType& symm,size_t currentSite)
 	{
-		std::vector<size_t> quantumNumbers;
-		model_.getOneSite(quantumNumbers,currentSite);
-		symm.growRight(currentSite,quantumNumbers); // grows symm
 		size_t nsites = model_.geometry().numberOfSites();
 		lrs_.growRight(currentSite,symm,nsites); // grows B, computes R
-		internalUpdate(currentSite,TO_THE_RIGHT,symm); // <--  From cL and cR construct a new A, only A changes here
-		lrs_.updateContracted(currentSite,TO_THE_RIGHT,symm);
 	}
 
 	void printReport(std::ostream& os) const

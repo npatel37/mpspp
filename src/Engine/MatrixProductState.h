@@ -141,9 +141,29 @@ public:
 		return *(B_[site]);
 	}
 
-//	const SymmetryLocalType& symmetry() const { return symm_; }
+
+	typename ProgramGlobals::Real<ComplexOrRealType>::Type norm(size_t type) const
+	{
+		if (type==MpsFactorType::TYPE_B) {
+			return normB();
+		}
+		return normA();
+	}
+
+	template<typename ComplexOrRealType2,typename SymmetryLocalType2>
+	friend std::ostream& operator<<(std::ostream& os,const MatrixProductState<ComplexOrRealType2,SymmetryLocalType2>& mps);
 
 private:
+
+	typename ProgramGlobals::Real<ComplexOrRealType>::Type normA() const
+	{
+		throw std::runtime_error("normA(): unimplemented\n");
+	}
+
+	typename ProgramGlobals::Real<ComplexOrRealType>::Type normB() const
+	{
+		throw std::runtime_error("normB(): unimplemented\n");
+	}
 
 	// copy ctor:
 	MatrixProductState(const MatrixProductState& other);
@@ -157,6 +177,20 @@ private:
 	typename ProgramGlobals::Vector<MpsFactorType*>::Type B_;
 	typename ProgramGlobals::Vector<MpsFactorType*>::Type A_;
 }; // MatrixProductState
+
+template<typename ComplexOrRealType,typename SymmetryLocalType>
+std::ostream& operator<<(std::ostream& os,const MatrixProductState<ComplexOrRealType,SymmetryLocalType>& mps)
+{
+	os<<"nsites= "<<mps.nsites_<<" center="<<mps.center_;
+	os<<"A_.size= "<<mps.A_.size()<<"\n";
+	for (size_t i=0;i<mps.A_.size();i++)
+		os<<*(mps.A_[i]);
+	os<<"B_.size= "<<mps.B_.size()<<"\n";
+	for (size_t i=0;i<mps.B_.size();i++)
+		os<<*(mps.B_[i]);
+	os<<"\n";
+	return os;
+}
 
 } // namespace Mpspp
 

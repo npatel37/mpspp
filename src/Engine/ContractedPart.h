@@ -68,23 +68,22 @@ public:
 	typedef ContractedFactor<MatrixProductOperatorType> ContractedFactorType;
 
 	ContractedPart(const MatrixProductStateType& abState,const MatrixProductOperatorType& h)
-		: abState_(abState),h_(h)
+		: abState_(abState),
+		  h_(h),
+		  R_(abState.sites(),ProgramGlobals::PART_RIGHT),
+		  L_(abState.sites(),ProgramGlobals::PART_LEFT)
 	{}
 
 	void growRight(size_t currentSite,const SymmetryLocalType& symm,size_t nsites)
 	{
-		ContractedFactorType cf(abState_.B(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_RIGHT,0,symm(currentSite));
-		R_.push_back(cf);
-
-		if (currentSite+2==nsites) {
-			ContractedFactorType cf3(currentSite,ProgramGlobals::PART_RIGHT);
-			R_.push_back(cf3);
+		if (currentSite+1==nsites) {
+			return;
 		}
 
-		if (currentSite>0) return;
-
-		ContractedFactorType cf2(currentSite,ProgramGlobals::PART_LEFT);
-		L_.push_back(cf2);
+		ContractedFactorType cf(ProgramGlobals::PART_RIGHT);
+		assert(currentSite+1<nsites);
+		assert(currentSite<R_.size());
+		R_[currentSite].build(abState_.B(currentSite+1),h_(currentSite+1),R_[currentSite+1],symm(currentSite+1));
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this

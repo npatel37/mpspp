@@ -105,20 +105,32 @@ public:
 		data_[site] = symmFactor;
 	}
 
-	void growRight(size_t site,const std::vector<size_t>& quantumNumbers)
+	// left = prev.left + one site
+	// right = prev.right - one site
+	void growRight(size_t site,const std::vector<size_t>& quantumNumbers,size_t nsites)
 	{
 		SymmetryFactorType symmFactor;
 		SymmetryFactorType *previous = 0;
 		if (data_.size()>0) previous = &data_[data_.size()-1];
-		symmFactor.growRight(site,quantumNumbers,previous);
+		symmFactor.growRight(site,quantumNumbers,previous,nsites);
 		data_.push_back(symmFactor);
 	}
+
+	friend std::ostream& operator<<(std::ostream& os,const SymmetryLocal& symm);
 
 private:
 
 	ProgramGlobals::Vector<SymmetryFactorType>::Type data_;
 
 }; // SymmetryLocal
+
+std::ostream& operator<<(std::ostream& os,const SymmetryLocal& symm)
+{
+	os<<"symm.data.size= "<<symm.data_.size()<<"\n";
+	for (size_t i=0;i<symm.data_.size();i++)
+		os<<symm.data_[i];
+	return os;
+}
 
 } // namespace Mpspp
 

@@ -89,29 +89,48 @@ public:
 	void computeGroundState()
 	{
 		SymmetryLocalType symm;
-		MatrixProductStateType psi(1);
+		MatrixProductStateType psi(model_.geometry().numberOfSites());
 		ContractedPartType contracted(psi,model_.hamiltonian());
-		LeftRightSuperType lrs(psi,contracted);
-		StepType step(solverParams_,lrs,model_);
+//		LeftRightSuperType lrs(psi,contracted);
+//		StepType step(solverParams_,lrs,model_);
 
 		size_t center = 0;
 
-		growLattice(step,center,symm);
+		growLattice(psi,contracted,center,symm);
 
-		finiteLoops(step,center,symm);
+//		finiteLoops(step,center,symm);
 	}
 
 private:
 
-	void growLattice(StepType& step,size_t& center,SymmetryLocalType& symm)
+	void growLattice(MatrixProductStateType& psi,ContractedPartType& contracted,size_t& center,SymmetryLocalType& symm)
 	{
 		size_t nsites = model_.geometry().numberOfSites();
-
-		for (size_t i=0;i<nsites-1;i++) {
+		for (size_t i=0;i<nsites;i++) {
 			center=i;
-			step.growRight(symm,center);
-			printProgress(symm,center);
+			std::vector<size_t> quantumNumbers;
+			model_.getOneSite(quantumNumbers,center);
+			symm.growRight(center,quantumNumbers,nsites); // grows symm
 		}
+
+		std::cout<<symm;
+
+		for (size_t i=0;i<nsites;i++) {
+			center=i;
+			psi.growRight(center,symm);
+		}
+
+		std::cout<<psi;
+
+//		RealType tmp = psi.norm(MatrixProductStateType::MpsFactorType::TYPE_B);
+//		std::cout<<tmp<<"\n";
+
+		for (size_t i=0;i<nsites;i++) {
+			size_t center = nsites-i-1;
+			contracted.growRight(center,symm,nsites);
+		}
+
+		std::cout<<contracted;
 	}
 
 	void finiteLoops(StepType& step,size_t& center,SymmetryLocalType& symm)
