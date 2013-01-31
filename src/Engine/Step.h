@@ -66,8 +66,8 @@ class Step {
 	typedef typename ModelType::ParametersSolverType ParametersSolverType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ModelType::VectorType VectorType;
-	typedef typename ModelType::LeftRightSuperType LeftRightSuperType;
-	typedef typename LeftRightSuperType::SymmetryLocalType SymmetryLocalType;
+	typedef typename ModelType::ContractedPartType ContractedPartType;
+	typedef typename ContractedPartType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 	typedef StatePredictor<RealType,VectorType> StatePredictorType;
@@ -78,10 +78,14 @@ class Step {
 	
 public:
 
-	Step(const ParametersSolverType& solverParams,LeftRightSuperType& lrs,const ModelType& model)
+	Step(const ParametersSolverType& solverParams,
+		 MatrixProductStateType& mps,
+		 ContractedPartType& contractedPart,
+		 const ModelType& model)
 	: progress_("Step",0),
 	  solverParams_(solverParams),
-	  lrs_(lrs),
+	  mps_(mps),
+	  contractedPart_(contractedPart),
 	  model_(model),
 	  statePredictor_()
 	{}
@@ -96,13 +100,13 @@ public:
 		if (currentSite+2==nsites) {
 			//symm.moveLeft(currentSite,quantumNumbers);
 			internalUpdate(currentSite,TO_THE_LEFT,symm); // <-- From cL and cR construct a new B, only B changes here
-			lrs_.updateContracted(currentSite,TO_THE_LEFT,symm);
+			contractedPart_.update(currentSite,TO_THE_LEFT,symm);
 			return;
 		}
 
 		symm.moveLeft(currentSite,quantumNumbers);
 		internalUpdate(currentSite,TO_THE_LEFT,symm); // <-- From cL and cR construct a new B, only B changes here
-		lrs_.updateContracted(currentSite,TO_THE_LEFT,symm);
+		contractedPart_.update(currentSite,TO_THE_LEFT,symm);
 	}
 
 	//! Moves the center of orthogonality by one to the right
@@ -120,14 +124,15 @@ public:
 
 		symm.moveRight(currentSite,quantumNumbers);
 		internalUpdate(currentSite,TO_THE_RIGHT,symm); // <--  <--  From cL and cR construct a new A, only A changes here
-		lrs_.updateContracted(currentSite,TO_THE_RIGHT,symm);
+		contractedPart_.update(currentSite,TO_THE_RIGHT,symm);
 	}
 
 
 	void growRight(SymmetryLocalType& symm,size_t currentSite)
 	{
 		size_t nsites = model_.geometry().numberOfSites();
-		lrs_.growRight(currentSite,symm,nsites); // grows B, computes R
+		contractedPart_.mps().growRight(currentSite,symm); // grows B
+		contractedPart_.growRight(currentSite,symm,nsites); // computes R
 	}
 
 	void printReport(std::ostream& os) const
@@ -151,7 +156,7 @@ private:
 
 		ReflectionSymmetryType *rs = 0;
 		size_t hamiltonianSite = (direction == TO_THE_RIGHT) ? currentSite : currentSite + 1;
-		ModelHelperType modelHelper(lrs_,symmetrySector,currentSite,direction,model_.hamiltonian()(hamiltonianSite),symm(currentSite));
+		ModelHelperType modelHelper(contractedPart_,symmetrySector,currentSite,direction,model_.hamiltonian()(hamiltonianSite),symm(currentSite));
 		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 
 		RealType eps=ProgramGlobals::LanczosTolerance;
@@ -181,13 +186,13 @@ private:
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
 
-		lrs_.updateMps(currentSite,tmpVec,direction,symmetrySector,symm);
+		mps_.update(currentSite,tmpVec,direction,symmetrySector,symm);
 		statePredictor_.push(tmpVec,symmetrySector);
 	}
 
 	size_t getSymmetrySector(size_t direction,SymmetryLocalType& symm) const
 	{
-		size_t center = lrs_.abState().center();
+		size_t center = mps_.center();
 		size_t sites = symm(center).super().block().size();
 		size_t targetQuantumNumber = getQuantumSector(sites,direction);
 		
@@ -248,7 +253,8 @@ private:
 
 	PsimagLite::ProgressIndicator progress_;
 	const ParametersSolverType& solverParams_;
-	LeftRightSuperType& lrs_;
+	MatrixProductStateType& mps_;
+	ContractedPartType& contractedPart_;
 	const ModelType& model_;
 	StatePredictorType statePredictor_;
 }; // Step

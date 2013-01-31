@@ -48,33 +48,32 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
-template<typename LeftRightSuperType>
+template<typename ContractedPartType>
 class ModelHelper {
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 public:
 
-	typedef typename LeftRightSuperType::RealType RealType;
-	typedef typename LeftRightSuperType::ComplexOrRealType ComplexOrRealType;
-	typedef typename LeftRightSuperType::ContractedPartType ContractedPartType;
 	typedef typename ContractedPartType::ContractedFactorType ContractedFactorType;
-	typedef typename LeftRightSuperType::MatrixProductStateType MatrixProductStateType;
+	typedef typename ContractedPartType::MatrixProductStateType MatrixProductStateType;
+	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
+	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
 	typedef typename MatrixProductStateType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::PairType PairType;
 	typedef typename ContractedPartType::SparseMatrixType SparseMatrixType;
 	typedef typename ProgramGlobals::Vector<ComplexOrRealType>::Type VectorType;
-	typedef typename LeftRightSuperType::MatrixProductOperatorType MatrixProductOperatorType;
+	typedef typename ContractedPartType::MatrixProductOperatorType MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
 
-	ModelHelper(const LeftRightSuperType& lrs,
+	ModelHelper(const ContractedPartType& contractedPart,
 				size_t symmetrySector,
 				size_t currentSite,
 				size_t direction,
 				const MpoFactorType& hamiltonian,
 				const SymmetryFactorType& symmetry)
-	: lrs_(lrs),
+	: contractedPart_(contractedPart),
 	  symmetrySector_(symmetrySector),
 	  currentSite_(currentSite),
 	  direction_(direction),
@@ -91,21 +90,11 @@ public:
 
 	size_t hilbertSize() const { return hamiltonian_(0,0).row(); }
 
-	const LeftRightSuperType& lrs() const { return lrs_; }
+//	const LeftRightSuperType& lrs() const { return lrs_; }
 
 	const MpoFactorType& hamiltonian() const { return hamiltonian_; }
 
 	const SymmetryFactorType& symmetry() const { return symmetry_; }
-
-//	const ContractedFactorType& contractedFactorLeft() const
-//	{
-//		return lrs_.contracted()(currentSite_,ProgramGlobals::PART_LEFT);
-//	}
-
-//	const ContractedFactorType& contractedFactorRight() const
-//	{
-//		return lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
-//	}
 
 	//! Eq. (201) but very modified
 	void matrixVectorProduct(VectorType& x,const VectorType& y) const
@@ -120,8 +109,8 @@ public:
 
 		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ -1 : currentSite_;
 
-		const ContractedFactorType& cL = lrs_.contracted()(leftIndex,ProgramGlobals::PART_LEFT);
-		const ContractedFactorType& cR = lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
+		const ContractedFactorType& cL = contractedPart_(leftIndex,ProgramGlobals::PART_LEFT);
+		const ContractedFactorType& cR = contractedPart_(currentSite_,ProgramGlobals::PART_RIGHT);
 		const SymmetryFactorType& symm = symmetry_;
 		for (size_t blm1=0;blm1<cL.size();blm1++) {
 			const SparseMatrixType& l1 = cL(blm1);
@@ -187,8 +176,8 @@ public:
 		size_t rightIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
 
 		matrix.resize(total,total);
-		const ContractedFactorType& cL = lrs_.contracted()(leftIndex,ProgramGlobals::PART_LEFT);
-		const ContractedFactorType& cR = lrs_.contracted()(rightIndex,ProgramGlobals::PART_RIGHT);
+		const ContractedFactorType& cL = contractedPart_(leftIndex,ProgramGlobals::PART_LEFT);
+		const ContractedFactorType& cR = contractedPart_(rightIndex,ProgramGlobals::PART_RIGHT);
 		const SymmetryFactorType& symm = symmetry_;
 		VectorType v(total,0);
 		size_t counter = 0;
@@ -260,7 +249,7 @@ private:
 		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
 		size_t total = symmetry_.super().partitionSize(symmetrySector_);
 
-		const ContractedFactorType& cR = lrs_.contracted()(currentSite_,ProgramGlobals::PART_RIGHT);
+		const ContractedFactorType& cR = contractedPart_(currentSite_,ProgramGlobals::PART_RIGHT);
 		const SymmetryFactorType& symm = symmetry_;
 
 		for (size_t bl=0;bl<cR.size();bl++) {
@@ -335,7 +324,7 @@ private:
 //	}
 
 
-	const LeftRightSuperType& lrs_;
+	const ContractedPartType& contractedPart_;
 	size_t symmetrySector_;
 	size_t currentSite_;
 	size_t direction_;

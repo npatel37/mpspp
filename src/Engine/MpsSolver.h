@@ -64,8 +64,8 @@ class MpsSolver {
 	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ParametersSolverType::FiniteLoopsType FiniteLoopsType;
-	typedef typename ModelBaseType::LeftRightSuperType LeftRightSuperType;
-	typedef typename LeftRightSuperType::ContractedPartType ContractedPartType;
+//	typedef typename ModelBaseType::LeftRightSuperType LeftRightSuperType;
+	typedef typename ModelBaseType::ContractedPartType ContractedPartType;
 	typedef typename ModelBaseType::SymmetryLocalType SymmetryLocalType;
 	typedef Step<ModelBaseType,InternalProductTemplate> StepType;
 
@@ -92,12 +92,12 @@ public:
 		MatrixProductStateType psi(model_.geometry().numberOfSites());
 		ContractedPartType contracted(psi,model_.hamiltonian());
 //		LeftRightSuperType lrs(psi,contracted);
-//		StepType step(solverParams_,lrs,model_);
 
 		size_t center = 0;
 
 		growLattice(psi,contracted,center,symm);
 
+//		StepType step(solverParams_,psi,contracted,model_);
 //		finiteLoops(step,center,symm);
 	}
 
@@ -157,63 +157,6 @@ private:
 				}
 			}
 		}
-	}
-
-	void finiteStep(LeftRightSuperType& lrs,size_t loopIndex)
-	{
-		const FiniteLoopsType& finiteLoops = solverParams_.finiteLoops;
-		int stepLength = finiteLoops[loopIndex].stepLength;
-//		size_t keptStates = finiteLoops[loopIndex].keptStates;
-//		int saveOption = (finiteLoops[loopIndex].saveOption & 1);
-//		RealType gsEnergy=0;
-
-		size_t direction=TO_THE_RIGHT;
-		if (stepLength<0) direction=TO_THE_LEFT;
-
-//		wft_.setStage(direction);
-
-		int stepFinal = stepCurrent_+stepLength;
-		StepType step(solverParams_,lrs,model_);
-		while(true) {
-			// FIXME: make it an assert below
-			if (size_t(stepCurrent_)>=sitesIndices_.size())
-				throw std::runtime_error("stepCurrent_ too large!\n");
-
-			if (direction==TO_THE_RIGHT) {
-				step.moveRight(stepCurrent_);
-			} else {
-				step.moveLeft(stepCurrent_);
-			}
-
-			step.printReport(std::cout);
-
-			if (finalStep(stepLength,stepFinal)) break;
-			// FIXME: make it an assert below
-			if (stepCurrent_<0)
-				throw std::runtime_error("MpsSolver::finiteStep() currentStep_ is negative\n");
-
-			printMemoryUsage();
-
-		}
-	}
-
-	bool finalStep(int stepLength,int stepFinal)
-	{
-		if (stepLength<0) {
-			stepCurrent_--;
-			if (stepCurrent_<=stepFinal) {
-				stepCurrent_++; // revert
-				return true;
-			}
-			return false;
-		}
-		stepCurrent_++;
-		if (stepCurrent_>=stepFinal) {
-			stepCurrent_--; //revert
-			return true;
-
-		}
-		return false;
 	}
 
 	void printProgress(const SymmetryLocalType& symm,size_t center) const

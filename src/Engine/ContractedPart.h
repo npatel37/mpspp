@@ -50,13 +50,8 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
-template<typename MatrixProductOperatorType>
+template<typename MatrixProductOperatorType_>
 class ContractedPart {
-
-	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
-	typedef typename MatrixProductStateType::SymmetryLocalType SymmetryLocalType;
-	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
-	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -64,6 +59,11 @@ class ContractedPart {
 
 public:
 
+	typedef MatrixProductOperatorType_ MatrixProductOperatorType;
+	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
+	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+	typedef typename MatrixProductStateType::SymmetryLocalType SymmetryLocalType;
+	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
 	typedef ContractedFactor<MatrixProductOperatorType> ContractedFactorType;
 
@@ -87,12 +87,12 @@ public:
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
-	void update(size_t currentSite,const MatrixProductStateType& abState,size_t direction,const SymmetryLocalType& symm)
+	void update(size_t currentSite,size_t direction,const SymmetryLocalType& symm)
 	{
 		if (direction==TO_THE_RIGHT) {
-			updateLeft(currentSite,abState,symm);
+			updateLeft(currentSite,abState_,symm);
 		} else {
-			updateRight(currentSite,abState,symm);
+			updateRight(currentSite,abState_,symm);
 		}
 	}
 
@@ -108,8 +108,8 @@ public:
 		return (leftOrRight == PART_LEFT) ? L_[currentSite] : R_[currentSite];
 	}
 
-	template<typename MatrixProductOperatorType_>
-	friend std::ostream& operator<<(std::ostream& os,const ContractedPart<MatrixProductOperatorType_>& contractedPart);
+	template<typename MatrixProductOperatorType2>
+	friend std::ostream& operator<<(std::ostream& os,const ContractedPart<MatrixProductOperatorType2>& contractedPart);
 
 private:
 
