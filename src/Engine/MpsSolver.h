@@ -140,13 +140,13 @@ private:
 			while(true) {
 				if (fl.stepLength<0) {
 					step.moveLeft(symm,center);
-					printProgress(symm,center);
+					printProgress(symm,center,"to the left");
 					if (center==0) break;
 					if (counter==0) break;
 					center--;
 				} else {
 					step.moveRight(symm,center);
-					printProgress(symm,center);
+					printProgress(symm,center,"to the right");
 					if (center+2==nsites) break;
 					center++;
 					if (counter==0) break;
@@ -156,10 +156,10 @@ private:
 		}
 	}
 
-	void printProgress(const SymmetryLocalType& symm,size_t center) const
+	void printProgress(const SymmetryLocalType& symm,size_t center,const std::string& direction) const
 	{
 		std::ostringstream msg;
-		msg<<"center="<<center<<" ";
+		msg<<"center="<<center<<" direction="<<direction;
 		msg<<" left space= "<<symm(center).left().size();
 		msg<<" right space="<<symm(center).right().size()<<"\n";
 		progress_.printline(msg,std::cout);

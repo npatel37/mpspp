@@ -96,13 +96,29 @@ public:
 
 	void setRandom(size_t site,const SymmetryFactorType& symm)
 	{
-		MatrixType m(symm.right().size(),symm.right().size());
-		for (size_t i=0;i<m.n_row();i++) {
-			for (size_t j=0;j<m.n_col();j++) {
-				m(i,j) = rng_();
-			}
-		}
-		fullMatrixToCrsMatrix(data_,m);
+//		MatrixType m(symm.right().size(),symm.right().size());
+//		for (size_t i=0;i<m.n_row();i++) {
+//			for (size_t j=i;j<m.n_col();j++) {
+//				m(i,j) = rng_();
+//			}
+//		}
+//		for (size_t i=0;i<m.n_row();i++) {
+//			for (size_t j=0;j<i;j++) {
+//				m(i,j) = std::conj(m(j,i));
+//			}
+//		}
+//		ComplexOrRealType sum = 0;
+//		for (size_t i=0;i<m.n_row();i++) {
+//			for (size_t j=0;j<m.n_col();j++) {
+//				sum += m(i,j) * std::conj(m(i,j));
+//			}
+//		}
+//		assert(sum>0);
+//		m *= (1.0/sqrt(sum));
+//		fullMatrixToCrsMatrix(data_,m);
+		data_.resize(symm.right().size(),symm.right().size());
+		data_.makeDiagonal(symm.right().size(),1.0);
+//		assert(isNormalized(data_));
 	}
 
 	void updateFromVector(const VectorType& v,size_t symmetrySector,const SymmetryFactorType& symm)
@@ -126,7 +142,7 @@ public:
 
 		std::vector<RealType> s;
 		svd(m,s);
-		fullMatrixToCrsMatrix(data_,m);
+		updateFromVector(m);
 	}
 
 	template<typename SomeNumericType>
@@ -149,6 +165,34 @@ public:
 	friend std::ostream& operator<<(std::ostream& os,const MpsFactor<ComplexOrRealType2,SymmetryLocalType2>& mps);
 
 private:
+
+	void updateFromVector(const MatrixType& m)
+	{
+		assert(isNormalized(m));
+		MatrixType mtranspose;
+		if (aOrB_==TYPE_B)
+			transposeConjugate(mtranspose,m);
+
+		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? m : mtranspose);
+	}
+
+	bool isNormalized(const MatrixType& m) const
+	{
+		assert(m.n_row()==m.n_col());
+		for (size_t i=0;i<m.n_row();i++) {
+			for (size_t j=0;j<m.n_col();j++) {
+				ComplexOrRealType sum = 0;
+				for (size_t k=0;k<m.n_row();k++) {
+					sum += m(k,i) * std::conj(m(k,j));
+				}
+				if (i==j && fabs(sum-1.0)>1e-5)
+					return false;
+				if (i!=j && fabs(sum)>1e-5)
+					return false;
+			}
+		}
+		return true;
+	}
 
 	size_t site_;
 	RandomNumberGeneratorType rng_;

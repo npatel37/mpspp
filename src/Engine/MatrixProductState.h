@@ -122,10 +122,11 @@ public:
 		if (direction==ProgramGlobals::TO_THE_RIGHT) {
 			assert(currentSite<A_.size());
 			A_[currentSite]->updateFromVector(v,symmetrySector,symm);
-			std::cout<<"A_["<<currentSite<<"].row= "<<A_[currentSite]->operator()().row()<<"\n";
+			std::cout<<"updated A["<<currentSite<<"].row= "<<A_[currentSite]->operator()().row()<<"\n";
 		} else {
-			assert(currentSite<B_.size());
-			B_[currentSite]->updateFromVector(v,symmetrySector,symm);
+			assert(currentSite+1<B_.size());
+			B_[currentSite+1]->updateFromVector(v,symmetrySector,symm);
+			std::cout<<"updated B["<<(currentSite+1)<<"].row= "<<B_[currentSite+1]->operator()().row()<<"\n";
 		}
 	}
 

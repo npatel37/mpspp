@@ -181,6 +181,9 @@ public:
 		const SymmetryFactorType& symm = symmetry_;
 		VectorType v(total,0);
 		size_t counter = 0;
+		assert(hamiltonian_.n_row()==cL.size());
+		assert(hamiltonian_.n_col()==cR.size());
+
 		if (direction_==TO_THE_RIGHT) {
 			assert(symm.left().split()==cL(0).row());
 			assert(symm.right().size()==cR(0).row());
