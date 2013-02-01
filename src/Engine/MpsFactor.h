@@ -139,9 +139,11 @@ public:
 				m(ab.second,ab.first) = v[i];
 			}
 		}
-
+		std::cout<<m;
 		std::vector<RealType> s;
-		svd(m,s);
+		svd(m,s,'A');
+		std::cout<<"-----------\n";
+		std::cout<<m;
 		updateFromVector(m);
 	}
 

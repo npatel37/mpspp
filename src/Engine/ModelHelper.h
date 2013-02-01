@@ -240,7 +240,7 @@ public:
 				} // bl
 			} // blm1
 			for (size_t j=0;j<v.size();j++) {
-				if (fabs(v[j])<1e-6) continue;
+				if (fabs(v[j])<1e-12) continue;
 				matrix.pushCol(j);
 				matrix.pushValue(v[j]);
 				v[j]=0;

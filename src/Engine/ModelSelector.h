@@ -48,6 +48,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <string>
 #include <stdexcept>
 #include "HubbardOneOrbital.h"
+#include "HeisenbergSpinOneHalf.h"
 
 namespace Mpspp {
 
@@ -66,6 +67,12 @@ class ModelSelector {
 							  SymmetryLocalType,
 							  GeometryType,
 							  ConcurrencyType> HubbardOneOrbitalType;
+
+	typedef HeisenbergSpinOneHalf<ParametersSolverType,
+							  InputValidatorType,
+							  SymmetryLocalType,
+							  GeometryType,
+							  ConcurrencyType> HeisenbergSpinOneHalfType;
 
 public:
 
@@ -91,6 +98,8 @@ public:
 	{
 		if (name_ == "HubbardOneBand") {
 			model_ = new HubbardOneOrbitalType(solverParams,io,geometry,concurrency);
+		} else if (name_ == "HeisenbergSpinOneHalf") {
+			model_ = new HeisenbergSpinOneHalfType(solverParams,io,geometry,concurrency);
 		} else {
 			std::string str(__FILE__);
 			str += " " + ttos(__LINE__) + "\n";

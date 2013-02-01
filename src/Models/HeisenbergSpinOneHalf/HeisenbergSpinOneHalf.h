@@ -108,6 +108,7 @@ public:
 	{
 		// FIXME: CONNECT WITH THE GEOMETRY HERE!!
 		RealType J = 1.0;
+		RealType Jover2 = 0.5*J;
 		size_t n = hamiltonian_.size();
 		size_t wdim = 5;
 
@@ -122,8 +123,8 @@ public:
 		fillSzMatrix(sz);
 
 		MpoFactorType mleft(1,wdim);
-		mleft(0,1) = J*sminus;
-		mleft(0,2) = J*splus;
+		mleft(0,1) = Jover2*sminus;
+		mleft(0,2) = Jover2*splus;
 		mleft(0,3) = J*sz;
 		mleft(0,4) = identity;
 		hamiltonian_(0)=mleft;
@@ -135,8 +136,8 @@ public:
 			m(2,0) = sminus;
 			m(3,0) = sz;
 
-			m(4,1) = J*sminus;
-			m(4,2) = J*splus;
+			m(4,1) = Jover2*sminus;
+			m(4,2) = Jover2*splus;
 			m(4,3) = J*sz;
 			m(4,4) = identity;
 			hamiltonian_(i)=m;
@@ -171,6 +172,14 @@ private:
 	{
 		MatrixType m(hilbert_,hilbert_);
 		m(1,0) = 1;
+		fullMatrixToCrsMatrix(cm,m);
+	}
+
+	void fillSzMatrix(SparseMatrixType& cm) const
+	{
+		MatrixType m(hilbert_,hilbert_);
+		m(0,0) = 0.5;
+		m(1,1) = -0.5;
 		fullMatrixToCrsMatrix(cm,m);
 	}
 
