@@ -108,6 +108,12 @@ public:
 		updateRight(AorB,h,prev.data_,symm);
 	}
 
+	void build(const MpoFactorType& h)
+	{
+		assert(leftOrRight_==PART_LEFT);
+		data_.resize(h.n_row());
+	}
+
 	ContractedFactor(size_t leftOrRight)
 		: data_(1),leftOrRight_(leftOrRight)
 	{
@@ -139,11 +145,11 @@ public:
 
 private:
 
-	void initRight2(SparseMatrixType& m,const MpsFactorType& AorB,size_t b1,const MpoFactorType& h)
-	{
-		//only when growing:
-		contractedFactor0(m,AorB,b1,h);
-	}
+//	void initRight2(SparseMatrixType& m,const MpsFactorType& AorB,size_t b1,const MpoFactorType& h)
+//	{
+//		//only when growing:
+//		contractedFactor0(m,AorB,b1,h);
+//	}
 
 //	void initLeft2old(SparseMatrixType& m,const MpsFactorType& AorB,size_t b,const MpoFactorType& h,ThisType* dataPrev)
 //	{
@@ -249,37 +255,37 @@ private:
 		std::cerr<<"End initLeft2\n";
 	}
 
-	void contractedFactor0(SparseMatrixType& m,const MpsFactorType& AorB,size_t b1,const MpoFactorType& h)
-	{
-		MatrixType m2(AorB().row(),AorB().col());
-		for (size_t a1=0;a1<m2.n_row();a1++) {
-			for (size_t a1p=0;a1p<m2.n_row();a1p++) {
-				m2(a1,a1p)=contractedFactor0aux(a1,a1p,b1,AorB,h);
-			}
-		}
-		fullMatrixToCrsMatrix(m,m2);
-	}
+//	void contractedFactor0(SparseMatrixType& m,const MpsFactorType& AorB,size_t b1,const MpoFactorType& h)
+//	{
+//		MatrixType m2(AorB().row(),AorB().col());
+//		for (size_t a1=0;a1<m2.n_row();a1++) {
+//			for (size_t a1p=0;a1p<m2.n_row();a1p++) {
+//				m2(a1,a1p)=contractedFactor0aux(a1,a1p,b1,AorB,h);
+//			}
+//		}
+//		fullMatrixToCrsMatrix(m,m2);
+//	}
 
-	ComplexOrRealType contractedFactor0aux(size_t a1,size_t a1p,size_t b1,const MpsFactorType& AorB,const MpoFactorType& h) const
-	{
-		ComplexOrRealType sum = 0;
-		MatrixType w;
-		size_t row = (leftOrRight_==PART_LEFT) ? 0 : b1;
-		size_t col = (leftOrRight_==PART_LEFT) ? b1 : 0;
-		if (h.n_row()==1) {
-			col=b1;
-			row=0;
-		}
-		crsMatrixToFullMatrix(w,h(row,col));
-		for (int k=AorB().getRowPtr(a1);k<AorB().getRowPtr(a1+1);k++) {
-			size_t s2 = AorB().getCol(k);
-			for (int kp=AorB().getRowPtr(a1p);kp<AorB().getRowPtr(a1p+1);kp++) {
-				size_t s2p = AorB().getCol(kp);
-				sum += std::conj(AorB().getValue(k)) * w(s2,s2p) * AorB().getValue(kp);
-			}
-		}
-		return sum;
-	}
+//	ComplexOrRealType contractedFactor0aux(size_t a1,size_t a1p,size_t b1,const MpsFactorType& AorB,const MpoFactorType& h) const
+//	{
+//		ComplexOrRealType sum = 0;
+//		MatrixType w;
+//		size_t row = (leftOrRight_==PART_LEFT) ? 0 : b1;
+//		size_t col = (leftOrRight_==PART_LEFT) ? b1 : 0;
+//		if (h.n_row()==1) {
+//			col=b1;
+//			row=0;
+//		}
+//		crsMatrixToFullMatrix(w,h(row,col));
+//		for (int k=AorB().getRowPtr(a1);k<AorB().getRowPtr(a1+1);k++) {
+//			size_t s2 = AorB().getCol(k);
+//			for (int kp=AorB().getRowPtr(a1p);kp<AorB().getRowPtr(a1p+1);kp++) {
+//				size_t s2p = AorB().getCol(kp);
+//				sum += std::conj(AorB().getValue(k)) * w(s2,s2p) * AorB().getValue(kp);
+//			}
+//		}
+//		return sum;
+//	}
 
 	void updateLeft(const MpsFactorType& A,const MpoFactorType& h,const DataType& dataPrev,const SymmetryFactorType& symm)
 	{

@@ -76,6 +76,9 @@ public:
 
 	void growRight(size_t currentSite,const SymmetryLocalType& symm,size_t nsites)
 	{
+		if (currentSite>0)
+			L_[currentSite].build(h_(currentSite));
+
 		if (currentSite+1==nsites) {
 			return;
 		}
@@ -115,11 +118,7 @@ private:
 
 	void updateLeft(size_t currentSite,const MatrixProductStateType& abState,const SymmetryLocalType& symm)
 	{
-		assert(L_.size()>0);
-		if (currentSite+1>=L_.size()) {
-			ContractedFactorType* dataPrev = &(L_[L_.size()-1]);
-			ContractedFactorType cf(abState.A(currentSite),h_(currentSite),currentSite,ProgramGlobals::PART_LEFT,dataPrev,symm(currentSite));
-			L_.push_back(cf);
+		if (currentSite==0) {
 			return;
 		}
 		assert(currentSite<L_.size());

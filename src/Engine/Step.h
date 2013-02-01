@@ -99,13 +99,13 @@ public:
 		size_t nsites = model_.geometry().numberOfSites();
 		if (currentSite+2==nsites) {
 			//symm.moveLeft(currentSite,quantumNumbers);
-			internalUpdate(currentSite,TO_THE_LEFT,symm); // <-- From cL and cR construct a new B, only B changes here
+			internalUpdate(currentSite,TO_THE_LEFT,symm(currentSite)); // <-- From cL and cR construct a new B, only B changes here
 			contractedPart_.update(currentSite,TO_THE_LEFT,symm);
 			return;
 		}
 
 		symm.moveLeft(currentSite,quantumNumbers);
-		internalUpdate(currentSite,TO_THE_LEFT,symm); // <-- From cL and cR construct a new B, only B changes here
+		internalUpdate(currentSite,TO_THE_LEFT,symm(currentSite)); // <-- From cL and cR construct a new B, only B changes here
 		contractedPart_.update(currentSite,TO_THE_LEFT,symm);
 	}
 
@@ -115,15 +115,8 @@ public:
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 
-		if (currentSite==0) {
-			//symm.moveLeft(currentSite,quantumNumbers);
-			internalUpdate(currentSite,TO_THE_RIGHT,symm);  // <--  From cL and cR construct a new A, only A changes here
-			//lrs_.updateContracted(currentSite,TO_THE_RIGHT,symm);
-			return;
-		}
-
-		symm.moveRight(currentSite,quantumNumbers);
-		internalUpdate(currentSite,TO_THE_RIGHT,symm); // <--  <--  From cL and cR construct a new A, only A changes here
+		//symm.moveRight(currentSite,quantumNumbers);
+		internalUpdate(currentSite,TO_THE_RIGHT,symm(currentSite+1)); // <--  <--  From cL and cR construct a new A, only A changes here
 		contractedPart_.update(currentSite,TO_THE_RIGHT,symm);
 	}
 
@@ -142,7 +135,7 @@ public:
 
 private:
 
-	void internalUpdate(size_t currentSite,size_t direction,SymmetryLocalType& symm)
+	void internalUpdate(size_t currentSite,size_t direction,const SymmetryFactorType& symm)
 	{
 		const ParametersSolverType& solverParams = model_.solverParams();
 
@@ -156,7 +149,7 @@ private:
 
 		ReflectionSymmetryType *rs = 0;
 		size_t hamiltonianSite = (direction == TO_THE_RIGHT) ? currentSite : currentSite + 1;
-		ModelHelperType modelHelper(contractedPart_,symmetrySector,currentSite,direction,model_.hamiltonian()(hamiltonianSite),symm(currentSite));
+		ModelHelperType modelHelper(contractedPart_,symmetrySector,currentSite,direction,model_.hamiltonian()(hamiltonianSite),symm);
 		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 
 		RealType eps=ProgramGlobals::LanczosTolerance;
@@ -190,13 +183,12 @@ private:
 		statePredictor_.push(tmpVec,symmetrySector);
 	}
 
-	size_t getSymmetrySector(size_t direction,SymmetryLocalType& symm) const
+	size_t getSymmetrySector(size_t direction,const SymmetryFactorType& symm) const
 	{
-		size_t center = mps_.center();
-		size_t sites = symm(center).super().block().size();
+		size_t sites = symm.super().block().size();
 		size_t targetQuantumNumber = getQuantumSector(sites,direction);
 		
-		SymmetryComponentType super = symm(center).super();
+		SymmetryComponentType super = symm.super();
 		for (size_t i=0;i<super.partitions()-1;i++) {
 			size_t state = super.partitionOffset(i);
 			size_t q = super.qn(state);

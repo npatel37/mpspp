@@ -91,14 +91,13 @@ public:
 		SymmetryLocalType symm;
 		MatrixProductStateType psi(model_.geometry().numberOfSites());
 		ContractedPartType contracted(psi,model_.hamiltonian());
-//		LeftRightSuperType lrs(psi,contracted);
 
 		size_t center = 0;
 
 		growLattice(psi,contracted,center,symm);
 
-//		StepType step(solverParams_,psi,contracted,model_);
-//		finiteLoops(step,center,symm);
+		StepType step(solverParams_,psi,contracted,model_);
+		finiteLoops(step,center,symm);
 	}
 
 private:
@@ -126,10 +125,9 @@ private:
 //		std::cout<<tmp<<"\n";
 
 		for (size_t i=0;i<nsites;i++) {
-			size_t center = nsites-i-1;
+			center = nsites-i-1;
 			contracted.growRight(center,symm,nsites);
 		}
-
 		std::cout<<contracted;
 	}
 

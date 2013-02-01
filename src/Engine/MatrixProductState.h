@@ -97,6 +97,8 @@ public:
 		MpsFactorType* mpsFactor = new MpsFactorType(currentSite,MpsFactorType::TYPE_B);
 		mpsFactor->setRandom(currentSite,symm(currentSite));
 		B_.push_back(mpsFactor);
+		MpsFactorType* mpsFactor2 = new MpsFactorType(currentSite,MpsFactorType::TYPE_A);
+		A_.push_back(mpsFactor2);
 	}
 
 	size_t center() const
@@ -111,21 +113,16 @@ public:
 	}
 
 	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-	void update(size_t currentSite,const VectorType& v,size_t direction,size_t symmetrySector,const SymmetryLocalType& symm)
+	void update(size_t currentSite,const VectorType& v,size_t direction,size_t symmetrySector,const SymmetryFactorType& symm)
 	{
 		center_ = currentSite;
 		if (direction==ProgramGlobals::TO_THE_RIGHT) {
-			if (currentSite>=A_.size()) {
-				MpsFactorType* mpsFactor = new MpsFactorType(currentSite,MpsFactorType::TYPE_A);
-				mpsFactor->updateFromVector(v,symmetrySector,symm(currentSite));
-				A_.push_back(mpsFactor);
-				return;
-			}
 			assert(currentSite<A_.size());
-			A_[currentSite]->updateFromVector(v,symmetrySector,symm(currentSite));
+			A_[currentSite]->updateFromVector(v,symmetrySector,symm);
+			std::cout<<"A_["<<currentSite<<"].row= "<<A_[currentSite]->operator()().row()<<"\n";
 		} else {
 			assert(currentSite<B_.size());
-			B_[currentSite]->updateFromVector(v,symmetrySector,symm(currentSite));
+			B_[currentSite]->updateFromVector(v,symmetrySector,symm);
 		}
 	}
 
