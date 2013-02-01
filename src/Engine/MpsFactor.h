@@ -129,6 +129,13 @@ public:
 		fullMatrixToCrsMatrix(data_,m);
 	}
 
+	template<typename SomeNumericType>
+	void divideBy(const SomeNumericType& value)
+	{
+		assert(value!=0);
+		data_ *= (1.0/value);
+	}
+
 	std::string typeToString() const
 	{
 		return (aOrB_==TYPE_A) ? "A" : "B";

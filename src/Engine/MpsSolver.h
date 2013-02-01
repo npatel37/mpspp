@@ -121,8 +121,7 @@ private:
 
 		std::cout<<psi;
 
-//		RealType tmp = psi.norm(MatrixProductStateType::MpsFactorType::TYPE_B);
-//		std::cout<<tmp<<"\n";
+//		psi.normalize(symm);
 
 		for (size_t i=0;i<nsites;i++) {
 			center = nsites-i-1;

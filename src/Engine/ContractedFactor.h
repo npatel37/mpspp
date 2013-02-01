@@ -212,7 +212,8 @@ private:
 		size_t counter=0;
 		std::vector<size_t> cols(m.row(),0);
 		std::vector<ComplexOrRealType> values(m.row(),0.0);
-
+		assert(symm.left().split()==0 || symm.left().split()==dataPrev[0].row());
+		assert(symm.left().size()==A.row());
 		for (size_t a2=0;a2<Atranspose.row();a2++) {
 			m.setRow(a2,counter);
 			for (int k3=Atranspose.getRowPtr(a2);k3<Atranspose.getRowPtr(a2+1);k3++) {
@@ -349,7 +350,8 @@ private:
 	{
 //		const SymmetryFactorType& symm = B.symm();
 		const SparseMatrixType& Bmatrix = B();
-
+		assert(symm.right().split()==0 || symm.right().size()/symm.right().split()==dataPrev[0].row());
+		assert(Btranspose.row()==symm.right().size());
 		for (int kb=Bmatrix.getRowPtr(alm2);kb<Bmatrix.getRowPtr(alm2+1);kb++) {
 			PairType sigmalm1alm1 = symm.right().unpack(Bmatrix.getCol(kb));
 			size_t sigmalm1 = sigmalm1alm1.first;

@@ -96,16 +96,8 @@ public:
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 
-		size_t nsites = model_.geometry().numberOfSites();
-		if (currentSite+2==nsites) {
-			//symm.moveLeft(currentSite,quantumNumbers);
-			internalUpdate(currentSite,TO_THE_LEFT,symm(currentSite)); // <-- From cL and cR construct a new B, only B changes here
-			contractedPart_.update(currentSite,TO_THE_LEFT,symm);
-			return;
-		}
-
-		symm.moveLeft(currentSite,quantumNumbers);
-		internalUpdate(currentSite,TO_THE_LEFT,symm(currentSite)); // <-- From cL and cR construct a new B, only B changes here
+//		symm.moveLeft(currentSite,quantumNumbers);
+		internalUpdate(currentSite,TO_THE_LEFT,symm(currentSite+1)); // <-- From cL and cR construct a new B, only B changes here
 		contractedPart_.update(currentSite,TO_THE_LEFT,symm);
 	}
 

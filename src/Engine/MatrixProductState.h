@@ -60,10 +60,13 @@ public:
 	typedef SymmetryLocalType_ SymmetryLocalType;
 	typedef typename SymmetryLocalType::IoInputType IoInputType;
 	typedef ComplexOrRealType_ ComplexOrRealType;
+	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
+	typedef typename SymmetryFactorType::PairType PairType;
 	typedef MpsFactor<ComplexOrRealType,SymmetryFactorType> MpsFactorType;
 	typedef typename MpsFactorType::VectorType VectorType;
 	typedef typename MpsFactorType::SparseMatrixType SparseMatrixType;
+	typedef typename MpsFactorType::MatrixType MatrixType;
 
 	MatrixProductState(size_t nsites)
 	: nsites_(nsites),center_(0)
@@ -126,6 +129,24 @@ public:
 		}
 	}
 
+	void normalize(const SymmetryLocalType& symm)
+	{
+		RealType tmp = norm(MpsFactorType::TYPE_B,symm);
+		std::cout<<"norm before normalization = "<<tmp<<"\n";
+
+		assert(tmp>0);
+		tmp = sqrt(tmp);
+
+		tmp = pow(tmp,1.0/static_cast<RealType>(B_.size()));
+
+		for (size_t i=0;i<B_.size();i++)
+			B_[i]->divideBy(tmp);
+
+		tmp = norm(MpsFactorType::TYPE_B,symm);
+		std::cout<<"norm after normalization = "<<tmp<<"\n";
+
+	}
+
 	const MpsFactorType& A(size_t site) const
 	{
 		assert(site<A_.size());
@@ -139,10 +160,10 @@ public:
 	}
 
 
-	typename ProgramGlobals::Real<ComplexOrRealType>::Type norm(size_t type) const
+	typename ProgramGlobals::Real<ComplexOrRealType>::Type norm(size_t type,const SymmetryLocalType& symm) const
 	{
 		if (type==MpsFactorType::TYPE_B) {
-			return normB();
+			return normB(symm);
 		}
 		return normA();
 	}
@@ -157,9 +178,64 @@ private:
 		throw std::runtime_error("normA(): unimplemented\n");
 	}
 
-	typename ProgramGlobals::Real<ComplexOrRealType>::Type normB() const
+	typename ProgramGlobals::Real<ComplexOrRealType>::Type normB(const SymmetryLocalType& symm) const
 	{
-		throw std::runtime_error("normB(): unimplemented\n");
+		MatrixType tmpOld;
+
+		for (size_t i=0;i<B_.size();i++) {
+			size_t center = B_.size()-1-i;
+			MatrixType tmpNew;
+			computeIntermediate(tmpNew,tmpOld,center,symm);
+			tmpOld = tmpNew;
+		}
+
+		ComplexOrRealType sum = 0;
+		for (size_t i=0;i<tmpOld.n_row();i++) {
+			for (size_t j=0;j<tmpOld.n_col();j++) {
+				sum += tmpOld(i,j);
+			}
+		}
+		return std::real(sum);
+	}
+
+	void computeIntermediate(MatrixType& matrixNew,const MatrixType& matrixOld,size_t center,const SymmetryLocalType& symmLocal) const
+	{
+		const SparseMatrixType& Bmatrix = B_[center]->operator()();
+		SparseMatrixType Btranspose;
+		transposeConjugate(Btranspose,Bmatrix);
+
+		matrixNew.resize(Bmatrix.row(),Bmatrix.row());
+		matrixNew.setTo(0.0);
+
+		if (matrixOld.n_row()==0) {
+			assert(center+1==B_.size());
+			for (size_t x=0;x<Bmatrix.row();x++) {
+				for (int k=Bmatrix.getRowPtr(x);k<Bmatrix.getRowPtr(x+1);k++) {
+					size_t sigma = Bmatrix.getCol(k);
+					for (int k2=Btranspose.getRowPtr(sigma);k2<Btranspose.getRowPtr(sigma+1);k2++) {
+						size_t y = Btranspose.getCol(k2);
+						matrixNew(x,y) += Bmatrix.getValue(k) * std::conj(Btranspose.getValue(k2));
+					}
+				}
+			}
+			return;
+		}
+
+		const SymmetryFactorType& symm = symmLocal(center);
+		for (size_t anm2=0;anm2<Bmatrix.row();anm2++) {
+			for (int k=Bmatrix.getRowPtr(anm2);k<Bmatrix.getRowPtr(anm2+1);k++) {
+				PairType p = symm.right().unpack(Bmatrix.getCol(k));
+				size_t sigmanm2=p.first;
+				size_t anm1=p.second;
+				for (size_t apnm1=0;apnm1<matrixOld.n_row();apnm1++) {
+					size_t x = symm.right().pack(sigmanm2,apnm1);
+					for (int k2=Btranspose.getRowPtr(x);k2<Btranspose.getRowPtr(x+1);k2++) {
+						size_t apnm2 = Btranspose.getCol(k2);
+						matrixNew(anm2,apnm2) += matrixOld(anm1,apnm1) * Bmatrix.getValue(k) * Btranspose.getValue(k2);
+					} // k2
+				} // apnm1
+			} // k
+		} // anm2
 	}
 
 	// copy ctor:

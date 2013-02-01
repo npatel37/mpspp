@@ -103,7 +103,6 @@ public:
 	{
 		if (leftOrRight == PART_LEFT) {
 			assert(currentSite<L_.size());
-//			std::cout<<L_;
 		} else {
 			assert(currentSite<R_.size());
 		}
@@ -118,18 +117,14 @@ private:
 
 	void updateLeft(size_t currentSite,const MatrixProductStateType& abState,const SymmetryLocalType& symm)
 	{
-		if (currentSite==0) {
-			return;
-		}
-		assert(currentSite<L_.size());
-		assert(currentSite>0);
-		L_[currentSite].update(abState.A(currentSite-1),h_(currentSite-1),L_[currentSite-1],symm(currentSite-1));
+		assert(currentSite+1<L_.size());
+		L_[currentSite+1].update(abState.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite+1));
 	}
 
 	void updateRight(size_t currentSite,const MatrixProductStateType& abState,const SymmetryLocalType& symm)
 	{
 		assert(currentSite+1<R_.size());
-		R_[currentSite].update(abState.B(currentSite),h_(currentSite+1),R_[currentSite+1],symm(currentSite));
+		R_[currentSite].update(abState.B(currentSite+1),h_(currentSite+1),R_[currentSite+1],symm(currentSite+1));
 	}
 
 	const MatrixProductStateType& abState_;

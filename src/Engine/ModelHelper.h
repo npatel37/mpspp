@@ -181,6 +181,13 @@ public:
 		const SymmetryFactorType& symm = symmetry_;
 		VectorType v(total,0);
 		size_t counter = 0;
+		if (direction_==TO_THE_RIGHT) {
+			assert(symm.left().split()==cL(0).row());
+			assert(symm.right().size()==cR(0).row());
+		} else {
+			assert(symm.right().split()==0 || symm.right().size()/symm.right().split()==cR(0).row());
+			assert(symm.left().size()==cL(0).row());
+		}
 		for (size_t i=0;i<total;i++) {
 			matrix.setRow(i,counter);
 			for (size_t blm1=0;blm1<hamiltonian_.n_row();blm1++) {
