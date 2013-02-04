@@ -116,6 +116,7 @@ public:
 //		assert(sum>0);
 //		m *= (1.0/sqrt(sum));
 //		fullMatrixToCrsMatrix(data_,m);
+		assert(aOrB_==TYPE_B);
 		data_.resize(symm.right().size(),symm.right().size());
 		data_.makeDiagonal(symm.right().size(),1.0);
 //		assert(isNormalized(data_));

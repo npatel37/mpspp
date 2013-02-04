@@ -143,7 +143,7 @@ public:
 									j = symm.super().pack(tmp1,alBp);
 								} else {
 									size_t tmp1 = symm.right().pack(sigmaLp,alBp);
-									j = symm.super().pack(alm1,tmp1);
+									j = symm.super().pack(alm1p,tmp1);
 								}
 								if (j<offset || j>=offset+total) continue;
 								x[i] += y[j-offset]*l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2);
@@ -219,7 +219,7 @@ public:
 									j = symm.super().pack(tmp1,alBp);
 								} else {
 									size_t tmp1 = symm.right().pack(sigmaLp,alBp);
-									j = symm.super().pack(alm1,tmp1);
+									j = symm.super().pack(alm1p,tmp1);
 								}
 								if (j<offset || j>=offset+total) continue;
 								v[j-offset] += l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2);
