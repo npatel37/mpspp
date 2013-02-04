@@ -104,10 +104,10 @@ public:
 		A_.push_back(mpsFactor2);
 	}
 
-	size_t center() const
-	{
-		return center_;
-	}
+//	size_t center() const
+//	{
+//		return center_;
+//	}
 
 	//! Returns the number of sites
 	size_t sites() const
@@ -130,23 +130,23 @@ public:
 		}
 	}
 
-	void normalize(const SymmetryLocalType& symm)
-	{
-		RealType tmp = norm(MpsFactorType::TYPE_B,symm);
-		std::cout<<"norm before normalization = "<<tmp<<"\n";
+//	void normalize(const SymmetryLocalType& symm)
+//	{
+//		RealType tmp = norm(MpsFactorType::TYPE_B,symm);
+//		std::cout<<"norm before normalization = "<<tmp<<"\n";
 
-		assert(tmp>0);
-		tmp = sqrt(tmp);
+//		assert(tmp>0);
+//		tmp = sqrt(tmp);
 
-		tmp = pow(tmp,1.0/static_cast<RealType>(B_.size()));
+//		tmp = pow(tmp,1.0/static_cast<RealType>(B_.size()));
 
-		for (size_t i=0;i<B_.size();i++)
-			B_[i]->divideBy(tmp);
+//		for (size_t i=0;i<B_.size();i++)
+//			B_[i]->divideBy(tmp);
 
-		tmp = norm(MpsFactorType::TYPE_B,symm);
-		std::cout<<"norm after normalization = "<<tmp<<"\n";
+//		tmp = norm(MpsFactorType::TYPE_B,symm);
+//		std::cout<<"norm after normalization = "<<tmp<<"\n";
 
-	}
+//	}
 
 	const MpsFactorType& A(size_t site) const
 	{

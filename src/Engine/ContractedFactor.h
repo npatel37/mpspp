@@ -183,6 +183,7 @@ private:
 		assert(A.type()==MpsFactorType::TYPE_A);
 		SparseMatrixType Atranspose;
 		transposeConjugate(Atranspose,A());
+		assert(data_.size()==h.n_col());
 		for (size_t b1=0;b1<data_.size();b1++)
 			updateLeft(data_[b1],A,Atranspose,b1,h,dataPrev,symm);
 	}
@@ -226,6 +227,7 @@ private:
 			}
 		}
 		m.setRow(m.row(),counter);
+		m.checkValidity();
 	}
 
 	void updateRight(std::vector<ComplexOrRealType>& values,
