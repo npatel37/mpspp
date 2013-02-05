@@ -282,7 +282,10 @@ std::ostream& operator<<(std::ostream& os,const ContractedFactor<MatrixProductOp
 {
 	os<<"SparseMatrices= "<<contractedFactor.data_.size()<<"\n";
 	for (size_t i=0;i<contractedFactor.data_.size();i++) {
-		os<<contractedFactor.data_[i].row()<<"x"<<contractedFactor.data_[i].col()<<"    ";
+		typename MatrixProductOperatorType::MatrixProductStateType::MatrixType m;
+		crsMatrixToFullMatrix(m,contractedFactor.data_[i]);
+		std::cout<<m;
+//		os<<contractedFactor.data_[i].row()<<"x"<<contractedFactor.data_[i].col()<<"    ";
 	}
 	os<<"\n";
 	return os;

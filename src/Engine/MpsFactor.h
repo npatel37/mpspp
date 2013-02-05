@@ -94,31 +94,10 @@ public:
 //		fullMatrixToCrsMatrix(data_,mpsFactor);
 //	}
 
-	void setRandom(size_t site,const SymmetryFactorType& symm)
+	void setRandom(size_t site,size_t n)
 	{
-//		MatrixType m(symm.right().size(),symm.right().size());
-//		for (size_t i=0;i<m.n_row();i++) {
-//			for (size_t j=i;j<m.n_col();j++) {
-//				m(i,j) = rng_();
-//			}
-//		}
-//		for (size_t i=0;i<m.n_row();i++) {
-//			for (size_t j=0;j<i;j++) {
-//				m(i,j) = std::conj(m(j,i));
-//			}
-//		}
-//		ComplexOrRealType sum = 0;
-//		for (size_t i=0;i<m.n_row();i++) {
-//			for (size_t j=0;j<m.n_col();j++) {
-//				sum += m(i,j) * std::conj(m(i,j));
-//			}
-//		}
-//		assert(sum>0);
-//		m *= (1.0/sqrt(sum));
-//		fullMatrixToCrsMatrix(data_,m);
-		assert(aOrB_==TYPE_B);
-		data_.resize(symm.right().size(),symm.right().size());
-		data_.makeDiagonal(symm.right().size(),1.0);
+		data_.resize(n,n);
+		data_.makeDiagonal(n,1.0);
 //		assert(isNormalized(data_));
 	}
 
@@ -144,7 +123,7 @@ public:
 		std::vector<RealType> s;
 		svd(m,s,'A');
 		std::cout<<"-----------\n";
-		std::cout<<m;
+		std::cout<<s;
 		updateFromVector(m);
 	}
 
@@ -175,9 +154,20 @@ private:
 		MatrixType mtranspose;
 		if (aOrB_==TYPE_B)
 			transposeConjugate(mtranspose,m);
-
-		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? m : mtranspose);
+		std::cout<<"new AorB=\n";
+		std::cout<<m;
+//		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? m : mtranspose);
 	}
+
+//	void flipColumns(MatrixType& m2,const MatrixType& m) const
+//	{
+//		m2.resize(m.n_row(),m.n_col());
+//		for (size_t i=0;i<m.n_col();i++) {
+//			for (size_t j=0;j<m.n_row();j++) {
+//				m2(j,i) = m(j,m.n_col()-1-i);
+//			}
+//		}
+//	}
 
 	bool isNormalized(const MatrixType& m) const
 	{

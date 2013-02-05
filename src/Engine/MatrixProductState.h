@@ -98,9 +98,12 @@ public:
 	{
 		center_ = currentSite;
 		MpsFactorType* mpsFactor = new MpsFactorType(currentSite,MpsFactorType::TYPE_B);
-		mpsFactor->setRandom(currentSite,symm(currentSite));
+		size_t n = symm(currentSite).right().size();
+		mpsFactor->setRandom(currentSite,n);
 		B_.push_back(mpsFactor);
 		MpsFactorType* mpsFactor2 = new MpsFactorType(currentSite,MpsFactorType::TYPE_A);
+		n = (currentSite+1<symm(0).super().block().size()) ? symm(currentSite+1).left().size() : symm(currentSite).super().size();
+		mpsFactor2->setRandom(currentSite,n);
 		A_.push_back(mpsFactor2);
 	}
 

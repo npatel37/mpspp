@@ -72,6 +72,8 @@ public:
 		  block_(1,site),
 		  quantumNumbers_(quantumNumbers)
 	{
+		if (quantumNumbers.size()==1) block_.resize(0);
+
 		findPermutationAndPartition();
 	}
 
@@ -160,9 +162,9 @@ public:
 		assert(i<permutation_.size());
 		size_t ip = permutation_[i];
 		if (leftSize_==0 && type_==COMPONENT_LEFT)
-			return PairType(0,i);
+			return PairType(0,ip);
 		if (leftSize_==0 && type_==COMPONENT_RIGHT)
-			return PairType(i,0);
+			return PairType(ip,0);
 		div_t q = div(ip,leftSize_);
 		return PairType(q.rem,q.quot);
 	}
@@ -275,6 +277,9 @@ private:
 std::ostream& operator<<(std::ostream& os,const SymmetryComponent& symm)
 {
 	os<<"type="<<symm.typeToString()<<" leftSize_= "<<symm.leftSize_<<" size= "<<symm.quantumNumbers_.size();
+	os<<" block= ";
+	for (size_t i=0;i<symm.block_.size();i++)
+		os<<symm.block_[i]<<" ";
 	os<<" ";
 	return os;
 }

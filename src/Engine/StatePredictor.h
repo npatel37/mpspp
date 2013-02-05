@@ -46,7 +46,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define STATE_PREDICTOR_H
 
 #include "ProgramGlobals.h"
-#include "Random48.h"
+#include "RandomForTests.h"
 
 namespace Mpspp {
 
@@ -56,7 +56,7 @@ class StatePredictor {
 public:
 
 	StatePredictor()
-		: rng_(3433117),symmetrySector_(0)
+		: rng_(3433117),energy_(0),symmetrySector_(0)
 	{}
 
 	void createRandomVector(VectorType& y,size_t offset,size_t final)
@@ -75,11 +75,14 @@ public:
 		vectorSaved_=y;
 	}
 
-	void push(const VectorType& v,size_t symmetrySector)
+	void push(const RealType& e,const VectorType& v,size_t symmetrySector)
 	{
+		energy_ = e;
 		vectorSaved_ = v;
 		symmetrySector_ = symmetrySector;
 	}
+
+	const RealType& energy() const { return energy_; }
 
 	const VectorType& vector() const { return vectorSaved_; }
 
@@ -87,17 +90,18 @@ public:
 
 private:
 
-	void myRandomT(std::complex<RealType>& value) const
+	void myRandomT(std::complex<RealType>& value)
 	{
 		value = std::complex<RealType>(rng_() - 0.5, rng_() - 0.5);
 	}
 
-	void myRandomT(RealType& value) const
+	void myRandomT(RealType& value)
 	{
 		value = rng_() - 0.5;
 	}
 
-	PsimagLite::Random48<RealType> rng_;
+	PsimagLite::RandomForTests<RealType> rng_;
+	RealType energy_;
 	VectorType vectorSaved_;
 	size_t symmetrySector_;
 }; // StatePredictor

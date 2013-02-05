@@ -119,6 +119,9 @@ private:
 	{
 		assert(currentSite+1<L_.size());
 		L_[currentSite+1].update(abState.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite+1));
+		std::cout<<"L["<<(currentSite+1)<<"]\n";
+		std::cout<<L_[currentSite+1];
+		std::cout<<"--------------------------------\n";
 	}
 
 	void updateRight(size_t currentSite,const MatrixProductStateType& abState,const SymmetryLocalType& symm)

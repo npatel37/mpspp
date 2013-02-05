@@ -183,7 +183,6 @@ public:
 		for (size_t i=0;i<total;i++) {
 			matrix.setRow(i,counter);
 			for (size_t blm1=0;blm1<hamiltonian_.n_row();blm1++) {
-
 				for (size_t bl=0;bl<hamiltonian_.n_col();bl++) {
 					const SparseMatrixType& w = hamiltonian_(blm1,bl);
 					if (w.row()==0) continue;

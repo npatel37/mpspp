@@ -172,7 +172,8 @@ private:
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
 
 		mps_.update(currentSite,tmpVec,direction,symmetrySector,symm);
-		statePredictor_.push(tmpVec,symmetrySector);
+		statePredictor_.push(energyTmp,tmpVec,symmetrySector);
+
 	}
 
 	size_t getSymmetrySector(size_t direction,const SymmetryFactorType& symm) const
