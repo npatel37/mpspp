@@ -96,16 +96,41 @@ public:
 
 	void setRandom(size_t site,size_t n)
 	{
+//		MatrixType m(n,n);
+//		for (size_t i=0;i<n;i++)
+//			m(i,i) = (rng_()<0.5) ? -1 : 1;
+
+//		fullMatrixToCrsMatrix(data_,m);
 		data_.resize(n,n);
 		data_.makeDiagonal(n,1.0);
-//		assert(isNormalized(data_));
+		if (n==2 && site==0 && aOrB_==TYPE_A) {
+			MatrixType m(n,n);
+			m(0,1) = m(1,0) = -1;
+			fullMatrixToCrsMatrix(data_,m);
+		}
+		if (n==2 && site==1 && aOrB_==TYPE_B) {
+			MatrixType m(n,n);
+			m(1,1) = 1;
+			m(0,0) = -1;
+			fullMatrixToCrsMatrix(data_,m);
+		}
+
+		assert(isNormalized(data_));
 	}
 
 	void updateFromVector(const VectorType& v,size_t symmetrySector,const SymmetryFactorType& symm)
 	{
+
 		size_t row = symm.left().size();
 		size_t col = symm.right().size();
+
+//		if (aOrB_==TYPE_A && row==symm.right().split())
+//			return;
+//		if (aOrB_==TYPE_B && col==symm.right().split())
+//			return;
+
 		if (aOrB_==TYPE_B) std::swap(row,col);
+
 
 		MatrixType m(row,col);
 
@@ -119,11 +144,17 @@ public:
 				m(ab.second,ab.first) = v[i];
 			}
 		}
+		std::cout<<"matrix to svd is\n";
 		std::cout<<m;
 		std::vector<RealType> s;
 		svd(m,s,'A');
 		std::cout<<"-----------\n";
 		std::cout<<s;
+//		if (s.size()==2 && aOrB_==TYPE_A) {
+//			MatrixType m2;
+//			flipColumns(m2,m);
+//			m = m2;
+//		}
 		updateFromVector(m);
 	}
 
@@ -178,20 +209,22 @@ private:
 		MatrixType mtranspose;
 		if (aOrB_==TYPE_B)
 			transposeConjugate(mtranspose,m);
+
 		std::cout<<"new AorB=\n";
 		std::cout<<m;
+
 		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? m : mtranspose);
 	}
 
-//	void flipColumns(MatrixType& m2,const MatrixType& m) const
-//	{
-//		m2.resize(m.n_row(),m.n_col());
-//		for (size_t i=0;i<m.n_col();i++) {
-//			for (size_t j=0;j<m.n_row();j++) {
-//				m2(j,i) = m(j,m.n_col()-1-i);
-//			}
-//		}
-//	}
+	void flipColumns(MatrixType& m2,const MatrixType& m) const
+	{
+		m2.resize(m.n_row(),m.n_col());
+		for (size_t i=0;i<m.n_col();i++) {
+			for (size_t j=0;j<m.n_row();j++) {
+				m2(j,i) = m(j,m.n_col()-1-i);
+			}
+		}
+	}
 
 	bool isNormalized(const MatrixType& m) const
 	{

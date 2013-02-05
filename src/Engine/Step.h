@@ -142,7 +142,8 @@ private:
 //			for (size_t j=0;j<tmpVec.size();j++) v[j+offset] = tmpVec[j];
 //		}
 
-		size_t symmetrySector = getSymmetrySector(direction,symm);
+		size_t symmetrySector = getSymmetrySector(direction,symm.super());
+		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
 		size_t total = symm.super().partitionSize(symmetrySector);
 		VectorType v(total,0.0);
 		RealType energy = internalUpdate(v,currentSite,direction,symm,symmetrySector);
@@ -190,16 +191,16 @@ private:
 
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
-
+		std::cout<<"Eigenstate\n";
+		std::cout<<tmpVec;
 		return energyTmp;
 	}
 
-	size_t getSymmetrySector(size_t direction,const SymmetryFactorType& symm) const
+	size_t getSymmetrySector(size_t direction,const SymmetryComponentType& super) const
 	{
-		size_t sites = symm.super().block().size();
+		size_t sites = super.block().size();
 		size_t targetQuantumNumber = getQuantumSector(sites,direction);
 		
-		SymmetryComponentType super = symm.super();
 		for (size_t i=0;i<super.partitions()-1;i++) {
 			size_t state = super.partitionOffset(i);
 			size_t q = super.qn(state);
