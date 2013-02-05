@@ -114,6 +114,12 @@ public:
 		if (data_.size()>0) previous = &data_[data_.size()-1];
 		symmFactor.growRight(site,quantumNumbers,previous,nsites);
 		data_.push_back(symmFactor);
+		if (site+1==nsites) {
+			SymmetryFactorType symmFactor2;
+			symmFactor2.growRight(site+1,quantumNumbers,&symmFactor,nsites);
+			data_.push_back(symmFactor2);
+		}
+		assert(data_.size()<=nsites+1);
 	}
 
 	friend std::ostream& operator<<(std::ostream& os,const SymmetryLocal& symm);

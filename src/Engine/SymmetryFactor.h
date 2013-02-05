@@ -80,15 +80,18 @@ public:
 				   SymmetryFactor* previous,
 				   size_t nsites)
 	{
+		std::vector<size_t> qn(1,0);
 		if (previous!=0) {
 			SymmetryComponentType onesiteRight(SymmetryComponentType::COMPONENT_RIGHT,0,site-1,quantumNumbers);
 			left_.combine(previous->left(),onesiteRight);
 		} else {
-			std::vector<size_t> qn(1,0);
 			SymmetryComponentType onesiteLeft(SymmetryComponentType::COMPONENT_LEFT,0,site,qn);
 			left_ = onesiteLeft;
 		}
-		right_.grow(site,quantumNumbers,nsites,(site+1<nsites) ? quantumNumbers.size() : 0);
+		if (site<nsites)
+			right_.grow(site,quantumNumbers,nsites,quantumNumbers.size());
+		else
+			right_.grow(site,qn,nsites,qn.size());
 
 		super_.combine(left_,right_);
 	}

@@ -125,13 +125,30 @@ public:
 		if (direction==ProgramGlobals::TO_THE_RIGHT) {
 			assert(currentSite<A_.size());
 			A_[currentSite]->updateFromVector(v,symmetrySector,symm);
-			std::cout<<"updated A["<<currentSite<<"].row= "<<A_[currentSite]->operator()().row()<<"\n";
+			std::cout<<"updated A["<<currentSite<<"].row= ";
+			std::cout<<A_[currentSite]->operator()().row()<<"\n";
 		} else {
 			assert(currentSite+1<B_.size());
 			B_[currentSite+1]->updateFromVector(v,symmetrySector,symm);
-			std::cout<<"updated B["<<(currentSite+1)<<"].row= "<<B_[currentSite+1]->operator()().row()<<"\n";
+			std::cout<<"updated B["<<(currentSite+1)<<"].row= ";
+			std::cout<<B_[currentSite+1]->operator()().row()<<"\n";
 		}
 	}
+
+//	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
+//	void update(size_t currentSite,const VectorType& v,size_t direction,const SymmetryFactorType& symm)
+//	{
+//		center_ = currentSite;
+//		if (direction==ProgramGlobals::TO_THE_RIGHT) {
+//			assert(currentSite<A_.size());
+//			A_[currentSite]->updateFromVector(v,symm);
+//			std::cout<<"updated A["<<currentSite<<"].row= "<<A_[currentSite]->operator()().row()<<"\n";
+//		} else {
+//			assert(currentSite+1<B_.size());
+//			B_[currentSite+1]->updateFromVector(v,symm);
+//			std::cout<<"updated B["<<(currentSite+1)<<"].row= "<<B_[currentSite+1]->operator()().row()<<"\n";
+//		}
+//	}
 
 //	void normalize(const SymmetryLocalType& symm)
 //	{
@@ -169,18 +186,13 @@ public:
 		if (type==MpsFactorType::TYPE_B) {
 			return normB(symm);
 		}
-		return normA();
+		return normA(symm);
 	}
 
 	template<typename ComplexOrRealType2,typename SymmetryLocalType2>
 	friend std::ostream& operator<<(std::ostream& os,const MatrixProductState<ComplexOrRealType2,SymmetryLocalType2>& mps);
 
 private:
-
-	typename ProgramGlobals::Real<ComplexOrRealType>::Type normA() const
-	{
-		throw std::runtime_error("normA(): unimplemented\n");
-	}
 
 	typename ProgramGlobals::Real<ComplexOrRealType>::Type normB(const SymmetryLocalType& symm) const
 	{
@@ -240,6 +252,60 @@ private:
 				} // apnm1
 			} // k
 		} // anm2
+	}
+
+	typename ProgramGlobals::Real<ComplexOrRealType>::Type normA(const SymmetryLocalType& symm) const
+	{
+		MatrixType tmpOld;
+
+		for (size_t i=0;i<A_.size();i++) {
+			size_t center = i;
+			MatrixType tmpNew;
+			computeIntermediateA(tmpNew,tmpOld,center,symm);
+			tmpOld = tmpNew;
+		}
+
+		ComplexOrRealType sum = 0;
+		for (size_t i=0;i<tmpOld.n_row();i++) {
+			for (size_t j=0;j<tmpOld.n_col();j++) {
+				sum += tmpOld(i,j);
+			}
+		}
+		return std::real(sum);
+	}
+
+	void computeIntermediateA(MatrixType& matrixNew,const MatrixType& matrixOld,size_t center,const SymmetryLocalType& symmLocal) const
+	{
+		const SymmetryFactorType& symm = symmLocal(center+1);
+		size_t leftSize = symm.left().split();
+		size_t leftSize2 = symm.left().size();
+
+		SparseMatrixType Atranspose;
+		transposeConjugate(Atranspose,A_[center]->operator()());
+		matrixNew.resize(leftSize*leftSize,leftSize2*leftSize2);
+		matrixNew.setTo(0.0);
+		assert(Atranspose.row()==symm.left().size());
+		for (size_t a1=0;a1<Atranspose.row();a1++) {
+			for (int k1=Atranspose.getRowPtr(a1);k1<Atranspose.getRowPtr(a1+1);k1++) {
+				PairType a0sigma1=symm.left().unpack(Atranspose.getCol(k1));
+				size_t a0 = a0sigma1.first;
+				size_t sigma1= a0sigma1.second;
+				for (size_t a1p=0;a1p<Atranspose.row();a1p++) {
+					for (int k2=Atranspose.getRowPtr(a1p);k2<Atranspose.getRowPtr(a1p+1);k2++) {
+
+						PairType a0sigma1p=symm.left().unpack(Atranspose.getCol(k2));
+						size_t a0p = a0sigma1p.first;
+						size_t sigma1p= a0sigma1p.second;
+						if (sigma1!=sigma1p) continue;
+						matrixNew(a0+a0p*leftSize,a1+a1p*leftSize2) += Atranspose.getValue(k1) * std::conj(Atranspose.getValue(k2));
+					} // k2
+				} // a1p
+			} // k1
+		} // a1
+
+		if (matrixOld.n_row()==0) return;
+		MatrixType m = matrixOld * matrixNew;
+		matrixNew = m;
 	}
 
 	// copy ctor:

@@ -127,6 +127,30 @@ public:
 		updateFromVector(m);
 	}
 
+//	void updateFromVector(const VectorType& v,const SymmetryFactorType& symm)
+//	{
+//		size_t row = symm.left().size();
+//		size_t col = symm.right().size();
+//		if (aOrB_==TYPE_B) std::swap(row,col);
+
+//		MatrixType m(row,col);
+
+//		for (size_t i=0;i<v.size();i++) {
+//			PairType ab = symm.super().unpack(i);
+//			if (aOrB_==TYPE_A) {
+//				m(ab.first,ab.second) = v[i];
+//			} else {
+//				m(ab.second,ab.first) = v[i];
+//			}
+//		}
+//		std::cout<<m;
+//		std::vector<RealType> s;
+//		svd(m,s,'A');
+//		std::cout<<"-----------\n";
+//		std::cout<<s;
+//		updateFromVector(m);
+//	}
+
 	template<typename SomeNumericType>
 	void divideBy(const SomeNumericType& value)
 	{
@@ -156,7 +180,7 @@ private:
 			transposeConjugate(mtranspose,m);
 		std::cout<<"new AorB=\n";
 		std::cout<<m;
-//		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? m : mtranspose);
+		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? m : mtranspose);
 	}
 
 //	void flipColumns(MatrixType& m2,const MatrixType& m) const

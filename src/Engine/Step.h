@@ -108,6 +108,8 @@ public:
 		model_.getOneSite(quantumNumbers,currentSite);
 
 		//symm.moveRight(currentSite,quantumNumbers);
+		std::cout<<"normB="<<mps_.norm(MatrixProductStateType::MpsFactorType::TYPE_B,symm)<<" ";
+		std::cout<<"normA="<<mps_.norm(MatrixProductStateType::MpsFactorType::TYPE_A,symm)<<"\n";
 		internalUpdate(currentSite,TO_THE_RIGHT,symm(currentSite+1)); // <--  <--  From cL and cR construct a new A, only A changes here
 		contractedPart_.update(currentSite,TO_THE_RIGHT,symm);
 	}
@@ -129,15 +131,33 @@ private:
 
 	void internalUpdate(size_t currentSite,size_t direction,const SymmetryFactorType& symm)
 	{
+//		SymmetryComponentType super = symm.super();
+//		VectorType v(super.size(),0);
+//		for (size_t i=0;i<super.partitions()-1;i++) {
+//			std::cerr<<"symmetrySector="<<i<<"\n";
+//			size_t offset = symm.super().partitionOffset(i);
+//			size_t total = symm.super().partitionSize(i);
+//			VectorType tmpVec(total,0.0);
+//			internalUpdate(tmpVec,currentSite,direction,symm,i);
+//			for (size_t j=0;j<tmpVec.size();j++) v[j+offset] = tmpVec[j];
+//		}
+
+		size_t symmetrySector = getSymmetrySector(direction,symm);
+		size_t total = symm.super().partitionSize(symmetrySector);
+		VectorType v(total,0.0);
+		RealType energy = internalUpdate(v,currentSite,direction,symm,symmetrySector);
+		mps_.update(currentSite,v,direction,symmetrySector,symm);
+		statePredictor_.push(energy,v,symmetrySector);
+	}
+
+	RealType internalUpdate(VectorType& tmpVec,size_t currentSite,size_t direction,const SymmetryFactorType& symm,size_t symmetrySector)
+	{
 		const ParametersSolverType& solverParams = model_.solverParams();
 
 		typedef InternalProductTemplate<typename VectorType::value_type,ModelType> InternalProductType;
 		typedef PsimagLite::ParametersForSolver<RealType> ParametersForSolverType;
 		typedef PsimagLite::LanczosOrDavidsonBase<ParametersForSolverType,InternalProductType,VectorType> LanczosOrDavidsonBaseType;
 		typedef typename ModelType::ModelHelperType ModelHelperType;
-
-		size_t symmetrySector = getSymmetrySector(direction,symm);
-		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
 
 		ReflectionSymmetryType *rs = 0;
 		size_t hamiltonianSite = (direction == TO_THE_RIGHT) ? currentSite : currentSite + 1;
@@ -164,16 +184,14 @@ private:
 		}
 
 		RealType energyTmp = 0;
-		VectorType tmpVec(lanczosHelper.rank());
+		assert(tmpVec.size()==lanczosHelper.rank());
 		VectorType initialVector(lanczosHelper.rank());
 		statePredictor_.createRandomVector(initialVector,0,initialVector.size());
 
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
 
-		mps_.update(currentSite,tmpVec,direction,symmetrySector,symm);
-		statePredictor_.push(energyTmp,tmpVec,symmetrySector);
-
+		return energyTmp;
 	}
 
 	size_t getSymmetrySector(size_t direction,const SymmetryFactorType& symm) const
