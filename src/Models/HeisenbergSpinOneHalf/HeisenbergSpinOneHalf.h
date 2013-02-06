@@ -108,6 +108,7 @@ public:
 	{
 		// FIXME: CONNECT WITH THE GEOMETRY HERE!!
 		RealType J = 1.0;
+		RealType Jz=1.0;
 		RealType Jover2 = 0.5*J;
 		size_t n = hamiltonian_.size();
 		size_t wdim = 5;
@@ -125,7 +126,7 @@ public:
 		MpoFactorType mleft(1,wdim);
 		mleft(0,1) = Jover2*sminus;
 		mleft(0,2) = Jover2*splus;
-		mleft(0,3) = J*sz;
+		mleft(0,3) = Jz*sz;
 		mleft(0,4) = identity;
 		hamiltonian_(0)=mleft;
 
@@ -138,7 +139,7 @@ public:
 
 			m(4,1) = Jover2*sminus;
 			m(4,2) = Jover2*splus;
-			m(4,3) = J*sz;
+			m(4,3) = Jz*sz;
 			m(4,4) = identity;
 			hamiltonian_(i)=m;
 		}

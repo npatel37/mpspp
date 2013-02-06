@@ -103,17 +103,6 @@ public:
 //		fullMatrixToCrsMatrix(data_,m);
 		data_.resize(n,n);
 		data_.makeDiagonal(n,1.0);
-		if (n==2 && site==0 && aOrB_==TYPE_A) {
-			MatrixType m(n,n);
-			m(0,1) = m(1,0) = -1;
-			fullMatrixToCrsMatrix(data_,m);
-		}
-		if (n==2 && site==1 && aOrB_==TYPE_B) {
-			MatrixType m(n,n);
-			m(1,1) = 1;
-			m(0,0) = -1;
-			fullMatrixToCrsMatrix(data_,m);
-		}
 
 		assert(isNormalized(data_));
 	}
@@ -134,10 +123,11 @@ public:
 
 		MatrixType m(row,col);
 
-		size_t offset = symm.super().partitionOffset(symmetrySector);
-		size_t total = symm.super().partitionSize(symmetrySector);
+//		size_t offset = symm.super().partitionOffset(symmetrySector);
+//		size_t total = symm.super().partitionSize(symmetrySector);
+		size_t total = symm.super().size();
 		for (size_t i=0;i<total;i++) {
-			PairType ab = symm.super().unpack(i+offset);
+			PairType ab = symm.super().unpack(i); //+offset);
 			if (aOrB_==TYPE_A) {
 				m(ab.first,ab.second) = v[i];
 			} else {

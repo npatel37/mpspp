@@ -144,7 +144,7 @@ private:
 
 		size_t symmetrySector = getSymmetrySector(direction,symm.super());
 		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
-		size_t total = symm.super().partitionSize(symmetrySector);
+		size_t total = symm.super().size(); //partitionSize(symmetrySector);
 		VectorType v(total,0.0);
 		RealType energy = internalUpdate(v,currentSite,direction,symm,symmetrySector);
 		mps_.update(currentSite,v,direction,symmetrySector,symm);

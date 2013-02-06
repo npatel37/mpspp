@@ -158,8 +158,9 @@ public:
 	//! Used only for stored option
 	void fullHamiltonian(SparseMatrixType& matrix) const
 	{
-		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
-		size_t total = symmetry_.super().partitionSize(symmetrySector_);
+//		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
+//		size_t total = symmetry_.super().partitionSize(symmetrySector_);
+		size_t total = symmetry_.super().size();
 
 		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
 		size_t rightIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
@@ -180,6 +181,7 @@ public:
 			assert(symm.right().split()==0 || symm.right().size()/symm.right().split()==cR(0).row());
 			assert(symm.left().size()==cL(0).row());
 		}
+
 		for (size_t i=0;i<total;i++) {
 			matrix.setRow(i,counter);
 			for (size_t blm1=0;blm1<hamiltonian_.n_row();blm1++) {
@@ -190,7 +192,7 @@ public:
 //					transposeConjugate(w,w1);
 					const SparseMatrixType& r1 = cR(bl);
 					const SparseMatrixType& l1 = cL(blm1);
-					PairType ab = symm.super().unpack(i+offset);
+					PairType ab = symm.super().unpack(i); //+offset);
 					size_t alm1=0;
 					size_t sigmaL=0;
 					size_t alB=0;
@@ -220,8 +222,9 @@ public:
 									size_t tmp1 = symm.right().pack(sigmaLp,alBp);
 									j = symm.super().pack(alm1p,tmp1);
 								}
-								if (j<offset || j>=offset+total) continue;
-								v[j-offset] += l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2);
+								v[j] += l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2);
+//								if (j<offset || j>=offset+total) continue;
+//								v[j-offset] += l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2);
 							} // k2 right
 						} // kw Hamiltonian
 					} // k1 left
