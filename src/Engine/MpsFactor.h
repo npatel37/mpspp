@@ -48,6 +48,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "VectorWithOffset.h"
 #include "ProgramGlobals.h"
 #include "RandomForTests.h"
+#include "Sort.h"
 
 namespace Mpspp {
 
@@ -66,6 +67,8 @@ public:
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
 	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
 	typedef typename SymmetryFactorType::IoInputType IoInputType;
+	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
+	typedef typename SymmetryComponentType::VectorType VectorIntegerType;
 	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
 
 	MpsFactor(size_t site,size_t aOrB)
@@ -145,7 +148,8 @@ public:
 //			flipColumns(m2,m);
 //			m = m2;
 //		}
-		updateFromVector(m);
+		const SymmetryComponentType& symmC = (aOrB_==TYPE_A) ? symm.left() : symm.right();
+		updateFromVector(m,symmC);
 	}
 
 //	void updateFromVector(const VectorType& v,const SymmetryFactorType& symm)
@@ -193,9 +197,12 @@ public:
 
 private:
 
-	void updateFromVector(const MatrixType& m)
+	void updateFromVector(MatrixType& m,const SymmetryComponentType& symm)
 	{
 		assert(isNormalized(m));
+		std::cout<<"before reorder=\n";
+		std::cout<<m;
+		reorder(m,symm);
 		MatrixType mtranspose;
 		if (aOrB_==TYPE_B)
 			transposeConjugate(mtranspose,m);
@@ -206,15 +213,59 @@ private:
 		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? m : mtranspose);
 	}
 
-	void flipColumns(MatrixType& m2,const MatrixType& m) const
+	void reorder(MatrixType& m,const SymmetryComponentType& symm) const
 	{
-		m2.resize(m.n_row(),m.n_col());
-		for (size_t i=0;i<m.n_col();i++) {
-			for (size_t j=0;j<m.n_row();j++) {
-				m2(j,i) = m(j,m.n_col()-1-i);
-			}
-		}
+		assert(m.n_row()==m.n_col());
+
+		for (size_t i=0;i<m.n_row();i++)
+			for (size_t j=0;j<m.n_row();j++)
+				m(i,j)=0;
+		for (size_t i=0;i<m.n_row();i++)
+			m(i,i)=1.0;
 	}
+
+//	void reorder(MatrixType& m,const SymmetryComponentType& symm)
+//	{
+//		VectorIntegerType q(m.n_row());
+//		for (size_t i=0;i<m.n_row();i++) {
+//			q[i] = findQforThisRow(m,i,symm);
+//		}
+//		Sort<VectorIntegerType> sort;
+//		VectorIntegerType iperm(q.size(),0);
+//		sort.sort(q,iperm);
+//		MatrixType m2(m.n_row(),m.n_col());
+//		for (size_t i=0;i<m.n_row();i++) {
+//			for (size_t j=0;j<m.n_row();j++)
+//				m2(i,j) = m(i,iperm[j]);
+//		}
+//		m=m2;
+//	}
+
+//	size_t findQforThisRow(const MatrixType& m,size_t row,const SymmetryComponentType& symm) const
+//	{
+//		size_t q=0;
+//		bool flag=false;
+//		for (size_t j=0;j<m.n_col();j++) {
+//			if (fabs(m(row,j))<1e-6) continue;
+//			if (!flag) {
+//				flag=true;
+//				q = symm.qn(j);
+//				continue;
+//			}
+//			assert(q==symm.qn(j));
+//		}
+//		return q;
+//	}
+
+//	void flipColumns(MatrixType& m2,const MatrixType& m) const
+//	{
+//		m2.resize(m.n_row(),m.n_col());
+//		for (size_t i=0;i<m.n_col();i++) {
+//			for (size_t j=0;j<m.n_row();j++) {
+//				m2(j,i) = m(j,m.n_col()-1-i);
+//			}
+//		}
+//	}
 
 	bool isNormalized(const MatrixType& m) const
 	{

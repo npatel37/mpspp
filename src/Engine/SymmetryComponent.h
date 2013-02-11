@@ -58,6 +58,7 @@ public:
 
 	typedef PsimagLite::IoSimple::In IoInputType;
 	typedef std::pair<size_t,size_t> PairType;
+	typedef ProgramGlobals::Vector<size_t>::Type VectorType;
 
 	enum {CORNER_LEFT,CORNER_RIGHT};
 	enum {COMPONENT_LEFT,COMPONENT_RIGHT,COMPONENT_SUPER};
@@ -265,11 +266,11 @@ private:
 
 	size_t type_;
 	size_t leftSize_;
-	std::vector<size_t> block_;
-	std::vector<size_t> quantumNumbers_;
-	std::vector<size_t> partition_;
-	ProgramGlobals::Vector<size_t>::Type permutation_;
-	ProgramGlobals::Vector<size_t>::Type permutationInverse_;
+	VectorType block_;
+	VectorType quantumNumbers_;
+	VectorType partition_;
+	VectorType permutation_;
+	VectorType permutationInverse_;
 
 
 }; // SymmetryComponent
