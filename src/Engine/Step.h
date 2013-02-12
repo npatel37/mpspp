@@ -96,8 +96,8 @@ public:
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 
-//		symm.moveLeft(currentSite,quantumNumbers);
-		internalmove(currentSite,TO_THE_LEFT,symm(currentSite+1)); // <-- From cL and cR construct a new B, only B changes here
+		symm.moveLeft(currentSite,quantumNumbers);
+		internalmove(currentSite,TO_THE_LEFT,symm(currentSite)); // <-- From cL and cR construct a new B, only B changes here
 		contractedLocal_.move(currentSite,TO_THE_LEFT,symm);
 	}
 
@@ -112,6 +112,17 @@ public:
 		std::cout<<"normA="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_A,symm)<<"\n";
 		internalmove(currentSite,TO_THE_RIGHT,symm(currentSite+1)); // <--  <--  From cL and cR construct a new A, only A changes here
 		contractedLocal_.move(currentSite,TO_THE_RIGHT,symm);
+	}
+
+	void growRight(SymmetryLocalType& symm,size_t center)
+	{
+		std::vector<size_t> quantumNumbers;
+		model_.getOneSite(quantumNumbers,center);
+		symm.growRight(center,quantumNumbers);
+		mps_.growRight(center,symm);
+		contractedLocal_.growLeft(center,symm);
+		if (center==0) return;
+		internalmove(center,TO_THE_RIGHT,symm(center));
 	}
 
 	void printReport(std::ostream& os) const
@@ -142,7 +153,7 @@ private:
 		typedef typename ModelType::ModelHelperType ModelHelperType;
 
 		ReflectionSymmetryType *rs = 0;
-		size_t hamiltonianSite = (direction == TO_THE_RIGHT) ? currentSite : currentSite + 1;
+		size_t hamiltonianSite = (direction == TO_THE_RIGHT) ? currentSite : currentSite+1;
 		ModelHelperType modelHelper(contractedLocal_,symmetrySector,currentSite,direction,model_.hamiltonian()(hamiltonianSite),symm);
 		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 
@@ -181,15 +192,23 @@ private:
 	{
 		size_t sites = super.block().size();
 		size_t targetQuantumNumber = getQuantumSector(sites,direction);
-		
+		size_t imin=0;
+		size_t minDiff=1e10;
 		for (size_t i=0;i<super.partitions()-1;i++) {
 			size_t state = super.partitionOffset(i);
 			size_t q = super.qn(state);
-			if (q == targetQuantumNumber) return i;
+			size_t diff = (q<targetQuantumNumber) ? targetQuantumNumber - q : q-targetQuantumNumber;
+			if (diff<minDiff) {
+				imin = i;
+				minDiff = diff;
+			}
 		}
-		assert(false);
-		throw std::runtime_error("getSymmetrySector\n");
-		return -1;
+		if (minDiff!=0) {
+			std::cerr<<__FILE__<<" "<<__LINE__<<"\n";
+			std::cerr<<"getSymmetrySector ";
+			std::cerr<<"WARNING: minDiff="<<minDiff<<" is non zero\n";
+		}
+		return imin;
 	}
 	
 	size_t getQuantumSector(size_t sites,size_t direction) const

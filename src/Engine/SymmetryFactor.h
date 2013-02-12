@@ -75,6 +75,22 @@ public:
 		  super_(SymmetryComponentType::COMPONENT_SUPER)
 	{}
 
+//	void growRight(size_t site,
+//				   const std::vector<size_t>& quantumNumbers,
+//				   SymmetryFactor* previous)
+//	{
+//		std::vector<size_t> qn(1,0);
+//		SymmetryComponentType onesiteLeft(SymmetryComponentType::COMPONENT_LEFT,0,site,qn);
+//		SymmetryComponentType previousLeft = (previous==0) ? onesiteLeft : previous->left();
+//		SymmetryComponentType onesiteRight(SymmetryComponentType::COMPONENT_RIGHT,0,site,quantumNumbers);
+//		left_.combine(previousLeft,onesiteRight);
+
+//		SymmetryComponentType onesiteRight2(SymmetryComponentType::COMPONENT_RIGHT,0,site+1,quantumNumbers);
+//		right_ = onesiteRight2;
+
+//		super_.combine(left_,right_);
+//	}
+
 	void growRight(size_t site,
 				   const std::vector<size_t>& quantumNumbers,
 				   SymmetryFactor* previous)
@@ -85,7 +101,7 @@ public:
 		SymmetryComponentType onesiteRight(SymmetryComponentType::COMPONENT_RIGHT,0,site,quantumNumbers);
 		left_.combine(previousLeft,onesiteRight);
 
-		SymmetryComponentType onesiteRight2(SymmetryComponentType::COMPONENT_RIGHT,0,site+1,quantumNumbers);
+		SymmetryComponentType onesiteRight2(SymmetryComponentType::COMPONENT_RIGHT,0,site,qn);
 		right_ = onesiteRight2;
 
 		super_.combine(left_,right_);

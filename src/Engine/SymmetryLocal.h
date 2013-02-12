@@ -87,14 +87,14 @@ public:
 		return data_[site];
 	}
 
-//	void moveLeft(size_t site,const std::vector<size_t>& quantumNumbers)
-//	{
-//		assert(site+1<data_.size());
-//		SymmetryFactorType symmFactor = data_[site];
-//		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_LEFT,0,site,quantumNumbers);
-//		symmFactor.moveLeft(data_[site].left(),onesite,data_[site+1].right());
-//		data_[site] = symmFactor;
-//	}
+	void moveLeft(size_t site,const std::vector<size_t>& quantumNumbers)
+	{
+		assert(site+1<data_.size());
+		SymmetryFactorType symmFactor = data_[site];
+		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_LEFT,0,site,quantumNumbers);
+		symmFactor.moveLeft(data_[site].left(),onesite, data_[site+1].right());
+		data_[site] = symmFactor;
+	}
 
 //	void moveRight(size_t site,const std::vector<size_t>& quantumNumbers)
 //	{

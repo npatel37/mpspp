@@ -106,23 +106,13 @@ private:
 	{
 		size_t nsites = model_.geometry().numberOfSites();
 
-		for (size_t i=0;i<nsites-1;i++) {
+		StepType step(solverParams_,psi,contracted,model_);
+
+		for (size_t i=0;i<nsites;i++) {
 			center=i;
-			std::vector<size_t> quantumNumbers;
-			model_.getOneSite(quantumNumbers,center);
-			symm.growRight(center,quantumNumbers);
-			psi.growRight(center,symm);
-			contracted.growLeft(center,symm,nsites);
+			step.growRight(symm,center);
 		}
-
-		throw std::runtime_error("testing\n");
-
-		// grows contracted right
-		for (size_t i=1;i<nsites;i++) {
-			center = nsites-i-1;
-			contracted.growRight(center,symm,nsites);
-		}
-		std::cout<<contracted;
+		center--;
 	}
 
 	void finiteLoops(StepType& step,size_t& center,SymmetryLocalType& symm)
