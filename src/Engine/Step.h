@@ -97,8 +97,8 @@ public:
 		model_.getOneSite(quantumNumbers,currentSite);
 
 //		symm.moveLeft(currentSite,quantumNumbers);
-		internalUpdate(currentSite,TO_THE_LEFT,symm(currentSite+1)); // <-- From cL and cR construct a new B, only B changes here
-		contractedLocal_.update(currentSite,TO_THE_LEFT,symm);
+		internalmove(currentSite,TO_THE_LEFT,symm(currentSite+1)); // <-- From cL and cR construct a new B, only B changes here
+		contractedLocal_.move(currentSite,TO_THE_LEFT,symm);
 	}
 
 	//! Moves the center of orthogonality by one to the right
@@ -110,8 +110,8 @@ public:
 		//symm.moveRight(currentSite,quantumNumbers);
 		std::cout<<"normB="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_B,symm)<<" ";
 		std::cout<<"normA="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_A,symm)<<"\n";
-		internalUpdate(currentSite,TO_THE_RIGHT,symm(currentSite+1)); // <--  <--  From cL and cR construct a new A, only A changes here
-		contractedLocal_.update(currentSite,TO_THE_RIGHT,symm);
+		internalmove(currentSite,TO_THE_RIGHT,symm(currentSite+1)); // <--  <--  From cL and cR construct a new A, only A changes here
+		contractedLocal_.move(currentSite,TO_THE_RIGHT,symm);
 	}
 
 
@@ -129,7 +129,7 @@ public:
 
 private:
 
-	void internalUpdate(size_t currentSite,size_t direction,const SymmetryFactorType& symm)
+	void internalmove(size_t currentSite,size_t direction,const SymmetryFactorType& symm)
 	{
 //		SymmetryComponentType super = symm.super();
 //		VectorType v(super.size(),0);
@@ -138,7 +138,7 @@ private:
 //			size_t offset = symm.super().partitionOffset(i);
 //			size_t total = symm.super().partitionSize(i);
 //			VectorType tmpVec(total,0.0);
-//			internalUpdate(tmpVec,currentSite,direction,symm,i);
+//			internalmove(tmpVec,currentSite,direction,symm,i);
 //			for (size_t j=0;j<tmpVec.size();j++) v[j+offset] = tmpVec[j];
 //		}
 
@@ -146,12 +146,12 @@ private:
 		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
 		size_t total = symm.super().size(); //partitionSize(symmetrySector);
 		VectorType v(total,0.0);
-		RealType energy = internalUpdate(v,currentSite,direction,symm,symmetrySector);
-		mps_.update(currentSite,v,direction,symmetrySector,symm);
+		RealType energy = internalmove(v,currentSite,direction,symm,symmetrySector);
+		mps_.move(currentSite,v,direction,symmetrySector,symm);
 		statePredictor_.push(energy,v,symmetrySector);
 	}
 
-	RealType internalUpdate(VectorType& tmpVec,size_t currentSite,size_t direction,const SymmetryFactorType& symm,size_t symmetrySector)
+	RealType internalmove(VectorType& tmpVec,size_t currentSite,size_t direction,const SymmetryFactorType& symm,size_t symmetrySector)
 	{
 		const ParametersSolverType& solverParams = model_.solverParams();
 

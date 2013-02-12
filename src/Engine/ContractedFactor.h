@@ -77,7 +77,7 @@ public:
 		assert(AorB.type()==MpsFactorType::TYPE_B);
 		assert(leftOrRight_==PART_RIGHT);
 		data_.resize(h.n_row());
-		updateRight(AorB,h,prev.data_,symm);
+		moveRight(AorB,h,prev.data_,symm);
 	}
 
 	void build(const MpoFactorType& h)
@@ -93,14 +93,14 @@ public:
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
-	void update(const MpsFactorType& AorB,const MpoFactorType& h,const ThisType& dataPrev,const SymmetryFactorType& symm)
+	void move(const MpsFactorType& AorB,const MpoFactorType& h,const ThisType& dataPrev,const SymmetryFactorType& symm)
 	{
 		if (leftOrRight_ == PART_RIGHT) {
 			assert(AorB.type()==MpsFactorType::TYPE_B);
-			updateRight(AorB,h,dataPrev.data_,symm);
+			moveRight(AorB,h,dataPrev.data_,symm);
 		} else {
 			assert(AorB.type()==MpsFactorType::TYPE_A);
-			updateLeft(AorB,h,dataPrev.data_,symm);
+			moveLeft(AorB,h,dataPrev.data_,symm);
 		}
 	}
 
@@ -117,7 +117,7 @@ public:
 
 private:
 
-	void updateLeft(SparseMatrixType& m,
+	void moveLeft(SparseMatrixType& m,
 				   const MpsFactorType& AorB,
 				   const SparseMatrixType& Atranspose,
 				   size_t b,
@@ -177,7 +177,7 @@ private:
 		std::cerr<<"End initLeft2\n";
 	}
 
-	void updateLeft(const MpsFactorType& A,const MpoFactorType& h,const DataType& dataPrev,const SymmetryFactorType& symm)
+	void moveLeft(const MpsFactorType& A,const MpoFactorType& h,const DataType& dataPrev,const SymmetryFactorType& symm)
 	{
 		assert(leftOrRight_ == PART_LEFT);
 		assert(A.type()==MpsFactorType::TYPE_A);
@@ -185,10 +185,10 @@ private:
 		transposeConjugate(Atranspose,A());
 		assert(data_.size()==h.n_col());
 		for (size_t b1=0;b1<data_.size();b1++)
-			updateLeft(data_[b1],A,Atranspose,b1,h,dataPrev,symm);
+			moveLeft(data_[b1],A,Atranspose,b1,h,dataPrev,symm);
 	}
 
-	void updateRight(const MpsFactorType& B,const MpoFactorType& h,const DataType& dataPrev,const SymmetryFactorType& symm)
+	void moveRight(const MpsFactorType& B,const MpoFactorType& h,const DataType& dataPrev,const SymmetryFactorType& symm)
 	{
 		assert(leftOrRight_ == PART_RIGHT);
 		assert(B.type()==MpsFactorType::TYPE_B);
@@ -196,10 +196,10 @@ private:
 		transposeConjugate(Btranspose,B());
 		assert(h.n_row()==data_.size());
 		for (size_t blm2=0;blm2<data_.size();blm2++)
-			updateRight(data_[blm2],blm2,B,Btranspose,h,dataPrev,symm);
+			moveRight(data_[blm2],blm2,B,Btranspose,h,dataPrev,symm);
 	}
 
-	void updateRight(SparseMatrixType& m,
+	void moveRight(SparseMatrixType& m,
 					 size_t blm2,
 					 const MpsFactorType& B,
 					 const SparseMatrixType& Btranspose,
@@ -216,7 +216,7 @@ private:
 
 		for (size_t alm2=0;alm2<m.row();alm2++) {
 			m.setRow(alm2,counter);
-			updateRight(values,cols,alm2,blm2,B,Btranspose,h,dataPrev,symm);
+			moveRight(values,cols,alm2,blm2,B,Btranspose,h,dataPrev,symm);
 			for (size_t i=0;i<cols.size();i++) {
 				if (cols[i]==0) continue;
 				cols[i]=0;
@@ -230,7 +230,7 @@ private:
 		m.checkValidity();
 	}
 
-	void updateRight(std::vector<ComplexOrRealType>& values,
+	void moveRight(std::vector<ComplexOrRealType>& values,
 					 std::vector<size_t>& cols,
 					 size_t alm2,
 					 size_t blm2,

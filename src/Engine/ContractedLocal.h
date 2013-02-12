@@ -90,12 +90,12 @@ public:
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
-	void update(size_t currentSite,size_t direction,const SymmetryLocalType& symm)
+	void move(size_t currentSite,size_t direction,const SymmetryLocalType& symm)
 	{
 		if (direction==TO_THE_RIGHT) {
-			updateLeft(currentSite,abState_,symm);
+			moveLeft(currentSite,abState_,symm);
 		} else {
-			updateRight(currentSite,abState_,symm);
+			moveRight(currentSite,abState_,symm);
 		}
 	}
 
@@ -115,19 +115,19 @@ public:
 
 private:
 
-	void updateLeft(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)
+	void moveLeft(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)
 	{
 		assert(currentSite+1<L_.size());
-		L_[currentSite+1].update(abState.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite+1));
+		L_[currentSite+1].move(abState.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite+1));
 		std::cout<<"L["<<(currentSite+1)<<"]\n";
 		std::cout<<L_[currentSite+1];
 		std::cout<<"--------------------------------\n";
 	}
 
-	void updateRight(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)
+	void moveRight(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)
 	{
 		assert(currentSite+1<R_.size());
-		R_[currentSite].update(abState.B(currentSite+1),h_(currentSite+1),R_[currentSite+1],symm(currentSite+1));
+		R_[currentSite].move(abState.B(currentSite+1),h_(currentSite+1),R_[currentSite+1],symm(currentSite+1));
 	}
 
 	const MpsLocalType& abState_;

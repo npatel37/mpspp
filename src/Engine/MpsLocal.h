@@ -119,54 +119,21 @@ public:
 	}
 
 	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-	void update(size_t currentSite,const VectorType& v,size_t direction,size_t symmetrySector,const SymmetryFactorType& symm)
+	void move(size_t currentSite,const VectorType& v,size_t direction,size_t symmetrySector,const SymmetryFactorType& symm)
 	{
 		center_ = currentSite;
 		if (direction==ProgramGlobals::TO_THE_RIGHT) {
 			assert(currentSite<A_.size());
-			A_[currentSite]->updateFromVector(v,symmetrySector,symm);
-			std::cout<<"updated A["<<currentSite<<"].row= ";
+			A_[currentSite]->move(v,symmetrySector,symm);
+			std::cout<<"moved A["<<currentSite<<"].row= ";
 			std::cout<<A_[currentSite]->operator()().row()<<"\n";
 		} else {
 			assert(currentSite+1<B_.size());
-			B_[currentSite+1]->updateFromVector(v,symmetrySector,symm);
-			std::cout<<"updated B["<<(currentSite+1)<<"].row= ";
+			B_[currentSite+1]->move(v,symmetrySector,symm);
+			std::cout<<"moved B["<<(currentSite+1)<<"].row= ";
 			std::cout<<B_[currentSite+1]->operator()().row()<<"\n";
 		}
 	}
-
-//	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-//	void update(size_t currentSite,const VectorType& v,size_t direction,const SymmetryFactorType& symm)
-//	{
-//		center_ = currentSite;
-//		if (direction==ProgramGlobals::TO_THE_RIGHT) {
-//			assert(currentSite<A_.size());
-//			A_[currentSite]->updateFromVector(v,symm);
-//			std::cout<<"updated A["<<currentSite<<"].row= "<<A_[currentSite]->operator()().row()<<"\n";
-//		} else {
-//			assert(currentSite+1<B_.size());
-//			B_[currentSite+1]->updateFromVector(v,symm);
-//			std::cout<<"updated B["<<(currentSite+1)<<"].row= "<<B_[currentSite+1]->operator()().row()<<"\n";
-//		}
-//	}
-
-//	void normalize(const SymmetryLocalType& symm)
-//	{
-//		RealType tmp = norm(MpsFactorType::TYPE_B,symm);
-//		std::cout<<"norm before normalization = "<<tmp<<"\n";
-
-//		assert(tmp>0);
-//		tmp = sqrt(tmp);
-
-//		tmp = pow(tmp,1.0/static_cast<RealType>(B_.size()));
-
-//		for (size_t i=0;i<B_.size();i++)
-//			B_[i]->divideBy(tmp);
-
-//		tmp = norm(MpsFactorType::TYPE_B,symm);
-//		std::cout<<"norm after normalization = "<<tmp<<"\n";
-
-//	}
 
 	const MpsFactorType& A(size_t site) const
 	{

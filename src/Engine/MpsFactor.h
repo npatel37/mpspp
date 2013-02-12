@@ -110,7 +110,7 @@ public:
 		assert(isNormalized(data_));
 	}
 
-	void updateFromVector(const VectorType& v,size_t symmetrySector,const SymmetryFactorType& symm)
+	void move(const VectorType& v,size_t symmetrySector,const SymmetryFactorType& symm)
 	{
 
 		size_t row = symm.left().size();
@@ -131,7 +131,7 @@ public:
 		std::cout<<"full matrix prior to svd is\n";
 		std::cout<<m;
 
-		updateFromVector(m,symm,symmetrySector);
+		moveFromVector(m,symm,symmetrySector);
 	}
 
 //	template<typename SomeNumericType>
@@ -155,7 +155,7 @@ public:
 
 private:
 
-	void updateFromVector(MatrixType& m,const SymmetryFactorType& symm,size_t symmetrySector)
+	void moveFromVector(MatrixType& m,const SymmetryFactorType& symm,size_t symmetrySector)
 	{
 		const SymmetryComponentType& summed = (aOrB_==TYPE_A) ? symm.left() : symm.right();
 		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
