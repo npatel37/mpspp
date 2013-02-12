@@ -115,19 +115,10 @@ public:
 
 		size_t row = symm.left().size();
 		size_t col = symm.right().size();
-
-//		if (aOrB_==TYPE_A && row==symm.right().split())
-//			return;
-//		if (aOrB_==TYPE_B && col==symm.right().split())
-//			return;
-
 		if (aOrB_==TYPE_B) std::swap(row,col);
-
 
 		MatrixType m(row,col);
 
-//		size_t offset = symm.super().partitionOffset(symmetrySector);
-//		size_t total = symm.super().partitionSize(symmetrySector);
 		size_t total = symm.super().size();
 		for (size_t i=0;i<total;i++) {
 			PairType ab = symm.super().unpack(i); //+offset);
@@ -137,51 +128,18 @@ public:
 				m(ab.second,ab.first) = v[i];
 			}
 		}
-		std::cout<<"matrix to svd is\n";
+		std::cout<<"full matrix prior to svd is\n";
 		std::cout<<m;
-		std::vector<RealType> s;
-		svd(m,s,'A');
-		std::cout<<"-----------\n";
-		std::cout<<s;
-//		if (s.size()==2 && aOrB_==TYPE_A) {
-//			MatrixType m2;
-//			flipColumns(m2,m);
-//			m = m2;
-//		}
-		const SymmetryComponentType& symmC = (aOrB_==TYPE_A) ? symm.left() : symm.right();
-		updateFromVector(m,symmC);
+
+		updateFromVector(m,symm,symmetrySector);
 	}
 
-//	void updateFromVector(const VectorType& v,const SymmetryFactorType& symm)
+//	template<typename SomeNumericType>
+//	void divideBy(const SomeNumericType& value)
 //	{
-//		size_t row = symm.left().size();
-//		size_t col = symm.right().size();
-//		if (aOrB_==TYPE_B) std::swap(row,col);
-
-//		MatrixType m(row,col);
-
-//		for (size_t i=0;i<v.size();i++) {
-//			PairType ab = symm.super().unpack(i);
-//			if (aOrB_==TYPE_A) {
-//				m(ab.first,ab.second) = v[i];
-//			} else {
-//				m(ab.second,ab.first) = v[i];
-//			}
-//		}
-//		std::cout<<m;
-//		std::vector<RealType> s;
-//		svd(m,s,'A');
-//		std::cout<<"-----------\n";
-//		std::cout<<s;
-//		updateFromVector(m);
+//		assert(value!=0);
+//		data_ *= (1.0/value);
 //	}
-
-	template<typename SomeNumericType>
-	void divideBy(const SomeNumericType& value)
-	{
-		assert(value!=0);
-		data_ *= (1.0/value);
-	}
 
 	std::string typeToString() const
 	{
@@ -197,75 +155,84 @@ public:
 
 private:
 
-	void updateFromVector(MatrixType& m,const SymmetryComponentType& symm)
+	void updateFromVector(MatrixType& m,const SymmetryFactorType& symm,size_t symmetrySector)
 	{
-		assert(isNormalized(m));
-		std::cout<<"before reorder=\n";
-		std::cout<<m;
-		reorder(m,symm);
+		const SymmetryComponentType& summed = (aOrB_==TYPE_A) ? symm.left() : symm.right();
+		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
+
+		MatrixType finalU(summed.size(),summed.size());
+
+//		size_t symmetryState = symm.super().partitionOffset(symmetrySector);
+//		size_t targetQ = symm.super().qn(symmetryState);
+
+		for (size_t i=0;i<summed.partitions()-1;i++) {
+			size_t istart = summed.partitionOffset(i);
+			size_t itotal = summed.partitionSize(i);
+			for (size_t j=0;j<nonSummed.partitions()-1;j++) {
+				size_t jstart = nonSummed.partitionOffset(j);
+//				size_t thisState =(aOrB_==TYPE_A) ? symm.super().pack(istart,jstart) :  symm.super().pack(jstart,istart);
+//				size_t thisQ = symm.super().qn(thisState);
+//				if (thisQ!=targetQ) continue;
+				size_t jtotal = nonSummed.partitionSize(j);
+				std::vector<RealType> s;
+				MatrixType u(itotal,jtotal);
+				svdThisSector(u,s,istart,itotal,jstart,jtotal,m);
+				setFinalU(finalU,istart,itotal,u);
+			}
+		}
+
 		MatrixType mtranspose;
 		if (aOrB_==TYPE_B)
-			transposeConjugate(mtranspose,m);
+			transposeConjugate(mtranspose,finalU);
 
 		std::cout<<"new AorB=\n";
-		std::cout<<m;
-
-		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? m : mtranspose);
+		std::cout<<finalU;
+		assert(isNormalized(finalU));
+		assert(respectsSymmetry(finalU,summed));
+		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? finalU : mtranspose);
 	}
 
-	void reorder(MatrixType& m,const SymmetryComponentType& symm) const
+	void svdThisSector(MatrixType& u,
+					   std::vector<RealType>& s,
+					   size_t istart,
+					   size_t itotal,
+					   size_t jstart,
+					   size_t jtotal,
+					   const MatrixType& m) const
 	{
-		assert(m.n_row()==m.n_col());
-
-		for (size_t i=0;i<m.n_row();i++)
-			for (size_t j=0;j<m.n_row();j++)
-				m(i,j)=0;
-		for (size_t i=0;i<m.n_row();i++)
-			m(i,i)=1.0;
+		for (size_t i=0;i<itotal;i++) {
+			for (size_t j=0;j<jtotal;j++) {
+				u(i,j) = m(i+istart,j+jstart);
+			}
+		}
+		svd(u,s,'A');
 	}
 
-//	void reorder(MatrixType& m,const SymmetryComponentType& symm)
-//	{
-//		VectorIntegerType q(m.n_row());
-//		for (size_t i=0;i<m.n_row();i++) {
-//			q[i] = findQforThisRow(m,i,symm);
-//		}
-//		Sort<VectorIntegerType> sort;
-//		VectorIntegerType iperm(q.size(),0);
-//		sort.sort(q,iperm);
-//		MatrixType m2(m.n_row(),m.n_col());
-//		for (size_t i=0;i<m.n_row();i++) {
-//			for (size_t j=0;j<m.n_row();j++)
-//				m2(i,j) = m(i,iperm[j]);
-//		}
-//		m=m2;
-//	}
+	void setFinalU(MatrixType& finalU,
+				   size_t istart,
+				   size_t itotal,
+				   const MatrixType& u) const
+	{
+		std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal)<<"\n";
+		for (size_t i=0;i<itotal;i++) {
+			for (size_t j=0;j<itotal;j++) {
+				finalU(i+istart,j+istart)=u(i,j);
+			}
+		}
+	}
 
-//	size_t findQforThisRow(const MatrixType& m,size_t row,const SymmetryComponentType& symm) const
-//	{
-//		size_t q=0;
-//		bool flag=false;
-//		for (size_t j=0;j<m.n_col();j++) {
-//			if (fabs(m(row,j))<1e-6) continue;
-//			if (!flag) {
-//				flag=true;
-//				q = symm.qn(j);
-//				continue;
-//			}
-//			assert(q==symm.qn(j));
-//		}
-//		return q;
-//	}
-
-//	void flipColumns(MatrixType& m2,const MatrixType& m) const
-//	{
-//		m2.resize(m.n_row(),m.n_col());
-//		for (size_t i=0;i<m.n_col();i++) {
-//			for (size_t j=0;j<m.n_row();j++) {
-//				m2(j,i) = m(j,m.n_col()-1-i);
-//			}
-//		}
-//	}
+	bool respectsSymmetry(const MatrixType& m,const SymmetryComponentType& summed) const
+	{
+		for (size_t i=0;i<summed.size();i++) {
+			size_t qi = summed.qn(i);
+			for (size_t j=0;j<summed.size();j++) {
+				size_t qj = summed.qn(j);
+				if (qi==qj) continue;
+				if (fabs(m(i,j))>1e-6) return false;
+			}
+		}
+		return true;
+	}
 
 	bool isNormalized(const MatrixType& m) const
 	{
