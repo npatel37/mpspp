@@ -105,25 +105,20 @@ private:
 	void growLattice(MpsLocalType& psi,ContractedLocalType& contracted,size_t& center,SymmetryLocalType& symm)
 	{
 		size_t nsites = model_.geometry().numberOfSites();
-		for (size_t i=0;i<nsites;i++) {
+
+		for (size_t i=0;i<nsites-1;i++) {
 			center=i;
 			std::vector<size_t> quantumNumbers;
 			model_.getOneSite(quantumNumbers,center);
-			symm.growRight(center,quantumNumbers,nsites); // grows symm
-		}
-
-		std::cout<<symm;
-
-		for (size_t i=0;i<nsites;i++) {
-			center=i;
+			symm.growRight(center,quantumNumbers);
 			psi.growRight(center,symm);
+			contracted.growLeft(center,symm,nsites);
 		}
 
-		std::cout<<psi;
+		throw std::runtime_error("testing\n");
 
-//		psi.normalize(symm);
-
-		for (size_t i=0;i<nsites;i++) {
+		// grows contracted right
+		for (size_t i=1;i<nsites;i++) {
 			center = nsites-i-1;
 			contracted.growRight(center,symm,nsites);
 		}

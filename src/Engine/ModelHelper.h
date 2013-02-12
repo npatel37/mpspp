@@ -171,8 +171,8 @@ public:
 		const SymmetryFactorType& symm = symmetry_;
 		VectorType v(total,0);
 		size_t counter = 0;
-		assert(hamiltonian_.n_row()==cL.size());
-		assert(hamiltonian_.n_col()==cR.size());
+		assert(hamiltonian_.n_row()>=cL.size());
+		assert(hamiltonian_.n_col()>=cR.size());
 
 		if (direction_==TO_THE_RIGHT) {
 			assert(symm.left().split()==cL(0).row());
@@ -184,8 +184,8 @@ public:
 
 		for (size_t i=0;i<total;i++) {
 			matrix.setRow(i,counter);
-			for (size_t blm1=0;blm1<hamiltonian_.n_row();blm1++) {
-				for (size_t bl=0;bl<hamiltonian_.n_col();bl++) {
+			for (size_t blm1=0;blm1<cL.size();blm1++) {
+				for (size_t bl=0;bl<cR.size();bl++) {
 					const SparseMatrixType& w = hamiltonian_(blm1,bl);
 					if (w.row()==0) continue;
 //					SparseMatrixType w;

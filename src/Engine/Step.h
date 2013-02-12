@@ -114,14 +114,6 @@ public:
 		contractedLocal_.move(currentSite,TO_THE_RIGHT,symm);
 	}
 
-
-	void growRight(SymmetryLocalType& symm,size_t currentSite)
-	{
-		size_t nsites = model_.geometry().numberOfSites();
-		contractedLocal_.mps().growRight(currentSite,symm); // grows B
-		contractedLocal_.growRight(currentSite,symm,nsites); // computes R
-	}
-
 	void printReport(std::ostream& os) const
 	{
 		os<<"Nothing to report so far, except that I need a progress indicator\n";
@@ -131,20 +123,9 @@ private:
 
 	void internalmove(size_t currentSite,size_t direction,const SymmetryFactorType& symm)
 	{
-//		SymmetryComponentType super = symm.super();
-//		VectorType v(super.size(),0);
-//		for (size_t i=0;i<super.partitions()-1;i++) {
-//			std::cerr<<"symmetrySector="<<i<<"\n";
-//			size_t offset = symm.super().partitionOffset(i);
-//			size_t total = symm.super().partitionSize(i);
-//			VectorType tmpVec(total,0.0);
-//			internalmove(tmpVec,currentSite,direction,symm,i);
-//			for (size_t j=0;j<tmpVec.size();j++) v[j+offset] = tmpVec[j];
-//		}
-
 		size_t symmetrySector = getSymmetrySector(direction,symm.super());
 		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
-		size_t total = symm.super().size(); //partitionSize(symmetrySector);
+		size_t total = symm.super().size();
 		VectorType v(total,0.0);
 		RealType energy = internalmove(v,currentSite,direction,symm,symmetrySector);
 		mps_.move(currentSite,v,direction,symmetrySector,symm);

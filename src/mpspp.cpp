@@ -79,7 +79,7 @@ ConcurrencyType& concurrency)
 
 //	std::cout<<"Energy="<<scalarProduct(psi,hpsi)<<"\n";
 
-//	std::cout<<"That's all folks!\n";
+	std::cout<<"That's all folks!\n";
 }
 
 int main(int argc,char *argv[])
@@ -130,8 +130,6 @@ int main(int argc,char *argv[])
 	//typename MpsLocalType::IoInputType ioForMps(mpsSolverParams.initialMps);
 
 	//MpsLocalType psi(ioForMps);
-
-//	std::cerr<<"Testing: mps read from disk successfully\n";
 
 	if (mpsSolverParams.options.find("InternalProductStored")!=std::string::npos) {
 		mainLoop<ModelBaseType,Mpspp::InternalProductStored,ConcurrencyType>(mpsSolverParams,model,concurrency);

@@ -71,8 +71,8 @@ public:
 	typedef typename SymmetryComponentType::VectorType VectorIntegerType;
 	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
 
-	MpsFactor(size_t site,size_t aOrB)
-		: site_(site),rng_(0),aOrB_(aOrB)
+	MpsFactor(size_t aOrB)
+		: rng_(0),aOrB_(aOrB)
 	{}
 
 //	MpsFactor(IoInputType& io,const SymmetryFactorType& symm,size_t site)
@@ -252,7 +252,6 @@ private:
 		return true;
 	}
 
-	size_t site_;
 	RandomNumberGeneratorType rng_;
 	SparseMatrixType data_;
 	size_t aOrB_;
@@ -261,7 +260,7 @@ private:
 template<typename ComplexOrRealType,typename SymmetryLocalType>
 std::ostream& operator<<(std::ostream& os,const MpsFactor<ComplexOrRealType,SymmetryLocalType>& mps)
 {
-	os<<"site= "<<mps.site_<<" type= "<<mps.typeToString();
+	os<<"type= "<<mps.typeToString();
 	os<<" rows= "<<mps.data_.row()<<" cols="<<mps.data_.col()<<"\n";
 	return os;
 }

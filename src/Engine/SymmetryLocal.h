@@ -87,39 +87,33 @@ public:
 		return data_[site];
 	}
 
-	void moveLeft(size_t site,const std::vector<size_t>& quantumNumbers)
-	{
-		assert(site+1<data_.size());
-		SymmetryFactorType symmFactor = data_[site];
-		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_LEFT,0,site,quantumNumbers);
-		symmFactor.moveLeft(data_[site].left(),onesite,data_[site+1].right());
-		data_[site] = symmFactor;
-	}
+//	void moveLeft(size_t site,const std::vector<size_t>& quantumNumbers)
+//	{
+//		assert(site+1<data_.size());
+//		SymmetryFactorType symmFactor = data_[site];
+//		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_LEFT,0,site,quantumNumbers);
+//		symmFactor.moveLeft(data_[site].left(),onesite,data_[site+1].right());
+//		data_[site] = symmFactor;
+//	}
 
-	void moveRight(size_t site,const std::vector<size_t>& quantumNumbers)
-	{
-		assert(site>0);
-		SymmetryFactorType symmFactor;
-		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_RIGHT,0,site,quantumNumbers);
-		symmFactor.moveRight(data_[site-1].left(),onesite,data_[site].right());
-		data_[site] = symmFactor;
-	}
+//	void moveRight(size_t site,const std::vector<size_t>& quantumNumbers)
+//	{
+//		assert(site>0);
+//		SymmetryFactorType symmFactor;
+//		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_RIGHT,0,site,quantumNumbers);
+//		symmFactor.moveRight(data_[site-1].left(),onesite,data_[site].right());
+//		data_[site] = symmFactor;
+//	}
 
 	// left = prev.left + one site
 	// right = prev.right - one site
-	void growRight(size_t site,const std::vector<size_t>& quantumNumbers,size_t nsites)
+	void growRight(size_t site,const std::vector<size_t>& quantumNumbers)
 	{
 		SymmetryFactorType symmFactor;
 		SymmetryFactorType *previous = 0;
 		if (data_.size()>0) previous = &data_[data_.size()-1];
-		symmFactor.growRight(site,quantumNumbers,previous,nsites);
+		symmFactor.growRight(site,quantumNumbers,previous);
 		data_.push_back(symmFactor);
-		if (site+1==nsites) {
-			SymmetryFactorType symmFactor2;
-			symmFactor2.growRight(site+1,quantumNumbers,&symmFactor,nsites);
-			data_.push_back(symmFactor2);
-		}
-		assert(data_.size()<=nsites+1);
 	}
 
 	friend std::ostream& operator<<(std::ostream& os,const SymmetryLocal& symm);

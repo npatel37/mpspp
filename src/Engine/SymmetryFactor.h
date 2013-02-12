@@ -77,21 +77,16 @@ public:
 
 	void growRight(size_t site,
 				   const std::vector<size_t>& quantumNumbers,
-				   SymmetryFactor* previous,
-				   size_t nsites)
+				   SymmetryFactor* previous)
 	{
 		std::vector<size_t> qn(1,0);
-		if (previous!=0) {
-			SymmetryComponentType onesiteRight(SymmetryComponentType::COMPONENT_RIGHT,0,site-1,quantumNumbers);
-			left_.combine(previous->left(),onesiteRight);
-		} else {
-			SymmetryComponentType onesiteLeft(SymmetryComponentType::COMPONENT_LEFT,0,site,qn);
-			left_ = onesiteLeft;
-		}
-		if (site<nsites)
-			right_.grow(site,quantumNumbers,nsites,quantumNumbers.size());
-		else
-			right_.grow(site,qn,nsites,qn.size());
+		SymmetryComponentType onesiteLeft(SymmetryComponentType::COMPONENT_LEFT,0,site,qn);
+		SymmetryComponentType previousLeft = (previous==0) ? onesiteLeft : previous->left();
+		SymmetryComponentType onesiteRight(SymmetryComponentType::COMPONENT_RIGHT,0,site,quantumNumbers);
+		left_.combine(previousLeft,onesiteRight);
+
+		SymmetryComponentType onesiteRight2(SymmetryComponentType::COMPONENT_RIGHT,0,site+1,quantumNumbers);
+		right_ = onesiteRight2;
 
 		super_.combine(left_,right_);
 	}

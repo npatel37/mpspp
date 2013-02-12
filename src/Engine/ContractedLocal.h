@@ -76,17 +76,16 @@ public:
 
 	void growRight(size_t currentSite,const SymmetryLocalType& symm,size_t nsites)
 	{
-		if (currentSite>0)
-			L_[currentSite].build(h_(currentSite));
-
-		if (currentSite+1==nsites) {
-			return;
-		}
-
-		ContractedFactorType cf(ProgramGlobals::PART_RIGHT);
 		assert(currentSite+1<nsites);
 		assert(currentSite<R_.size());
-		R_[currentSite].build(abState_.B(currentSite+1),h_(currentSite+1),R_[currentSite+1],symm(currentSite+1));
+		R_[currentSite].build(abState_.B(currentSite+1),h_(currentSite+1),R_[currentSite+1],symm(currentSite));
+	}
+
+	void growLeft(size_t currentSite,const SymmetryLocalType& symm,size_t nsites)
+	{
+		assert(currentSite+1<nsites);
+		assert(currentSite+1<L_.size());
+		L_[currentSite+1].build(abState_.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite));
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this

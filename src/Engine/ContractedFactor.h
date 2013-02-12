@@ -74,17 +74,24 @@ public:
 
 	void build(const MpsFactorType& AorB,const MpoFactorType& h,const ThisType& prev,const SymmetryFactorType& symm)
 	{
-		assert(AorB.type()==MpsFactorType::TYPE_B);
-		assert(leftOrRight_==PART_RIGHT);
-		data_.resize(h.n_row());
-		moveRight(AorB,h,prev.data_,symm);
+		if (leftOrRight_==PART_RIGHT) {
+			assert(AorB.type()==MpsFactorType::TYPE_B);
+
+			data_.resize(h.n_row());
+			moveRight(AorB,h,prev.data_,symm);
+		} else {
+			assert(AorB.type()==MpsFactorType::TYPE_A);
+
+			data_.resize(h.n_col());
+			moveLeft(AorB,h,prev.data_,symm);
+		}
 	}
 
-	void build(const MpoFactorType& h)
-	{
-		assert(leftOrRight_==PART_LEFT);
-		data_.resize(h.n_row());
-	}
+//	void build(const MpoFactorType& h)
+//	{
+//		assert(leftOrRight_==PART_LEFT);
+//		data_.resize(h.n_row());
+//	}
 
 	ContractedFactor(size_t leftOrRight)
 		: data_(1),leftOrRight_(leftOrRight)
@@ -243,7 +250,7 @@ private:
 		const SparseMatrixType& Bmatrix = B();
 		assert(symm.right().split()==0 || symm.right().size()/symm.right().split()==dataPrev[0].row());
 		assert(Btranspose.row()==symm.right().size());
-		assert(dataPrev.size()==h.n_col());
+		assert(dataPrev.size()<=h.n_col());
 		for (int kb=Bmatrix.getRowPtr(alm2);kb<Bmatrix.getRowPtr(alm2+1);kb++) {
 			PairType sigmalm1alm1 = symm.right().unpack(Bmatrix.getCol(kb));
 			size_t sigmalm1 = sigmalm1alm1.first;
