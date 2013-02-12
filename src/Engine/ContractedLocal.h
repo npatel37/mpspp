@@ -42,8 +42,8 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef CONTRACTED_PART_H
-#define CONTRACTED_PART_H
+#ifndef CONTRACTED_LOCAL_H
+#define CONTRACTED_LOCAL_H
 
 #include "ProgramGlobals.h"
 #include "ContractedFactor.h"
@@ -51,7 +51,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 namespace Mpspp {
 
 template<typename MatrixProductOperatorType_>
-class ContractedPart {
+class ContractedLocal {
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -61,13 +61,13 @@ public:
 
 	typedef MatrixProductOperatorType_ MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
-	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
-	typedef typename MatrixProductStateType::SymmetryLocalType SymmetryLocalType;
-	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
+	typedef typename MatrixProductOperatorType::MpsLocalType MpsLocalType;
+	typedef typename MpsLocalType::SymmetryLocalType SymmetryLocalType;
+	typedef typename MpsLocalType::ComplexOrRealType ComplexOrRealType;
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
 	typedef ContractedFactor<MatrixProductOperatorType> ContractedFactorType;
 
-	ContractedPart(const MatrixProductStateType& abState,const MatrixProductOperatorType& h)
+	ContractedLocal(const MpsLocalType& abState,const MatrixProductOperatorType& h)
 		: abState_(abState),
 		  h_(h),
 		  R_(abState.sites(),ProgramGlobals::PART_RIGHT),
@@ -111,11 +111,11 @@ public:
 	}
 
 	template<typename MatrixProductOperatorType2>
-	friend std::ostream& operator<<(std::ostream& os,const ContractedPart<MatrixProductOperatorType2>& contractedPart);
+	friend std::ostream& operator<<(std::ostream& os,const ContractedLocal<MatrixProductOperatorType2>& contractedLocal);
 
 private:
 
-	void updateLeft(size_t currentSite,const MatrixProductStateType& abState,const SymmetryLocalType& symm)
+	void updateLeft(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)
 	{
 		assert(currentSite+1<L_.size());
 		L_[currentSite+1].update(abState.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite+1));
@@ -124,33 +124,33 @@ private:
 		std::cout<<"--------------------------------\n";
 	}
 
-	void updateRight(size_t currentSite,const MatrixProductStateType& abState,const SymmetryLocalType& symm)
+	void updateRight(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)
 	{
 		assert(currentSite+1<R_.size());
 		R_[currentSite].update(abState.B(currentSite+1),h_(currentSite+1),R_[currentSite+1],symm(currentSite+1));
 	}
 
-	const MatrixProductStateType& abState_;
+	const MpsLocalType& abState_;
 	const MatrixProductOperatorType& h_;
 	typename ProgramGlobals::Vector<ContractedFactorType>::Type R_;
 	typename ProgramGlobals::Vector<ContractedFactorType>::Type L_;
 
-}; // ContractedPart
+}; // ContractedLocal
 
 template<typename MatrixProductOperatorType>
-std::ostream& operator<<(std::ostream& os,const ContractedPart<MatrixProductOperatorType>& contractedPart)
+std::ostream& operator<<(std::ostream& os,const ContractedLocal<MatrixProductOperatorType>& contractedLocal)
 {
-	os<<"ContractedPart: right size="<<contractedPart.R_.size()<<"\n";
-	for (size_t i=0;i<contractedPart.R_.size();i++)
-		os<<contractedPart.R_[i];
-	os<<"ContractedPart: left size="<<contractedPart.L_.size()<<"\n";
-	for (size_t i=0;i<contractedPart.L_.size();i++)
-		os<<contractedPart.L_[i];
+	os<<"ContractedLocal: right size="<<contractedLocal.R_.size()<<"\n";
+	for (size_t i=0;i<contractedLocal.R_.size();i++)
+		os<<contractedLocal.R_[i];
+	os<<"ContractedLocal: left size="<<contractedLocal.L_.size()<<"\n";
+	for (size_t i=0;i<contractedLocal.L_.size();i++)
+		os<<contractedLocal.L_[i];
 	return os;
 }
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // CONTRACTED_PART_H
+#endif // CONTRACTED_LOCAL_H
 

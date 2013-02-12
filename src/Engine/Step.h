@@ -45,7 +45,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef STEP_H
 #define STEP_H
 
-#include "ContractedPart.h"
+//#include "ContractedLocal.h"
 #include "ProgressIndicator.h"
 #include "ParametersForSolver.h"
 #include "LanczosOrDavidsonBase.h"
@@ -61,13 +61,13 @@ template<typename ModelType,
 class Step {
 
 	typedef typename ModelType::MatrixProductOperatorType MatrixProductOperatorType;
-	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+	typedef typename MatrixProductOperatorType::MpsLocalType MpsLocalType;
 	typedef typename ModelType::ReflectionSymmetryType ReflectionSymmetryType;
 	typedef typename ModelType::ParametersSolverType ParametersSolverType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ModelType::VectorType VectorType;
-	typedef typename ModelType::ContractedPartType ContractedPartType;
-	typedef typename ContractedPartType::SymmetryLocalType SymmetryLocalType;
+	typedef typename ModelType::ContractedLocalType ContractedLocalType;
+	typedef typename ContractedLocalType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 	typedef StatePredictor<RealType,VectorType> StatePredictorType;
@@ -79,13 +79,13 @@ class Step {
 public:
 
 	Step(const ParametersSolverType& solverParams,
-		 MatrixProductStateType& mps,
-		 ContractedPartType& contractedPart,
+		 MpsLocalType& mps,
+		 ContractedLocalType& contractedLocal,
 		 const ModelType& model)
 	: progress_("Step",0),
 	  solverParams_(solverParams),
 	  mps_(mps),
-	  contractedPart_(contractedPart),
+	  contractedLocal_(contractedLocal),
 	  model_(model),
 	  statePredictor_()
 	{}
@@ -98,7 +98,7 @@ public:
 
 //		symm.moveLeft(currentSite,quantumNumbers);
 		internalUpdate(currentSite,TO_THE_LEFT,symm(currentSite+1)); // <-- From cL and cR construct a new B, only B changes here
-		contractedPart_.update(currentSite,TO_THE_LEFT,symm);
+		contractedLocal_.update(currentSite,TO_THE_LEFT,symm);
 	}
 
 	//! Moves the center of orthogonality by one to the right
@@ -108,18 +108,18 @@ public:
 		model_.getOneSite(quantumNumbers,currentSite);
 
 		//symm.moveRight(currentSite,quantumNumbers);
-		std::cout<<"normB="<<mps_.norm(MatrixProductStateType::MpsFactorType::TYPE_B,symm)<<" ";
-		std::cout<<"normA="<<mps_.norm(MatrixProductStateType::MpsFactorType::TYPE_A,symm)<<"\n";
+		std::cout<<"normB="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_B,symm)<<" ";
+		std::cout<<"normA="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_A,symm)<<"\n";
 		internalUpdate(currentSite,TO_THE_RIGHT,symm(currentSite+1)); // <--  <--  From cL and cR construct a new A, only A changes here
-		contractedPart_.update(currentSite,TO_THE_RIGHT,symm);
+		contractedLocal_.update(currentSite,TO_THE_RIGHT,symm);
 	}
 
 
 	void growRight(SymmetryLocalType& symm,size_t currentSite)
 	{
 		size_t nsites = model_.geometry().numberOfSites();
-		contractedPart_.mps().growRight(currentSite,symm); // grows B
-		contractedPart_.growRight(currentSite,symm,nsites); // computes R
+		contractedLocal_.mps().growRight(currentSite,symm); // grows B
+		contractedLocal_.growRight(currentSite,symm,nsites); // computes R
 	}
 
 	void printReport(std::ostream& os) const
@@ -162,7 +162,7 @@ private:
 
 		ReflectionSymmetryType *rs = 0;
 		size_t hamiltonianSite = (direction == TO_THE_RIGHT) ? currentSite : currentSite + 1;
-		ModelHelperType modelHelper(contractedPart_,symmetrySector,currentSite,direction,model_.hamiltonian()(hamiltonianSite),symm);
+		ModelHelperType modelHelper(contractedLocal_,symmetrySector,currentSite,direction,model_.hamiltonian()(hamiltonianSite),symm);
 		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 
 		RealType eps=ProgramGlobals::LanczosTolerance;
@@ -257,8 +257,8 @@ private:
 
 	PsimagLite::ProgressIndicator progress_;
 	const ParametersSolverType& solverParams_;
-	MatrixProductStateType& mps_;
-	ContractedPartType& contractedPart_;
+	MpsLocalType& mps_;
+	ContractedLocalType& contractedLocal_;
 	const ModelType& model_;
 	StatePredictorType statePredictor_;
 }; // Step

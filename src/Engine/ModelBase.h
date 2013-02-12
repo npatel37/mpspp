@@ -47,7 +47,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "MatrixProductOperator.h"
 #include "ModelHelper.h"
 #include "ReflectionSymmetryEmpty.h"
-#include "ContractedPart.h"
+#include "ContractedLocal.h"
 
 namespace Mpspp {
 
@@ -67,12 +67,12 @@ public:
 	typedef GeometryType_ GeometryType;
 	typedef ConcurrencyType_ ConcurrencyType;
 	typedef MatrixProductOperator<ComplexOrRealType,SymmetryLocalType> MatrixProductOperatorType;
-	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+	typedef typename MatrixProductOperatorType::MpsLocalType MpsLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ProgramGlobals::Vector<RealType>::Type VectorType;
-	typedef ContractedPart<MatrixProductOperatorType> ContractedPartType;
-	typedef ModelHelper<ContractedPartType> ModelHelperType;
+	typedef ContractedLocal<MatrixProductOperatorType> ContractedLocalType;
+	typedef ModelHelper<ContractedLocalType> ModelHelperType;
 	typedef typename ModelHelperType::SparseMatrixType SparseMatrixType;
 	typedef ReflectionSymmetryEmpty<SparseMatrixType> ReflectionSymmetryType;
 	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;

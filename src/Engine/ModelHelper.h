@@ -56,10 +56,10 @@ class ModelHelper {
 public:
 
 	typedef typename ContractedPartType::ContractedFactorType ContractedFactorType;
-	typedef typename ContractedPartType::MatrixProductStateType MatrixProductStateType;
-	typedef typename MatrixProductStateType::ComplexOrRealType ComplexOrRealType;
+	typedef typename ContractedPartType::MpsLocalType MpsLocalType;
+	typedef typename MpsLocalType::ComplexOrRealType ComplexOrRealType;
 	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
-	typedef typename MatrixProductStateType::SymmetryLocalType SymmetryLocalType;
+	typedef typename MpsLocalType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::PairType PairType;
 	typedef typename ContractedPartType::SparseMatrixType SparseMatrixType;

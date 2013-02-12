@@ -58,7 +58,7 @@ typedef Mpspp::ModelBase<ParametersSolverType,
 						 ConcurrencyType> ModelBaseType;
 typedef Mpspp::ModelSelector<ModelBaseType> ModelSelectorType;
 typedef ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
-typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+typedef typename MatrixProductOperatorType::MpsLocalType MpsLocalType;
 
 // FIXME: make configurable at runtime:
 
@@ -75,7 +75,7 @@ ConcurrencyType& concurrency)
 
 //	const MatrixProductOperatorType& H = model.hamiltonian();
 
-//	MatrixProductStateType hpsi = H*psi;
+//	MpsLocalType hpsi = H*psi;
 
 //	std::cout<<"Energy="<<scalarProduct(psi,hpsi)<<"\n";
 
@@ -127,9 +127,9 @@ int main(int argc,char *argv[])
 
 	const ModelBaseType& model = modelSelector(mpsSolverParams,io,geometry,concurrency);
 
-	//typename MatrixProductStateType::IoInputType ioForMps(mpsSolverParams.initialMps);
+	//typename MpsLocalType::IoInputType ioForMps(mpsSolverParams.initialMps);
 
-	//MatrixProductStateType psi(ioForMps);
+	//MpsLocalType psi(ioForMps);
 
 //	std::cerr<<"Testing: mps read from disk successfully\n";
 

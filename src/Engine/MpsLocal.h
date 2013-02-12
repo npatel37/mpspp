@@ -42,8 +42,8 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef MATRIX_PRODUCT_STATE_H
-#define MATRIX_PRODUCT_STATE_H
+#ifndef MPS_LOCAL_H
+#define MPS_LOCAL_H
 
 #include "ProgramGlobals.h"
 #include "MpsFactor.h"
@@ -51,7 +51,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 namespace Mpspp {
 
 template<typename ComplexOrRealType_,typename SymmetryLocalType_>
-class MatrixProductState {
+class MpsLocal {
 
 	// FIXME: IDEA: PULL SYMMETRY OUT, PASS THROUGH FUNCTIONS
 
@@ -68,11 +68,11 @@ public:
 	typedef typename MpsFactorType::SparseMatrixType SparseMatrixType;
 	typedef typename MpsFactorType::MatrixType MatrixType;
 
-	MatrixProductState(size_t nsites)
+	MpsLocal(size_t nsites)
 	: nsites_(nsites),center_(0)
 	{}
 
-//	MatrixProductState(IoInputType& io)
+//	MpsLocal(IoInputType& io)
 //		: symmNonconst_(new SymmetryLocalType(io)),
 //		  symm_(*symmNonconst_),
 //		  nsites_(symm_(0).super().block().size()),
@@ -86,7 +86,7 @@ public:
 //		}
 //	}
 
-	~MatrixProductState()
+	~MpsLocal()
 	{
 		for (size_t i=0;i<A_.size();i++)
 			if (A_[i]) delete A_[i];
@@ -190,7 +190,7 @@ public:
 	}
 
 	template<typename ComplexOrRealType2,typename SymmetryLocalType2>
-	friend std::ostream& operator<<(std::ostream& os,const MatrixProductState<ComplexOrRealType2,SymmetryLocalType2>& mps);
+	friend std::ostream& operator<<(std::ostream& os,const MpsLocal<ComplexOrRealType2,SymmetryLocalType2>& mps);
 
 private:
 
@@ -309,20 +309,20 @@ private:
 	}
 
 	// copy ctor:
-	MatrixProductState(const MatrixProductState& other);
+	MpsLocal(const MpsLocal& other);
 
 	// assignment
-	MatrixProductState& operator=(const MatrixProductState& other);
+	MpsLocal& operator=(const MpsLocal& other);
 
 //	const SymmetryLocalType& symm_;
 	size_t nsites_;
 	size_t center_;
 	typename ProgramGlobals::Vector<MpsFactorType*>::Type B_;
 	typename ProgramGlobals::Vector<MpsFactorType*>::Type A_;
-}; // MatrixProductState
+}; // MpsLocal
 
 template<typename ComplexOrRealType,typename SymmetryLocalType>
-std::ostream& operator<<(std::ostream& os,const MatrixProductState<ComplexOrRealType,SymmetryLocalType>& mps)
+std::ostream& operator<<(std::ostream& os,const MpsLocal<ComplexOrRealType,SymmetryLocalType>& mps)
 {
 	os<<"nsites= "<<mps.nsites_<<" center="<<mps.center_;
 	os<<"A_.size= "<<mps.A_.size()<<"\n";
@@ -338,5 +338,5 @@ std::ostream& operator<<(std::ostream& os,const MatrixProductState<ComplexOrReal
 } // namespace Mpspp
 
 /*@}*/
-#endif // MATRIX_PRODUCT_STATE_H
+#endif // MPS_LOCAL_H
 

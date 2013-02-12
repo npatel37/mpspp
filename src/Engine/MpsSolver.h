@@ -61,11 +61,11 @@ class MpsSolver {
 	typedef typename ModelBaseType::GeometryType GeometryType;
 	typedef typename ModelBaseType::ConcurrencyType ConcurrencyType;
 	typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
-	typedef typename MatrixProductOperatorType::MatrixProductStateType MatrixProductStateType;
+	typedef typename MatrixProductOperatorType::MpsLocalType MpsLocalType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ParametersSolverType::FiniteLoopsType FiniteLoopsType;
 //	typedef typename ModelBaseType::LeftRightSuperType LeftRightSuperType;
-	typedef typename ModelBaseType::ContractedPartType ContractedPartType;
+	typedef typename ModelBaseType::ContractedLocalType ContractedLocalType;
 	typedef typename ModelBaseType::SymmetryLocalType SymmetryLocalType;
 	typedef Step<ModelBaseType,InternalProductTemplate> StepType;
 
@@ -89,8 +89,8 @@ public:
 	void computeGroundState()
 	{
 		SymmetryLocalType symm;
-		MatrixProductStateType psi(model_.geometry().numberOfSites());
-		ContractedPartType contracted(psi,model_.hamiltonian());
+		MpsLocalType psi(model_.geometry().numberOfSites());
+		ContractedLocalType contracted(psi,model_.hamiltonian());
 
 		size_t center = 0;
 
@@ -102,7 +102,7 @@ public:
 
 private:
 
-	void growLattice(MatrixProductStateType& psi,ContractedPartType& contracted,size_t& center,SymmetryLocalType& symm)
+	void growLattice(MpsLocalType& psi,ContractedLocalType& contracted,size_t& center,SymmetryLocalType& symm)
 	{
 		size_t nsites = model_.geometry().numberOfSites();
 		for (size_t i=0;i<nsites;i++) {

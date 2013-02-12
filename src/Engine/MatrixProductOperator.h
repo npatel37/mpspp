@@ -46,7 +46,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define MATRIX_PRODUCT_OPERATOR_H
 
 #include "ProgramGlobals.h"
-#include "MatrixProductState.h"
+#include "MpsLocal.h"
 #include "MpoFactor.h"
 
 namespace Mpspp {
@@ -56,7 +56,7 @@ class MatrixProductOperator {
 
 public:
 
-	typedef MatrixProductState<ComplexOrRealType,SymmetryLocalType> MatrixProductStateType;
+	typedef MpsLocal<ComplexOrRealType,SymmetryLocalType> MpsLocalType;
 //	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
 	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
 	typedef MpoFactor<RealType,ComplexOrRealType> MpoFactorType;
