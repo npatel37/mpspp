@@ -60,8 +60,8 @@ template<typename ModelType,
          template<typename,typename> class InternalProductTemplate>
 class Step {
 
-	typedef typename ModelType::MatrixProductOperatorType MatrixProductOperatorType;
-	typedef typename MatrixProductOperatorType::MpsLocalType MpsLocalType;
+	typedef typename ModelType::MpoLocalType MpoLocalType;
+	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
 	typedef typename ModelType::ReflectionSymmetryType ReflectionSymmetryType;
 	typedef typename ModelType::ParametersSolverType ParametersSolverType;
 	typedef typename ParametersSolverType::RealType RealType;

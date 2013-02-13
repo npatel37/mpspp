@@ -60,7 +60,7 @@ class ModelSelector {
 	typedef typename ModelType::SymmetryLocalType SymmetryLocalType;
 	typedef typename ModelType::GeometryType GeometryType;
 	typedef typename ModelType::ConcurrencyType ConcurrencyType;
-	typedef typename ModelType::MatrixProductOperatorType MatrixProductOperatorType;
+	typedef typename ModelType::MpoLocalType MpoLocalType;
 
 	typedef HubbardOneOrbital<ParametersSolverType,
 							  InputValidatorType,

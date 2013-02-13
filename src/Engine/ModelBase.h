@@ -44,7 +44,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 #ifndef MODEL_BASE_H
 #define MODEL_BASE_H
-#include "MatrixProductOperator.h"
+#include "MpoLocal.h"
 #include "ModelHelper.h"
 #include "ReflectionSymmetryEmpty.h"
 #include "ContractedLocal.h"
@@ -66,21 +66,21 @@ public:
 	typedef SymmetryLocalType_ SymmetryLocalType;
 	typedef GeometryType_ GeometryType;
 	typedef ConcurrencyType_ ConcurrencyType;
-	typedef MatrixProductOperator<ComplexOrRealType,SymmetryLocalType> MatrixProductOperatorType;
-	typedef typename MatrixProductOperatorType::MpsLocalType MpsLocalType;
+	typedef MpoLocal<ComplexOrRealType,SymmetryLocalType> MpoLocalType;
+	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ProgramGlobals::Vector<RealType>::Type VectorType;
-	typedef ContractedLocal<MatrixProductOperatorType> ContractedLocalType;
+	typedef ContractedLocal<MpoLocalType> ContractedLocalType;
 	typedef ModelHelper<ContractedLocalType> ModelHelperType;
 	typedef typename ModelHelperType::SparseMatrixType SparseMatrixType;
 	typedef ReflectionSymmetryEmpty<SparseMatrixType> ReflectionSymmetryType;
 	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
-	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
+	typedef typename MpoLocalType::MpoFactorType MpoFactorType;
 
 	virtual ~ModelBase() {}
 
-	virtual const MatrixProductOperatorType& hamiltonian() const=0;
+	virtual const MpoLocalType& hamiltonian() const=0;
 
 	virtual const ParametersSolverType& solverParams() const=0;
 

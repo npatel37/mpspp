@@ -42,8 +42,8 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef MATRIX_PRODUCT_OPERATOR_H
-#define MATRIX_PRODUCT_OPERATOR_H
+#ifndef MPO_LOCAL_H
+#define MPO_LOCAL_H
 
 #include "ProgramGlobals.h"
 #include "MpsLocal.h"
@@ -52,7 +52,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 namespace Mpspp {
 
 template<typename ComplexOrRealType,typename SymmetryLocalType>
-class MatrixProductOperator {
+class MpoLocal {
 
 public:
 
@@ -62,7 +62,7 @@ public:
 	typedef MpoFactor<RealType,ComplexOrRealType> MpoFactorType;
 	typedef typename ProgramGlobals::Vector<MpoFactorType>::Type VectorType;
 
-	MatrixProductOperator(size_t nsites) : data_(nsites,MpoFactorType(0,0)) {}
+	MpoLocal(size_t nsites) : data_(nsites,MpoFactorType(0,0)) {}
 
 	const MpoFactorType& operator()(size_t site) const
 	{
@@ -82,10 +82,10 @@ private:
 
 	VectorType data_;
 
-}; // MatrixProductOperator
+}; // MpoLocal
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // MATRIX_PRODUCT_OPERATOR_H
+#endif // MPO_LOCAL_H
 

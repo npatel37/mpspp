@@ -36,7 +36,7 @@ const std::string license=
 #include "ParametersMpsSolver.h"
 #include "ModelSelector.h"
 #include "MpsSolver.h"
-#include "MatrixProductOperator.h"
+//#include "MpoLocal.h"
 #include "InternalProductStored.h"
 //#include "InternalProductKron.h"
 #include "InternalProductOnTheFly.h"
@@ -57,8 +57,8 @@ typedef Mpspp::ModelBase<ParametersSolverType,
 						 GeometryType,
 						 ConcurrencyType> ModelBaseType;
 typedef Mpspp::ModelSelector<ModelBaseType> ModelSelectorType;
-typedef ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
-typedef typename MatrixProductOperatorType::MpsLocalType MpsLocalType;
+typedef ModelBaseType::MpoLocalType MpoLocalType;
+typedef typename MpoLocalType::MpsLocalType MpsLocalType;
 
 // FIXME: make configurable at runtime:
 
@@ -73,7 +73,7 @@ ConcurrencyType& concurrency)
 
 	mpsSolver.computeGroundState();
 
-//	const MatrixProductOperatorType& H = model.hamiltonian();
+//	const MpoLocalType& H = model.hamiltonian();
 
 //	MpsLocalType hpsi = H*psi;
 

@@ -79,8 +79,8 @@ class HeisenbergSpinOneHalf : public ModelBase<ParametersSolverType,
 					  GeometryType,
 					  ConcurrencyType> ModelBaseType;
 
-	typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
-	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
+	typedef typename ModelBaseType::MpoLocalType MpoLocalType;
+	typedef typename MpoLocalType::MpoFactorType MpoFactorType;
 	typedef typename ModelBaseType::SparseMatrixType SparseMatrixType;
 	typedef typename ModelBaseType::ModelHelperType ModelHelperType;
 	typedef typename ModelBaseType::VectorType VectorType;
@@ -152,7 +152,7 @@ public:
 		hamiltonian_(n-1)=mright;
 	}
 
-	virtual const MatrixProductOperatorType& hamiltonian() const
+	virtual const MpoLocalType& hamiltonian() const
 	{
 		return hamiltonian_;
 	}
@@ -190,7 +190,7 @@ private:
 	ConcurrencyType& concurrency_;
 	size_t hilbert_;
 	ParametersModelType mp_;
-	MatrixProductOperatorType hamiltonian_;
+	MpoLocalType hamiltonian_;
 
 }; // HeisenbergSpinOneHalf
 

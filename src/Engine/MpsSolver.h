@@ -60,8 +60,8 @@ class MpsSolver {
 	typedef typename ModelBaseType::InputValidatorType InputValidatorType;
 	typedef typename ModelBaseType::GeometryType GeometryType;
 	typedef typename ModelBaseType::ConcurrencyType ConcurrencyType;
-	typedef typename ModelBaseType::MatrixProductOperatorType MatrixProductOperatorType;
-	typedef typename MatrixProductOperatorType::MpsLocalType MpsLocalType;
+	typedef typename ModelBaseType::MpoLocalType MpoLocalType;
+	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ParametersSolverType::FiniteLoopsType FiniteLoopsType;
 //	typedef typename ModelBaseType::LeftRightSuperType LeftRightSuperType;
