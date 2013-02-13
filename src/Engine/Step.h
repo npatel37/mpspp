@@ -107,10 +107,10 @@ public:
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 
-		//symm.moveRight(currentSite,quantumNumbers);
-		std::cout<<"normB="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_B,symm)<<" ";
-		std::cout<<"normA="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_A,symm)<<"\n";
-		internalmove(currentSite,TO_THE_RIGHT,symm(currentSite+1)); // <--  <--  From cL and cR construct a new A, only A changes here
+//		symm.moveRight(currentSite,quantumNumbers);
+//		std::cout<<"normB="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_B,symm)<<" ";
+//		std::cout<<"normA="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_A,symm)<<"\n";
+		internalmove(currentSite,TO_THE_RIGHT,symm(currentSite)); // <--  <--  From cL and cR construct a new A, only A changes here
 		contractedLocal_.move(currentSite,TO_THE_RIGHT,symm);
 	}
 

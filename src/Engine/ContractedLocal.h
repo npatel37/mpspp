@@ -82,6 +82,7 @@ public:
 
 	void growLeft(size_t currentSite,const SymmetryLocalType& symm)
 	{
+		if (currentSite+1==L_.size()) return;
 		assert(currentSite+1<L_.size());
 		L_[currentSite+1].build(abState_.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite));
 	}
@@ -124,7 +125,7 @@ private:
 	void moveRight(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)
 	{
 		assert(currentSite+1<R_.size());
-		R_[currentSite].move(abState.B(currentSite+1),h_(currentSite+1),R_[currentSite+1],symm(currentSite+1));
+		R_[currentSite].move(abState.B(currentSite+1),h_(currentSite+1),R_[currentSite+1],symm(currentSite));
 	}
 
 	const MpsLocalType& abState_;

@@ -201,6 +201,8 @@ private:
 		assert(B.type()==MpsFactorType::TYPE_B);
 		SparseMatrixType Btranspose;
 		transposeConjugate(Btranspose,B());
+		if (h.n_row()!=data_.size())
+			data_.resize(h.n_row());
 		assert(h.n_row()==data_.size());
 		for (size_t blm2=0;blm2<data_.size();blm2++)
 			moveRight(data_[blm2],blm2,B,Btranspose,h,dataPrev,symm);
