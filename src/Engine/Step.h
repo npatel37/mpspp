@@ -93,6 +93,7 @@ public:
 	//! Moves the center of orthogonality by one to the left
 	void moveLeft(SymmetryLocalType& symm,size_t currentSite)
 	{
+		if (currentSite+1==model_.geometry().numberOfSites()) return;
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 
@@ -107,7 +108,7 @@ public:
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 
-//		symm.moveRight(currentSite,quantumNumbers);
+		symm.moveRight(currentSite,quantumNumbers);
 //		std::cout<<"normB="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_B,symm)<<" ";
 //		std::cout<<"normA="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_A,symm)<<"\n";
 		internalmove(currentSite,TO_THE_RIGHT,symm(currentSite)); // <--  <--  From cL and cR construct a new A, only A changes here

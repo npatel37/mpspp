@@ -116,10 +116,7 @@ private:
 	void moveLeft(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)
 	{
 		assert(currentSite+1<L_.size());
-		L_[currentSite+1].move(abState.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite+1));
-		std::cout<<"L["<<(currentSite+1)<<"]\n";
-		std::cout<<L_[currentSite+1];
-		std::cout<<"--------------------------------\n";
+		L_[currentSite+1].move(abState.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite));
 	}
 
 	void moveRight(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)

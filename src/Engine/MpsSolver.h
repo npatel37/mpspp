@@ -112,7 +112,6 @@ private:
 			center=i;
 			step.growRight(symm,center);
 		}
-		center--;
 	}
 
 	void finiteLoops(StepType& step,size_t& center,SymmetryLocalType& symm)
