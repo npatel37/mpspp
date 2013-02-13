@@ -119,9 +119,11 @@ public:
 
 		MatrixType m(row,col);
 
-		size_t total = symm.super().size();
+//		size_t total = symm.super().size();
+		size_t offset = symm.super().partitionOffset(symmetrySector);
+		size_t total = symm.super().partitionSize(symmetrySector);
 		for (size_t i=0;i<total;i++) {
-			PairType ab = symm.super().unpack(i); //+offset);
+			PairType ab = symm.super().unpack(i+offset);
 			if (aOrB_==TYPE_A) {
 				m(ab.first,ab.second) = v[i];
 			} else {

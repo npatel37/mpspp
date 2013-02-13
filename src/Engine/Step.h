@@ -137,7 +137,8 @@ private:
 	{
 		size_t symmetrySector = getSymmetrySector(direction,symm.super());
 		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
-		size_t total = symm.super().size();
+//		size_t total = symm.super().size();
+		size_t total = symm.super().partitionSize(symmetrySector);
 		VectorType v(total,0.0);
 		RealType energy = internalmove(v,currentSite,direction,symm,symmetrySector);
 		mps_.move(currentSite,v,direction,symmetrySector,symm);
