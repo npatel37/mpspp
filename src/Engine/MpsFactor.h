@@ -69,6 +69,7 @@ public:
 	typedef typename SymmetryFactorType::IoInputType IoInputType;
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 	typedef typename SymmetryComponentType::VectorType VectorIntegerType;
+	typedef typename ProgramGlobals::Vector<RealType>::Type VectorRealType;
 	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
 
 	MpsFactor(size_t aOrB)
@@ -110,7 +111,7 @@ public:
 		assert(isNormalized(data_));
 	}
 
-	void move(const VectorType& v,size_t symmetrySector,const SymmetryFactorType& symm)
+	void move(VectorRealType& s,const VectorType& v,size_t symmetrySector,const SymmetryFactorType& symm)
 	{
 
 		size_t row = symm.left().size();
@@ -133,7 +134,7 @@ public:
 		std::cout<<"full matrix prior to svd is\n";
 		std::cout<<m;
 
-		moveFromVector(m,symm,symmetrySector);
+		moveFromVector(m,s,symm,symmetrySector);
 	}
 
 //	template<typename SomeNumericType>
@@ -157,29 +158,26 @@ public:
 
 private:
 
-	void moveFromVector(MatrixType& m,const SymmetryFactorType& symm,size_t symmetrySector)
+	void moveFromVector(MatrixType& m,VectorRealType& finalS,const SymmetryFactorType& symm,size_t symmetrySector)
 	{
 		const SymmetryComponentType& summed = (aOrB_==TYPE_A) ? symm.left() : symm.right();
 		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
 
 		MatrixType finalU(summed.size(),summed.size());
 
-//		size_t symmetryState = symm.super().partitionOffset(symmetrySector);
-//		size_t targetQ = symm.super().qn(symmetryState);
+		assert(finalS.size()==nonSummed.size());
 
 		for (size_t i=0;i<summed.partitions()-1;i++) {
 			size_t istart = summed.partitionOffset(i);
 			size_t itotal = summed.partitionSize(i);
 			for (size_t j=0;j<nonSummed.partitions()-1;j++) {
 				size_t jstart = nonSummed.partitionOffset(j);
-//				size_t thisState =(aOrB_==TYPE_A) ? symm.super().pack(istart,jstart) :  symm.super().pack(jstart,istart);
-//				size_t thisQ = symm.super().qn(thisState);
-//				if (thisQ!=targetQ) continue;
 				size_t jtotal = nonSummed.partitionSize(j);
-				std::vector<RealType> s;
+				VectorRealType s;
 				MatrixType u(itotal,jtotal);
 				svdThisSector(u,s,istart,itotal,jstart,jtotal,m);
 				setFinalU(finalU,istart,itotal,u);
+				setFinalS(finalS,jstart,jtotal,s);
 			}
 		}
 
@@ -195,7 +193,7 @@ private:
 	}
 
 	void svdThisSector(MatrixType& u,
-					   std::vector<RealType>& s,
+					   VectorRealType& s,
 					   size_t istart,
 					   size_t itotal,
 					   size_t jstart,
@@ -220,6 +218,19 @@ private:
 			for (size_t j=0;j<itotal;j++) {
 				finalU(i+istart,j+istart)=u(i,j);
 			}
+		}
+	}
+
+	void setFinalS(VectorRealType& finalS,
+				   size_t jstart,
+				   size_t jtotal,
+				   const VectorRealType& s) const
+	{
+		std::cout<<"setFinalS from "<<jstart<<" to "<<(jstart+jtotal)<<"\n";
+		size_t n = std::min(jtotal,s.size());
+		for (size_t j=0;j<n;j++) {
+			assert(j+jstart<finalS.size());
+			finalS[j+jstart]= s[j];
 		}
 	}
 

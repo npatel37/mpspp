@@ -67,6 +67,7 @@ public:
 	typedef typename MpsFactorType::VectorType VectorType;
 	typedef typename MpsFactorType::SparseMatrixType SparseMatrixType;
 	typedef typename MpsFactorType::MatrixType MatrixType;
+	typedef typename MpsFactorType::VectorRealType VectorRealType;
 
 	MpsLocal(size_t nsites)
 	: nsites_(nsites),center_(0)
@@ -124,17 +125,22 @@ public:
 	}
 
 	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-	void move(size_t currentSite,const VectorType& v,size_t direction,size_t symmetrySector,const SymmetryFactorType& symm)
+	void move(VectorRealType& s,
+			  size_t currentSite,
+			  const VectorType& v,
+			  size_t direction,
+			  size_t symmetrySector,
+			  const SymmetryFactorType& symm)
 	{
 		center_ = currentSite;
 		if (direction==ProgramGlobals::TO_THE_RIGHT) {
 			assert(currentSite<A_.size());
-			A_[currentSite]->move(v,symmetrySector,symm);
+			A_[currentSite]->move(s,v,symmetrySector,symm);
 			std::cout<<"moved A["<<currentSite<<"].row= ";
 			std::cout<<A_[currentSite]->operator()().row()<<"\n";
 		} else {
 			assert(currentSite+1<B_.size());
-			B_[currentSite+1]->move(v,symmetrySector,symm);
+			B_[currentSite+1]->move(s,v,symmetrySector,symm);
 			std::cout<<"moved B["<<(currentSite+1)<<"].row= ";
 			std::cout<<B_[currentSite+1]->operator()().row()<<"\n";
 		}

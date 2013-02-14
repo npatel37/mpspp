@@ -71,6 +71,7 @@ class Step {
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 	typedef StatePredictor<RealType,VectorType> StatePredictorType;
+	typedef typename MpsLocalType::VectorRealType VectorRealType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -98,7 +99,8 @@ public:
 		model_.getOneSite(quantumNumbers,currentSite);
 
 		symm.moveLeft(currentSite,quantumNumbers);
-		internalmove(currentSite,TO_THE_LEFT,symm(currentSite)); // <-- From cL and cR construct a new B, only B changes here
+		VectorRealType s(symm(currentSite).left().size(),0.0);
+		internalmove(s,currentSite,TO_THE_LEFT,symm(currentSite));
 		contractedLocal_.move(currentSite,TO_THE_LEFT,symm);
 	}
 
@@ -111,7 +113,8 @@ public:
 		symm.moveRight(currentSite,quantumNumbers);
 //		std::cout<<"normB="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_B,symm)<<" ";
 //		std::cout<<"normA="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_A,symm)<<"\n";
-		internalmove(currentSite,TO_THE_RIGHT,symm(currentSite)); // <--  <--  From cL and cR construct a new A, only A changes here
+		VectorRealType s(symm(currentSite).right().size(),0.0);
+		internalmove(s,currentSite,TO_THE_RIGHT,symm(currentSite));
 		contractedLocal_.move(currentSite,TO_THE_RIGHT,symm);
 	}
 
@@ -123,7 +126,8 @@ public:
 		mps_.growRight(center,symm);
 		contractedLocal_.growLeft(center,symm);
 		if (center==0) return;
-		internalmove(center,TO_THE_RIGHT,symm(center));
+		VectorRealType s(symm(center).right().size(),0.0);
+		internalmove(s,center,TO_THE_RIGHT,symm(center));
 	}
 
 	void printReport(std::ostream& os) const
@@ -133,7 +137,7 @@ public:
 
 private:
 
-	void internalmove(size_t currentSite,size_t direction,const SymmetryFactorType& symm)
+	void internalmove(VectorRealType& s,size_t currentSite,size_t direction,const SymmetryFactorType& symm)
 	{
 		size_t symmetrySector = getSymmetrySector(direction,symm.super());
 		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
@@ -141,7 +145,7 @@ private:
 		size_t total = symm.super().partitionSize(symmetrySector);
 		VectorType v(total,0.0);
 		RealType energy = internalmove(v,currentSite,direction,symm,symmetrySector);
-		mps_.move(currentSite,v,direction,symmetrySector,symm);
+		mps_.move(s,currentSite,v,direction,symmetrySector,symm);
 		statePredictor_.push(energy,v,symmetrySector);
 	}
 
