@@ -53,6 +53,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "DavidsonSolver.h"
 #include <vector>
 #include "StatePredictor.h"
+#include "Truncation.h"
 
 namespace Mpspp {
 
@@ -72,6 +73,7 @@ class Step {
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 	typedef StatePredictor<RealType,VectorType> StatePredictorType;
 	typedef typename MpsLocalType::VectorRealType VectorRealType;
+	typedef Truncation<RealType> TruncationType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -99,8 +101,8 @@ public:
 		model_.getOneSite(quantumNumbers,currentSite);
 
 		symm.moveLeft(currentSite,quantumNumbers);
-		VectorRealType s(symm(currentSite).left().size(),0.0);
-		internalmove(s,currentSite,TO_THE_LEFT,symm(currentSite));
+		TruncationType truncation(symm(currentSite).left().size());
+		internalmove(truncation,currentSite,TO_THE_LEFT,symm(currentSite));
 		contractedLocal_.move(currentSite,TO_THE_LEFT,symm);
 	}
 
@@ -113,8 +115,8 @@ public:
 		symm.moveRight(currentSite,quantumNumbers);
 //		std::cout<<"normB="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_B,symm)<<" ";
 //		std::cout<<"normA="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_A,symm)<<"\n";
-		VectorRealType s(symm(currentSite).right().size(),0.0);
-		internalmove(s,currentSite,TO_THE_RIGHT,symm(currentSite));
+		TruncationType truncation(symm(currentSite).right().size());
+		internalmove(truncation,currentSite,TO_THE_RIGHT,symm(currentSite));
 		contractedLocal_.move(currentSite,TO_THE_RIGHT,symm);
 	}
 
@@ -126,8 +128,8 @@ public:
 		mps_.growRight(center,symm);
 		contractedLocal_.growLeft(center,symm);
 		if (center==0) return;
-		VectorRealType s(symm(center).right().size(),0.0);
-		internalmove(s,center,TO_THE_RIGHT,symm(center));
+		TruncationType truncation(symm(center).right().size());
+		internalmove(truncation,center,TO_THE_RIGHT,symm(center));
 	}
 
 	void printReport(std::ostream& os) const
@@ -137,7 +139,7 @@ public:
 
 private:
 
-	void internalmove(VectorRealType& s,size_t currentSite,size_t direction,const SymmetryFactorType& symm)
+	void internalmove(TruncationType& truncation,size_t currentSite,size_t direction,const SymmetryFactorType& symm)
 	{
 		size_t symmetrySector = getSymmetrySector(direction,symm.super());
 		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
@@ -145,7 +147,7 @@ private:
 		size_t total = symm.super().partitionSize(symmetrySector);
 		VectorType v(total,0.0);
 		RealType energy = internalmove(v,currentSite,direction,symm,symmetrySector);
-		mps_.move(s,currentSite,v,direction,symmetrySector,symm);
+		mps_.move(truncation,currentSite,v,direction,symmetrySector,symm);
 		statePredictor_.push(energy,v,symmetrySector);
 	}
 

@@ -125,7 +125,8 @@ public:
 	}
 
 	//! tmpVec[i] --> M^\sigma2 _ {a1,a2}
-	void move(VectorRealType& s,
+	template<typename SomeTruncationType>
+	void move(SomeTruncationType& truncation,
 			  size_t currentSite,
 			  const VectorType& v,
 			  size_t direction,
@@ -135,12 +136,12 @@ public:
 		center_ = currentSite;
 		if (direction==ProgramGlobals::TO_THE_RIGHT) {
 			assert(currentSite<A_.size());
-			A_[currentSite]->move(s,v,symmetrySector,symm);
+			A_[currentSite]->move(truncation,v,symmetrySector,symm);
 			std::cout<<"moved A["<<currentSite<<"].row= ";
 			std::cout<<A_[currentSite]->operator()().row()<<"\n";
 		} else {
 			assert(currentSite+1<B_.size());
-			B_[currentSite+1]->move(s,v,symmetrySector,symm);
+			B_[currentSite+1]->move(truncation,v,symmetrySector,symm);
 			std::cout<<"moved B["<<(currentSite+1)<<"].row= ";
 			std::cout<<B_[currentSite+1]->operator()().row()<<"\n";
 		}
