@@ -138,6 +138,25 @@ public:
 		moveFromVector(m,truncation,symm,symmetrySector);
 	}
 
+	void truncate(size_t cutoff)
+	{
+		SparseMatrixType newdata(data_.row(),cutoff);
+		size_t counter = 0;
+		for (size_t i=0;i<data_.row();i++) {
+			newdata.setRow(i,counter);
+			for (int k=data_.getRowPtr(i);k<data_.getRowPtr(i+1);k++) {
+				size_t col = data_.getCol(k);
+				if (col>=cutoff) continue;
+				newdata.pushCol(col);
+				newdata.pushValue(data_.getValue(k));
+				counter++;
+			}
+		}
+		newdata.setRow(cutoff,counter);
+		data_=newdata;
+		data_.checkValidity();
+	}
+
 //	template<typename SomeNumericType>
 //	void divideBy(const SomeNumericType& value)
 //	{
@@ -160,30 +179,37 @@ public:
 private:
 
 	template<typename SomeTruncationType>
-	void moveFromVector(MatrixType& m,SomeTruncationType& truncation,const SymmetryFactorType& symm,size_t symmetrySector)
+	void moveFromVector(const MatrixType& m,SomeTruncationType& truncation,const SymmetryFactorType& symm,size_t symmetrySector)
 	{
 		const SymmetryComponentType& summed = (aOrB_==TYPE_A) ? symm.left() : symm.right();
-		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
+//		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
 
 		MatrixType finalU(summed.size(),summed.size());
-		assert(truncation.size()==nonSummed.size());
+		MatrixType finalVt; //(nonSummed.size(),nonSummed.size());
+//		assert(truncation.size()==nonSummed.size());
 
-		for (size_t i=0;i<summed.partitions()-1;i++) {
-			size_t istart = summed.partitionOffset(i);
-			size_t itotal = summed.partitionSize(i);
-			for (size_t j=0;j<nonSummed.partitions()-1;j++) {
-				size_t jstart = nonSummed.partitionOffset(j);
-				size_t jtotal = nonSummed.partitionSize(j);
-				VectorRealType s;
-				MatrixType u(itotal,jtotal);
-				svdThisSector(u,s,istart,itotal,jstart,jtotal,m);
-				setFinalU(finalU,istart,itotal,u);
-				if (jtotal<itotal)
-					setFinalS(truncation,jstart,jtotal,s);
-				else
-					setFinalS(truncation,istart,itotal,s);
-			}
-		}
+//		for (size_t i=0;i<summed.partitions()-1;i++) {
+//			size_t istart = summed.partitionOffset(i);
+//			size_t itotal = summed.partitionSize(i);
+//			for (size_t j=0;j<nonSummed.partitions()-1;j++) {
+//				size_t jstart = nonSummed.partitionOffset(j);
+//				size_t jtotal = nonSummed.partitionSize(j);
+//				VectorRealType s;
+//				MatrixType u(itotal,jtotal);
+//				MatrixType vt;
+//				svdThisSector(u,s,vt,istart,itotal,jstart,jtotal,m);
+//				setFinalU(finalU,istart,itotal,jstart,jtotal,u);
+//				if (jtotal<itotal)
+//					setFinalS(truncation,jstart,jtotal,s);
+//				else
+//					setFinalS(truncation,istart,itotal,s);
+//				setFinalVt(finalVt,istart,itotal,jstart,jtotal,vt);
+//			}
+//		}
+
+		VectorRealType finalS(m.n_col());
+		svd('A',finalU,finalS,finalVt);
+//		truncation.set(finalS);
 
 		MatrixType mtranspose;
 		if (aOrB_==TYPE_B)
@@ -191,13 +217,18 @@ private:
 
 		std::cout<<"new AorB=\n";
 		std::cout<<finalU;
+//		truncation.print(std::cout);
+		std::cout<<"final vt\n";
+		std::cout<<finalVt;
 		assert(isNormalized(finalU));
 		assert(respectsSymmetry(finalU,summed));
+//		assert(isCorrectSvd(m,finalU,truncation,finalVt));
 		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? finalU : mtranspose);
 	}
 
 	void svdThisSector(MatrixType& u,
 					   VectorRealType& s,
+					   MatrixType& vt,
 					   size_t istart,
 					   size_t itotal,
 					   size_t jstart,
@@ -209,12 +240,14 @@ private:
 				u(i,j) = m(i+istart,j+jstart);
 			}
 		}
-		svd(u,s,'A');
+		svd('A',u,s,vt);
 	}
 
 	void setFinalU(MatrixType& finalU,
 				   size_t istart,
 				   size_t itotal,
+				   size_t jstart,
+				   size_t jtotal,
 				   const MatrixType& u) const
 	{
 		std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
@@ -231,15 +264,44 @@ private:
 				   size_t jtotal,
 				   const VectorRealType& s) const
 	{
-		std::cout<<"setFinalS from "<<jstart<<" to "<<(jstart+jtotal-1)<<" ";
+		std::cout<<"setFinalS from "<<jstart<<" to "<<(jstart+jtotal-1)<<"\n";
 		size_t n = std::min(jtotal,s.size());
 		for (size_t j=0;j<n;j++) {
 //			assert(j+jstart<finalS.size());
 			if (fabs(s[j])<1e-6) continue;
 			truncation(j+jstart) = s[j];
-			std::cout<<"s["<<j<<"]="<<s[j]<<" ";
+//			std::cout<<"s["<<j<<"]="<<s[j]<<" ";
 		}
-		std::cout<<"\n";
+//		std::cout<<"\n";
+	}
+
+	void setFinalVt(MatrixType& finalVt,
+				   size_t istart,
+				   size_t itotal,
+				   size_t jstart,
+				   size_t jtotal,
+				   const MatrixType& vt) const
+	{
+		std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
+		for (size_t i=0;i<jtotal;i++) {
+			for (size_t j=0;j<jtotal;j++) {
+				finalVt(i+jstart,j+jstart) = vt(i,j);
+			}
+		}
+	}
+
+	template<typename SomeTruncationType>
+	bool isCorrectSvd(const MatrixType& mat,const MatrixType& u,SomeTruncationType& truncation,const MatrixType& vt) const
+	{
+		MatrixType m(u.n_row(),vt.n_col());
+		truncation.recoverSvd(m,u,vt);
+		std::cout<<"recovering matrix from svd:\n";
+		std::cout<<m;
+		for (size_t i=0;i<m.n_row();i++) {
+			for (size_t j=0;j<m.n_col();j++)
+				if (fabs(m(i,j)-mat(i,j))>1e-6) return false;
+		}
+		return true;
 	}
 
 	bool respectsSymmetry(const MatrixType& m,const SymmetryComponentType& summed) const
@@ -257,8 +319,8 @@ private:
 
 	bool isNormalized(const MatrixType& m) const
 	{
-		assert(m.n_row()==m.n_col());
-		for (size_t i=0;i<m.n_row();i++) {
+//		assert(m.n_row()==m.n_col());
+		for (size_t i=0;i<m.n_col();i++) {
 			for (size_t j=0;j<m.n_col();j++) {
 				ComplexOrRealType sum = 0;
 				for (size_t k=0;k<m.n_row();k++) {

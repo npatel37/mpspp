@@ -50,34 +50,88 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
-template<typename RealType>
+template<typename ContractedLocalType>
 class Truncation {
 	
-	typedef typename ProgramGlobals::Vector<RealType>::Type VectorRealType;
+	typedef typename ContractedLocalType::MatrixProductOperatorType MpoLocalType;
+	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
+	typedef typename MpsLocalType::VectorRealType VectorRealType;
+	typedef typename VectorRealType::value_type RealType;
 	typedef typename ProgramGlobals::Vector<size_t>::Type VectorIntegerType;
+	typedef typename ContractedLocalType::SymmetryLocalType SymmetryLocalType;
+	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 
 public:
 
-	Truncation(size_t length)
-		: s_(length,0.0)
+	Truncation(MpsLocalType& mps,ContractedLocalType& contracted)
+		: mps_(mps),contracted_(contracted)
 	{}
 
-	size_t size() const { return s_.size(); }
+//	size_t size() const { return s_.size(); }
 
-	RealType& operator()(size_t i) { return s_[i]; }
+//	RealType& operator()(size_t i) { return s_[i]; }
 
-	const RealType& operator()(size_t i) const { return s_[i]; }
-
-	void order() const
+	void operator()(SymmetryLocalType& symm,size_t site,size_t part,size_t cutoff)
 	{
-		Sort<VectorRealType> sort;
-		sort.sort(s_,perm_);
+		if (part==ProgramGlobals::PART_LEFT) {
+			if (symm(site).left().size()<=cutoff) return;
+		} else {
+			if (symm(site).right().size()<=cutoff) return;
+		}
+		mps_.truncate(site,part,cutoff);
+		contracted_.truncate(site,part,cutoff);
+		symm.truncate(site,part,cutoff);
 	}
+
+//	void order() const
+//	{
+//		Sort<VectorRealType> sort;
+//		sort.sort(s_,perm_);
+//	}
+
+//	void print(std::ostream& os) const
+//	{
+//		os<<"s.size= "<<s_.size()<<"\n";
+//		for (size_t i=0;i<s_.size();i++)
+//			os<<s_[i]<<" ";
+//		os<<"\n";
+//	}
+
+//	void set(const VectorRealType& s) { s_ = s; }
+
+//	void truncate(size_t spaceSize)
+//	{
+//		std::cout<<"spaceSize= "<<spaceSize<<" truncate()= "<<s_.size()<<"   ";
+//		for (size_t i=0;i<s_.size();i++) {
+//			std::cout<<s_[i]<<" ";
+//		}
+//		std::cout<<"\n";
+//	}
+
+//	template<typename SomeMatrixType>
+//	void recoverSvd(SomeMatrixType& mat,const SomeMatrixType& u,const SomeMatrixType& vt) const
+//	{
+//		size_t m = mat.n_row();
+//		size_t n = vt.n_col();
+//		size_t min = s_.size();
+//		assert(u.n_col()>=min);
+//		assert(vt.n_row()>=min);
+//		for (size_t i=0;i<m;i++) {
+//			for (size_t j=0;j<n;j++) {
+//				mat(i,j) = 0.0;
+//				for (size_t k=0;k<min;k++)
+//					mat(i,j) += u(i,k) * s_[k] * vt(k,j);
+//			}
+//		}
+//	}
 
 private:
 
-	VectorRealType s_;
-	VectorIntegerType perm_;
+	MpsLocalType& mps_;
+	ContractedLocalType& contracted_;
+
+//	VectorRealType s_;
+//	VectorIntegerType perm_;
 
 }; // Truncation
 

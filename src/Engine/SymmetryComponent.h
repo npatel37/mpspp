@@ -131,6 +131,16 @@ public:
 		leftSize_ = left.size();
 	}
 
+	void truncate(size_t cutoff)
+	{
+		if (size()<=cutoff) return;
+		VectorType q(cutoff);
+		for (size_t i=0;i<cutoff;i++)
+			q[i] = quantumNumbers_[i];
+		quantumNumbers_ = q;
+		findPermutationAndPartition();
+	}
+
 	std::string typeToString() const
 	{
 		switch (type_) {

@@ -73,7 +73,7 @@ class Step {
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 	typedef StatePredictor<RealType,VectorType> StatePredictorType;
 	typedef typename MpsLocalType::VectorRealType VectorRealType;
-	typedef Truncation<RealType> TruncationType;
+	typedef Truncation<ContractedLocalType> TruncationType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -90,24 +90,27 @@ public:
 	  mps_(mps),
 	  contractedLocal_(contractedLocal),
 	  model_(model),
-	  statePredictor_()
+	  statePredictor_(),
+	  truncation_(mps,contractedLocal)
 	{}
 
 	//! Moves the center of orthogonality by one to the left
-	void moveLeft(SymmetryLocalType& symm,size_t currentSite)
+	void moveLeft(SymmetryLocalType& symm,size_t currentSite,const FiniteLoop& finiteLoop)
 	{
 		if (currentSite+1==model_.geometry().numberOfSites()) return;
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 
 		symm.moveLeft(currentSite,quantumNumbers);
-		TruncationType truncation(symm(currentSite).left().size());
-		internalmove(truncation,currentSite,TO_THE_LEFT,symm(currentSite));
+//		TruncationType truncation(symm(currentSite).left().size());
+		internalmove(currentSite,TO_THE_LEFT,symm(currentSite));
 		contractedLocal_.move(currentSite,TO_THE_LEFT,symm);
+//		truncation.truncate(symm(currentSite).right().size());
+		truncation_(symm,currentSite,ProgramGlobals::PART_RIGHT,finiteLoop.keptStates);
 	}
 
 	//! Moves the center of orthogonality by one to the right
-	void moveRight(SymmetryLocalType& symm,size_t currentSite)
+	void moveRight(SymmetryLocalType& symm,size_t currentSite,const FiniteLoop& finiteLoop)
 	{
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
@@ -115,9 +118,11 @@ public:
 		symm.moveRight(currentSite,quantumNumbers);
 //		std::cout<<"normB="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_B,symm)<<" ";
 //		std::cout<<"normA="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_A,symm)<<"\n";
-		TruncationType truncation(symm(currentSite).right().size());
-		internalmove(truncation,currentSite,TO_THE_RIGHT,symm(currentSite));
+//		TruncationType truncation(symm(currentSite).right().size());
+		internalmove(currentSite,TO_THE_RIGHT,symm(currentSite));
 		contractedLocal_.move(currentSite,TO_THE_RIGHT,symm);
+//		truncation.truncate(symm(currentSite).left().size());
+		truncation_(symm,currentSite,ProgramGlobals::PART_LEFT,finiteLoop.keptStates);
 	}
 
 	void growRight(SymmetryLocalType& symm,size_t center)
@@ -128,8 +133,9 @@ public:
 		mps_.growRight(center,symm);
 		contractedLocal_.growLeft(center,symm);
 		if (center==0) return;
-		TruncationType truncation(symm(center).right().size());
-		internalmove(truncation,center,TO_THE_RIGHT,symm(center));
+//		TruncationType truncation(symm(center).right().size());
+		internalmove(center,TO_THE_RIGHT,symm(center));
+		truncation_(symm,center,ProgramGlobals::PART_LEFT,solverParams_.keptStatesInfinite);
 	}
 
 	void printReport(std::ostream& os) const
@@ -139,7 +145,7 @@ public:
 
 private:
 
-	void internalmove(TruncationType& truncation,size_t currentSite,size_t direction,const SymmetryFactorType& symm)
+	void internalmove(size_t currentSite,size_t direction,const SymmetryFactorType& symm)
 	{
 		size_t symmetrySector = getSymmetrySector(direction,symm.super());
 		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
@@ -147,7 +153,7 @@ private:
 		size_t total = symm.super().partitionSize(symmetrySector);
 		VectorType v(total,0.0);
 		RealType energy = internalmove(v,currentSite,direction,symm,symmetrySector);
-		mps_.move(truncation,currentSite,v,direction,symmetrySector,symm);
+		mps_.move(truncation_,currentSite,v,direction,symmetrySector,symm);
 		statePredictor_.push(energy,v,symmetrySector);
 	}
 
@@ -269,6 +275,7 @@ private:
 	ContractedLocalType& contractedLocal_;
 	const ModelType& model_;
 	StatePredictorType statePredictor_;
+	TruncationType truncation_;
 }; // Step
 
 } // namespace Mpspp

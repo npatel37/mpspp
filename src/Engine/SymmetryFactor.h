@@ -125,6 +125,15 @@ public:
 		super_.combine(left_,right_);
 	}
 
+	void truncate(size_t part,size_t cutoff)
+	{
+		if (part==ProgramGlobals::PART_LEFT)
+			left_.truncate(cutoff);
+		else
+			right_.truncate(cutoff);
+		super_.combine(left_,right_);
+	}
+
 	const SymmetryComponentType& super() const { return super_; }
 
 	const SymmetryComponentType& left() const { return left_; }

@@ -123,13 +123,13 @@ private:
 			size_t counter = abs(fl.stepLength);
 			while(true) {
 				if (fl.stepLength<0) {
-					step.moveLeft(symm,center);
+					step.moveLeft(symm,center,fl);
 					printProgress(symm,center,"to the left");
 					if (center==0) break;
 					if (counter==0) break;
 					center--;
 				} else {
-					step.moveRight(symm,center);
+					step.moveRight(symm,center,fl);
 					printProgress(symm,center,"to the right");
 					if (center+2==nsites) break;
 					center++;

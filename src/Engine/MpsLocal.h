@@ -147,6 +147,14 @@ public:
 		}
 	}
 
+	void truncate(size_t site,size_t part,size_t cutoff)
+	{
+		if (part==ProgramGlobals::PART_LEFT)
+			A_[site]->truncate(cutoff);
+		else
+			B_[site]->truncate(cutoff);
+	}
+
 	const MpsFactorType& A(size_t site) const
 	{
 		assert(site<A_.size());

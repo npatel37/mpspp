@@ -72,6 +72,12 @@ public:
 
 	typedef typename ProgramGlobals::Vector<SparseMatrixType>::Type DataType;
 
+	ContractedFactor(size_t leftOrRight)
+		: data_(1),leftOrRight_(leftOrRight)
+	{
+		data_[0].makeDiagonal(1,1);
+	}
+
 	void build(const MpsFactorType& AorB,const MpoFactorType& h,const ThisType& prev,const SymmetryFactorType& symm)
 	{
 		if (leftOrRight_==PART_RIGHT) {
@@ -87,18 +93,6 @@ public:
 		}
 	}
 
-//	void build(const MpoFactorType& h)
-//	{
-//		assert(leftOrRight_==PART_LEFT);
-//		data_.resize(h.n_row());
-//	}
-
-	ContractedFactor(size_t leftOrRight)
-		: data_(1),leftOrRight_(leftOrRight)
-	{
-		data_[0].makeDiagonal(1,1);
-	}
-
 	//! From As (or Bs) and Ws reconstruct *this
 	void move(const MpsFactorType& AorB,const MpoFactorType& h,const ThisType& dataPrev,const SymmetryFactorType& symm)
 	{
@@ -109,6 +103,12 @@ public:
 			assert(AorB.type()==MpsFactorType::TYPE_A);
 			moveLeft(AorB,h,dataPrev.data_,symm);
 		}
+	}
+
+	void truncate(size_t cutoff)
+	{
+		for (size_t i=0;i<data_.size();i++)
+			truncate(data_[i],cutoff);
 	}
 
 	const SparseMatrixType& operator()(size_t b1) const
@@ -274,6 +274,26 @@ private:
 				} // k
 			} // blm1
 		} // kb
+	}
+
+	void truncate(SparseMatrixType& m,size_t cutoff)
+	{
+		assert(m.row()==m.col());
+		if (m.row()<=cutoff) return;
+		size_t counter = 0;
+		SparseMatrixType newmatrix(cutoff,cutoff);
+		for (size_t i=0;i<cutoff;i++) {
+			newmatrix.setRow(i,counter);
+			for (int k=m.getRowPtr(i);k<m.getRowPtr(i+1);k++) {
+				size_t col = m.getCol(k);
+				if (col>=cutoff) continue;
+				newmatrix.pushCol(col);
+				newmatrix.pushValue(m.getValue(k));
+				counter++;
+			}
+		}
+		newmatrix.setRow(cutoff,counter);
+		newmatrix.checkValidity();
 	}
 
 	std::string partToString() const

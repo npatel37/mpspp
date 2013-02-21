@@ -117,6 +117,11 @@ public:
 		data_.push_back(symmFactor);
 	}
 
+	void truncate(size_t site,size_t part,size_t cutoff)
+	{
+		data_[site].truncate(part,cutoff);
+	}
+
 	friend std::ostream& operator<<(std::ostream& os,const SymmetryLocal& symm);
 
 private:
