@@ -100,7 +100,8 @@ public:
 	void truncate(size_t site,size_t part,size_t cutoff)
 	{
 		if (part==ProgramGlobals::PART_LEFT) {
-			L_[site].truncate(cutoff);
+			if (site+1>=L_.size()) return;
+			L_[site+1].truncate(cutoff);
 		} else {
 			R_[site].truncate(cutoff);
 		}

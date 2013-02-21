@@ -152,7 +152,7 @@ public:
 				counter++;
 			}
 		}
-		newdata.setRow(cutoff,counter);
+		newdata.setRow(data_.row(),counter);
 		data_=newdata;
 		data_.checkValidity();
 	}

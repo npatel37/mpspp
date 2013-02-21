@@ -293,7 +293,8 @@ private:
 			}
 		}
 		newmatrix.setRow(cutoff,counter);
-		newmatrix.checkValidity();
+		m=newmatrix;
+		m.checkValidity();
 	}
 
 	std::string partToString() const
