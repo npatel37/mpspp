@@ -74,17 +74,11 @@ public:
 		  L_(abState.sites(),ProgramGlobals::PART_LEFT)
 	{}
 
-	void growRight(size_t currentSite,const SymmetryLocalType& symm)
+	void grow(size_t currentSite,const SymmetryLocalType& symm,size_t nsites)
 	{
-		assert(currentSite<R_.size());
-		R_[currentSite].build(abState_.B(currentSite+1),h_(currentSite+1),R_[currentSite+1],symm(currentSite));
-	}
-
-	void growLeft(size_t currentSite,const SymmetryLocalType& symm)
-	{
-		if (currentSite+1==L_.size()) return;
-		assert(currentSite+1<L_.size());
 		L_[currentSite+1].build(abState_.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite));
+
+		R_[currentSite+1].build(abState_.B(currentSite),h_(nsites-1-currentSite),R_[currentSite],symm(currentSite));
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this

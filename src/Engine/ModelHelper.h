@@ -163,7 +163,7 @@ public:
 //		size_t total = symmetry_.super().size();
 
 		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
-		size_t rightIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
+		size_t rightIndex = (direction_ == TO_THE_RIGHT) ? currentSite_+1 : currentSite_;
 
 		matrix.resize(total,total);
 		const ContractedFactorType& cL = contractedPart_(leftIndex,ProgramGlobals::PART_LEFT);

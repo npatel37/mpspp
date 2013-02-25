@@ -78,7 +78,7 @@ namespace Mpspp {
 			if (!rs) {
 				matrixStored_[0].clear();
 				model->fullHamiltonian(matrixStored_[0],*modelHelper);
-				if (matrixStored_[0].row()<100) {
+				if (matrixStored_[0].row()<16) {
 					MatrixType m(matrixStored_[0]);
 					std::cout<<m;
 				}

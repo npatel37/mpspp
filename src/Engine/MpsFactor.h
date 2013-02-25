@@ -132,8 +132,8 @@ public:
 				m(ab.second,ab.first) = v[i];
 			}
 		}
-		std::cout<<"full matrix prior to svd is\n";
-		std::cout<<m;
+//		std::cout<<"full matrix prior to svd is\n";
+//		std::cout<<m;
 
 		moveFromVector(m,truncation,symm,symmetrySector);
 	}
@@ -215,11 +215,11 @@ private:
 		if (aOrB_==TYPE_B)
 			transposeConjugate(mtranspose,finalU);
 
-		std::cout<<"new AorB=\n";
-		std::cout<<finalU;
+//		std::cout<<"new AorB=\n";
+//		std::cout<<finalU;
 //		truncation.print(std::cout);
-		std::cout<<"final vt\n";
-		std::cout<<finalVt;
+//		std::cout<<"final vt\n";
+//		std::cout<<finalVt;
 		assert(isNormalized(finalU));
 		assert(respectsSymmetry(finalU,summed));
 //		assert(isCorrectSvd(m,finalU,truncation,finalVt));
@@ -250,7 +250,7 @@ private:
 				   size_t jtotal,
 				   const MatrixType& u) const
 	{
-		std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
+//		std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
 		for (size_t i=0;i<itotal;i++) {
 			for (size_t j=0;j<itotal;j++) {
 				finalU(i+istart,j+istart) = u(i,j);
@@ -264,7 +264,7 @@ private:
 				   size_t jtotal,
 				   const VectorRealType& s) const
 	{
-		std::cout<<"setFinalS from "<<jstart<<" to "<<(jstart+jtotal-1)<<"\n";
+//		std::cout<<"setFinalS from "<<jstart<<" to "<<(jstart+jtotal-1)<<"\n";
 		size_t n = std::min(jtotal,s.size());
 		for (size_t j=0;j<n;j++) {
 //			assert(j+jstart<finalS.size());

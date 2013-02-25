@@ -96,6 +96,9 @@ public:
 
 		growLattice(psi,contracted,center,symm);
 
+		if (solverParams_.options.find("nofiniteloops")!=std::string::npos)
+			return;
+
 		StepType step(solverParams_,psi,contracted,model_);
 		finiteLoops(step,center,symm);
 	}
@@ -108,9 +111,13 @@ private:
 
 		StepType step(solverParams_,psi,contracted,model_);
 
-		for (size_t i=0;i<nsites;i++) {
+		if (nsites&1) {
+			throw std::runtime_error("growLattice: nsites must be even\n");
+		}
+		size_t total = size_t(nsites/2);
+		for (size_t i=0;i<total;i++) {
 			center=i;
-			step.growRight(symm,center);
+			step.grow(symm,center);
 		}
 	}
 
@@ -121,6 +128,12 @@ private:
 		for (size_t finiteLoop=0;finiteLoop<solverParams_.finiteLoops.size();finiteLoop++) {
 			FiniteLoop fl = solverParams_.finiteLoops[finiteLoop];
 			size_t counter = abs(fl.stepLength);
+			if (finiteLoop==0) {
+				if (fl.stepLength<0) {
+					assert(center>0);
+					center--;
+				}
+			}
 			while(true) {
 				if (fl.stepLength<0) {
 					step.moveLeft(symm,center,fl);

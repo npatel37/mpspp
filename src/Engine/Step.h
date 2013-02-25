@@ -125,17 +125,19 @@ public:
 		truncation_(symm,currentSite,ProgramGlobals::PART_LEFT,finiteLoop.keptStates);
 	}
 
-	void growRight(SymmetryLocalType& symm,size_t center)
+	void grow(SymmetryLocalType& symm,size_t center)
 	{
+		size_t nsites = model_.geometry().numberOfSites();
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,center);
-		symm.growRight(center,quantumNumbers);
-		mps_.growRight(center,symm);
-		contractedLocal_.growLeft(center,symm);
+		symm.grow(center,quantumNumbers,nsites);
+		mps_.grow(center,symm,quantumNumbers.size());
+		contractedLocal_.grow(center,symm,nsites);
 		if (center==0) return;
 //		TruncationType truncation(symm(center).right().size());
 		internalmove(center,TO_THE_RIGHT,symm(center));
-		truncation_(symm,center,ProgramGlobals::PART_LEFT,solverParams_.keptStatesInfinite);
+		internalmove(center,TO_THE_LEFT,symm(center));
+//		truncation_(symm,center,ProgramGlobals::PART_LEFT,solverParams_.keptStatesInfinite);
 	}
 
 	void printReport(std::ostream& os) const

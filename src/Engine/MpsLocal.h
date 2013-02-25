@@ -95,20 +95,28 @@ public:
 			if (B_[i]) delete B_[i];
 	}
 
-	void growRight(size_t currentSite,const SymmetryLocalType& symm)
+	void grow(size_t currentSite,const SymmetryLocalType& symm,size_t nk)
 	{
 		center_ = currentSite;
-		MpsFactorType* mpsFactor = new MpsFactorType(MpsFactorType::TYPE_B);
-		size_t n = symm(currentSite).right().size();
-		mpsFactor->setRandom(currentSite,n);
-		B_.push_back(mpsFactor);
 		if (currentSite==0) {
 			MpsFactorType* mpsFactor2 = new MpsFactorType(MpsFactorType::TYPE_B);
-			mpsFactor2->setRandom(currentSite,n);
+			mpsFactor2->setRandom(currentSite,nk);
 			B_.push_back(mpsFactor2);
 		}
+
+		MpsFactorType* mpsFactor = new MpsFactorType(MpsFactorType::TYPE_B);
+		size_t n = symm(currentSite+1).right().size();
+		mpsFactor->setRandom(currentSite,n);
+		B_.push_back(mpsFactor);
+
+
+		if (currentSite==0) {
+			MpsFactorType* mpsFactor3 = new MpsFactorType(MpsFactorType::TYPE_A);
+			mpsFactor3->setRandom(currentSite,nk);
+			A_.push_back(mpsFactor3);
+		}
 		MpsFactorType* mpsFactor2 = new MpsFactorType(MpsFactorType::TYPE_A);
-		n =  symm(currentSite).left().size();
+		n =  symm(currentSite+1).left().size();
 		mpsFactor2->setRandom(currentSite,n);
 		A_.push_back(mpsFactor2);
 	}
@@ -140,10 +148,10 @@ public:
 			std::cout<<"moved A["<<currentSite<<"].row= ";
 			std::cout<<A_[currentSite]->operator()().row()<<"\n";
 		} else {
-			assert(currentSite+1<B_.size());
-			B_[currentSite+1]->move(truncation,v,symmetrySector,symm);
-			std::cout<<"moved B["<<(currentSite+1)<<"].row= ";
-			std::cout<<B_[currentSite+1]->operator()().row()<<"\n";
+			assert(currentSite<B_.size());
+			B_[currentSite]->move(truncation,v,symmetrySector,symm);
+			std::cout<<"moved B["<<(currentSite)<<"].row= ";
+			std::cout<<B_[currentSite]->operator()().row()<<"\n";
 		}
 	}
 
