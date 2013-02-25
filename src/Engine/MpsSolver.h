@@ -129,9 +129,8 @@ private:
 			FiniteLoop fl = solverParams_.finiteLoops[finiteLoop];
 			size_t counter = abs(fl.stepLength);
 			if (finiteLoop==0) {
-				if (fl.stepLength<0) {
-					assert(center>0);
-					center--;
+				if (fl.stepLength>0) {
+					center++;
 				}
 			}
 			while(true) {

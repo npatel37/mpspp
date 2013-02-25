@@ -119,6 +119,12 @@ public:
 
 	size_t size() const { return data_.size(); }
 
+	size_t row() const
+	{
+		assert(data_.size()>0);
+		return data_[0].row();
+	}
+
 	template<typename MatrixProductOperatorType_>
 	friend std::ostream& operator<<(std::ostream& os,const ContractedFactor<MatrixProductOperatorType_>& contractedFactor);
 
@@ -190,6 +196,8 @@ private:
 		assert(A.type()==MpsFactorType::TYPE_A);
 		SparseMatrixType Atranspose;
 		transposeConjugate(Atranspose,A());
+		if (data_.size()!=h.n_col())
+			data_.resize(h.n_col());
 		assert(data_.size()==h.n_col());
 		for (size_t b1=0;b1<data_.size();b1++)
 			moveLeft(data_[b1],A,Atranspose,b1,h,dataPrev,symm);

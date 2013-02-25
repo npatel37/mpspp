@@ -143,15 +143,30 @@ public:
 	{
 		center_ = currentSite;
 		if (direction==ProgramGlobals::TO_THE_RIGHT) {
+			if (currentSite==A_.size()) {
+				MpsFactorType* mpsFactor = new MpsFactorType(MpsFactorType::TYPE_A);
+				size_t n = symm.left().size();
+				mpsFactor->setRandom(currentSite,n);
+				A_.push_back(mpsFactor);
+			}
 			assert(currentSite<A_.size());
 			A_[currentSite]->move(truncation,v,symmetrySector,symm);
 			std::cout<<"moved A["<<currentSite<<"].row= ";
 			std::cout<<A_[currentSite]->operator()().row()<<"\n";
 		} else {
-			assert(currentSite<B_.size());
-			B_[currentSite]->move(truncation,v,symmetrySector,symm);
-			std::cout<<"moved B["<<(currentSite)<<"].row= ";
-			std::cout<<B_[currentSite]->operator()().row()<<"\n";
+			size_t nsites = symm.super().block().size();
+			size_t siteToSet = nsites - 1 - currentSite;
+			assert(siteToSet<nsites);
+
+			if (siteToSet==B_.size()) {
+				MpsFactorType* mpsFactor = new MpsFactorType(MpsFactorType::TYPE_B);
+				size_t n = symm.right().size();
+				mpsFactor->setRandom(currentSite,n);
+				B_.push_back(mpsFactor);
+			}
+			B_[siteToSet]->move(truncation,v,symmetrySector,symm);
+			std::cout<<"moved B["<<(siteToSet)<<"].row= ";
+			std::cout<<B_[siteToSet]->operator()().row()<<"\n";
 		}
 	}
 

@@ -120,13 +120,18 @@ private:
 	void moveLeft(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)
 	{
 		assert(currentSite+1<L_.size());
-		L_[currentSite+1].move(abState.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite));
+		L_[currentSite+1].move(abState.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite+1));
+		std::cout<<"set L_["<<(currentSite+1)<<"]="<<L_[currentSite+1].row()<<"\n";
 	}
 
 	void moveRight(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)
 	{
-		assert(currentSite+1<R_.size());
-		R_[currentSite].move(abState.B(currentSite+1),h_(currentSite+1),R_[currentSite+1],symm(currentSite));
+		size_t nsites = symm(currentSite).super().block().size();
+		size_t siteToSet = nsites - currentSite;
+		if (siteToSet==R_.size()) return;
+		assert(siteToSet<R_.size());
+		R_[siteToSet].move(abState.B(siteToSet-1),h_(currentSite),R_[siteToSet-1],symm(currentSite));
+		std::cout<<"set R_["<<siteToSet<<"]="<<R_[siteToSet].row()<<"\n";
 	}
 
 	const MpsLocalType& abState_;

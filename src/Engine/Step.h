@@ -115,11 +115,11 @@ public:
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 
-		symm.moveRight(currentSite,quantumNumbers);
+		symm.moveRight(currentSite+1,quantumNumbers);
 //		std::cout<<"normB="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_B,symm)<<" ";
 //		std::cout<<"normA="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_A,symm)<<"\n";
 //		TruncationType truncation(symm(currentSite).right().size());
-		internalmove(currentSite,TO_THE_RIGHT,symm(currentSite));
+		internalmove(currentSite,TO_THE_RIGHT,symm(currentSite+1));
 		contractedLocal_.move(currentSite,TO_THE_RIGHT,symm);
 //		truncation.truncate(symm(currentSite).left().size());
 		truncation_(symm,currentSite,ProgramGlobals::PART_LEFT,finiteLoop.keptStates);
@@ -136,7 +136,7 @@ public:
 		if (center==0) return;
 //		TruncationType truncation(symm(center).right().size());
 		internalmove(center,TO_THE_RIGHT,symm(center+1));
-		internalmove(center,TO_THE_LEFT,symm(center+1));
+		internalmove(center+1,TO_THE_LEFT,symm(center+1));
 //		truncation_(symm,center,ProgramGlobals::PART_LEFT,solverParams_.keptStatesInfinite);
 	}
 
@@ -169,7 +169,7 @@ private:
 		typedef typename ModelType::ModelHelperType ModelHelperType;
 
 		ReflectionSymmetryType *rs = 0;
-		size_t hamiltonianSite = (direction == TO_THE_RIGHT) ? currentSite : currentSite+1;
+		size_t hamiltonianSite = (direction == TO_THE_RIGHT) ? currentSite : currentSite;
 		ModelHelperType modelHelper(contractedLocal_,symmetrySector,currentSite,direction,model_.hamiltonian()(hamiltonianSite),symm);
 		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 

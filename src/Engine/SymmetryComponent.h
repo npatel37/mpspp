@@ -255,6 +255,7 @@ private:
 	//! Find a partition of the basis given the effecitve quantum numbers
 	void findPartition()
 	{
+		assert(quantumNumbers_.size()>0);
 		size_t qtmp = quantumNumbers_[0]+1;
 		partition_.clear();
 		for (size_t i=0;i<size();i++) {

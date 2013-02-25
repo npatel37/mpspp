@@ -92,7 +92,7 @@ public:
 		assert(site+1<data_.size());
 		SymmetryFactorType symmFactor = data_[site];
 		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_LEFT,0,site,quantumNumbers);
-		assert(site<data_.size());
+		assert(site+1<data_.size());
 		symmFactor.moveLeft(data_[site].left(),onesite, data_[site+1].right());
 		data_[site] = symmFactor;
 	}
@@ -101,6 +101,10 @@ public:
 	{
 		if (site==0) return;
 		assert(site>0);
+		if (site==data_.size()) {
+			data_.push_back(data_[site-1]);
+		}
+		assert(site<data_.size());
 		SymmetryFactorType symmFactor;
 		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_RIGHT,0,site,quantumNumbers);
 		symmFactor.moveRight(data_[site-1].left(),onesite,data_[site].right());
