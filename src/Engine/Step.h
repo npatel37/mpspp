@@ -135,8 +135,8 @@ public:
 		contractedLocal_.grow(center,symm,nsites);
 		if (center==0) return;
 //		TruncationType truncation(symm(center).right().size());
-		internalmove(center,TO_THE_RIGHT,symm(center));
-		internalmove(center,TO_THE_LEFT,symm(center));
+		internalmove(center,TO_THE_RIGHT,symm(center+1));
+		internalmove(center,TO_THE_LEFT,symm(center+1));
 //		truncation_(symm,center,ProgramGlobals::PART_LEFT,solverParams_.keptStatesInfinite);
 	}
 

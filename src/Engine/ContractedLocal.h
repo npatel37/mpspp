@@ -76,9 +76,9 @@ public:
 
 	void grow(size_t currentSite,const SymmetryLocalType& symm,size_t nsites)
 	{
-		L_[currentSite+1].build(abState_.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite));
+		L_[currentSite+1].build(abState_.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite+1));
 
-		R_[currentSite+1].build(abState_.B(currentSite),h_(nsites-1-currentSite),R_[currentSite],symm(currentSite));
+		R_[currentSite+1].build(abState_.B(currentSite),h_(nsites-1-currentSite),R_[currentSite],symm(currentSite+1));
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this

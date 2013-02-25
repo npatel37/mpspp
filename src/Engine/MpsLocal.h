@@ -98,11 +98,11 @@ public:
 	void grow(size_t currentSite,const SymmetryLocalType& symm,size_t nk)
 	{
 		center_ = currentSite;
-		if (currentSite==0) {
-			MpsFactorType* mpsFactor2 = new MpsFactorType(MpsFactorType::TYPE_B);
-			mpsFactor2->setRandom(currentSite,nk);
-			B_.push_back(mpsFactor2);
-		}
+//		if (currentSite==0) {
+//			MpsFactorType* mpsFactor2 = new MpsFactorType(MpsFactorType::TYPE_B);
+//			mpsFactor2->setRandom(currentSite,nk);
+//			B_.push_back(mpsFactor2);
+//		}
 
 		MpsFactorType* mpsFactor = new MpsFactorType(MpsFactorType::TYPE_B);
 		size_t n = symm(currentSite+1).right().size();
@@ -110,11 +110,11 @@ public:
 		B_.push_back(mpsFactor);
 
 
-		if (currentSite==0) {
-			MpsFactorType* mpsFactor3 = new MpsFactorType(MpsFactorType::TYPE_A);
-			mpsFactor3->setRandom(currentSite,nk);
-			A_.push_back(mpsFactor3);
-		}
+//		if (currentSite==0) {
+//			MpsFactorType* mpsFactor3 = new MpsFactorType(MpsFactorType::TYPE_A);
+//			mpsFactor3->setRandom(currentSite,nk);
+//			A_.push_back(mpsFactor3);
+//		}
 		MpsFactorType* mpsFactor2 = new MpsFactorType(MpsFactorType::TYPE_A);
 		n =  symm(currentSite+1).left().size();
 		mpsFactor2->setRandom(currentSite,n);

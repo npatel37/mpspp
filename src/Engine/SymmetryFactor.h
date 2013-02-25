@@ -82,8 +82,7 @@ public:
 		assert(site+1<nsites);
 		std::vector<size_t> qn(1,0);
 		SymmetryComponentType onesiteLeft(SymmetryComponentType::COMPONENT_LEFT,0,site,qn);
-		SymmetryComponentType onesiteRight(SymmetryComponentType::COMPONENT_RIGHT,0,site,quantumNumbers);
-		left_.combine(onesiteLeft,onesiteRight);
+		left_ = onesiteLeft;
 
 		size_t siteRight = nsites - 1 -site;
 		SymmetryComponentType onesiteRight2(SymmetryComponentType::COMPONENT_RIGHT,0,siteRight,qn);
@@ -104,7 +103,11 @@ public:
 
 		size_t siteRight = nsites - 1 -site;
 		SymmetryComponentType onesiteRight3(SymmetryComponentType::COMPONENT_LEFT,0,siteRight-1,quantumNumbers);
-		right_.combine(onesiteRight3,previous.right());
+		if (site==0) {
+			right_=previous.right();
+		} else {
+			right_.combine(onesiteRight3,previous.right());
+		}
 
 		super_.combine(left_,right_);
 	}

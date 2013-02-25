@@ -92,9 +92,9 @@ public:
 		assert(site+1<data_.size());
 		SymmetryFactorType symmFactor = data_[site];
 		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_LEFT,0,site,quantumNumbers);
-		assert(site>0);
-		symmFactor.moveLeft(data_[site-1].left(),onesite, data_[site].right());
-		data_[site-1] = symmFactor;
+		assert(site<data_.size());
+		symmFactor.moveLeft(data_[site].left(),onesite, data_[site+1].right());
+		data_[site] = symmFactor;
 	}
 
 	void moveRight(size_t site,const std::vector<size_t>& quantumNumbers)
