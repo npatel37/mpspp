@@ -134,10 +134,12 @@ public:
 		SymmetryFactorType symmFactor;
 		symmFactor.grow(site,quantumNumbers,data_[data_.size()-1],nsites);
 		data_.push_back(symmFactor);
+		std::cout<<symmFactor;
 	}
 
 	void truncate(size_t site,size_t part,size_t cutoff)
 	{
+		assert(site<data_.size());
 		data_[site].truncate(part,cutoff);
 	}
 

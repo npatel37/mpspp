@@ -91,7 +91,7 @@ public:
 	  contractedLocal_(contractedLocal),
 	  model_(model),
 	  statePredictor_(),
-	  truncation_(mps,contractedLocal)
+	  truncation_(mps,contractedLocal,solverParams_.options.find("notruncation")==std::string::npos)
 	{}
 
 	//! Moves the center of orthogonality by one to the left
@@ -102,10 +102,9 @@ public:
 		model_.getOneSite(quantumNumbers,currentSite);
 
 		symm.moveLeft(currentSite,quantumNumbers);
-//		TruncationType truncation(symm(currentSite).left().size());
+		if (currentSite==0) return;
 		internalmove(currentSite,TO_THE_LEFT,symm(currentSite));
 		contractedLocal_.move(currentSite,TO_THE_LEFT,symm);
-//		truncation.truncate(symm(currentSite).right().size());
 		truncation_(symm,currentSite,ProgramGlobals::PART_RIGHT,finiteLoop.keptStates);
 	}
 
@@ -130,10 +129,10 @@ public:
 		mps_.grow(center,symm,quantumNumbers.size());
 		contractedLocal_.grow(center,symm,nsites);
 		if (center==0) return;
-//		TruncationType truncation(symm(center).right().size());
 		internalmove(center,TO_THE_RIGHT,symm(center+1));
 		internalmove(center+1,TO_THE_LEFT,symm(center+1));
 		truncation_(symm,center,ProgramGlobals::PART_LEFT,solverParams_.keptStatesInfinite);
+		truncation_(symm,center+1,ProgramGlobals::PART_RIGHT,solverParams_.keptStatesInfinite);
 	}
 
 	void printReport(std::ostream& os) const
@@ -195,8 +194,8 @@ private:
 
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
-		std::cout<<"Eigenstate\n";
-		std::cout<<tmpVec;
+//		std::cout<<"Eigenstate\n";
+//		std::cout<<tmpVec;
 		return energyTmp;
 	}
 

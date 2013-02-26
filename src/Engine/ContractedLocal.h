@@ -91,13 +91,14 @@ public:
 		}
 	}
 
-	void truncate(size_t site,size_t part,size_t cutoff)
+	void truncate(size_t site,size_t part,size_t cutoff,size_t nsites)
 	{
 		if (part==ProgramGlobals::PART_LEFT) {
 			if (site+1>=L_.size()) return;
 			L_[site+1].truncate(cutoff);
 		} else {
-			R_[site].truncate(cutoff);
+			size_t siteToSet = nsites - site;
+			R_[siteToSet].truncate(cutoff);
 		}
 	}
 

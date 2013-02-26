@@ -170,12 +170,14 @@ public:
 		}
 	}
 
-	void truncate(size_t site,size_t part,size_t cutoff)
+	void truncate(size_t site,size_t part,size_t cutoff,size_t nsites)
 	{
-		if (part==ProgramGlobals::PART_LEFT)
+		if (part==ProgramGlobals::PART_LEFT) {
 			A_[site]->truncate(cutoff);
-		else
-			B_[site]->truncate(cutoff);
+		} else {
+			size_t siteToSet = nsites-site-1;
+			B_[siteToSet]->truncate(cutoff);
+		}
 	}
 
 	const MpsFactorType& A(size_t site) const

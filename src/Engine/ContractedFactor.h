@@ -138,7 +138,7 @@ private:
 				   const DataType& dataPrev,
 				   const SymmetryFactorType& symm)
 	{
-		std::cerr<<"Start initLeft2\n";
+//		std::cerr<<"Start initLeft2\n";
 
 		const SparseMatrixType& A = AorB();
 
@@ -187,7 +187,7 @@ private:
 
 		m.setRow(m.row(),counter);
 		m.checkValidity();
-		std::cerr<<"End initLeft2\n";
+//		std::cerr<<"End initLeft2\n";
 	}
 
 	void moveLeft(const MpsFactorType& A,const MpoFactorType& h,const DataType& dataPrev,const SymmetryFactorType& symm)

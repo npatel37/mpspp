@@ -63,8 +63,8 @@ class Truncation {
 
 public:
 
-	Truncation(MpsLocalType& mps,ContractedLocalType& contracted)
-		: mps_(mps),contracted_(contracted)
+	Truncation(MpsLocalType& mps,ContractedLocalType& contracted,bool enabled)
+		: mps_(mps),contracted_(contracted),enabled_(enabled)
 	{}
 
 //	size_t size() const { return s_.size(); }
@@ -73,14 +73,20 @@ public:
 
 	void operator()(SymmetryLocalType& symm,size_t site,size_t part,size_t cutoff)
 	{
-//		if (part==ProgramGlobals::PART_LEFT) {
-//			if (symm(site).left().size()<=cutoff) return;
-//		} else {
-//			if (symm(site).right().size()<=cutoff) return;
-//		}
-//		mps_.truncate(site,part,cutoff);
-//		contracted_.truncate(site,part,cutoff);
-//		symm.truncate(site,part,cutoff);
+		if (!enabled_) return;
+		size_t siteForSymm = (part==ProgramGlobals::PART_LEFT) ? site+1 : site;
+
+		if (part==ProgramGlobals::PART_LEFT) {
+			if (symm(siteForSymm).left().size()<=cutoff) return;
+		} else {
+			if (symm(siteForSymm).right().size()<=cutoff) return;
+		}
+
+		size_t nsites = symm(siteForSymm).super().block().size();
+		mps_.truncate(site,part,cutoff,nsites);
+		contracted_.truncate(site,part,cutoff,nsites);
+
+		symm.truncate(siteForSymm,part,cutoff);
 	}
 
 //	void order() const
@@ -129,6 +135,7 @@ private:
 
 	MpsLocalType& mps_;
 	ContractedLocalType& contracted_;
+	bool enabled_;
 
 //	VectorRealType s_;
 //	VectorIntegerType perm_;
