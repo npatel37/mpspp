@@ -101,7 +101,7 @@ public:
 	void moveRight(size_t site,const std::vector<size_t>& quantumNumbers)
 	{
 		if (site==0) return;
-		assert(site>1);
+		assert(site>0);
 		std::vector<size_t> qn(1,0);
 		bool flag=false;
 

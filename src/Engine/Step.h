@@ -97,7 +97,7 @@ public:
 	//! Moves the center of orthogonality by one to the left
 	void moveLeft(SymmetryLocalType& symm,size_t currentSite,const FiniteLoop& finiteLoop)
 	{
-//		if (currentSite+1==model_.geometry().numberOfSites()) return;
+		if (currentSite==model_.geometry().numberOfSites()) return;
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 
