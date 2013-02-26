@@ -73,14 +73,14 @@ public:
 
 	void operator()(SymmetryLocalType& symm,size_t site,size_t part,size_t cutoff)
 	{
-		if (part==ProgramGlobals::PART_LEFT) {
-			if (symm(site).left().size()<=cutoff) return;
-		} else {
-			if (symm(site).right().size()<=cutoff) return;
-		}
-		mps_.truncate(site,part,cutoff);
-		contracted_.truncate(site,part,cutoff);
-		symm.truncate(site,part,cutoff);
+//		if (part==ProgramGlobals::PART_LEFT) {
+//			if (symm(site).left().size()<=cutoff) return;
+//		} else {
+//			if (symm(site).right().size()<=cutoff) return;
+//		}
+//		mps_.truncate(site,part,cutoff);
+//		contracted_.truncate(site,part,cutoff);
+//		symm.truncate(site,part,cutoff);
 	}
 
 //	void order() const

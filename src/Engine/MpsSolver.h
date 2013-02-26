@@ -139,14 +139,17 @@ private:
 					printProgress(symm,center,"to the left");
 					if (center==0) break;
 					if (counter==0) break;
+					counter--;
+					if (counter==0) break;
 					center--;
 				} else {
 					step.moveRight(symm,center,fl);
 					printProgress(symm,center,"to the right");
-					if (center+2==nsites) break;
 					center++;
+					if (center==nsites) break;
 					if (counter==0) break;
 					counter--;
+					if (counter==0) break;
 				}
 			}
 		}

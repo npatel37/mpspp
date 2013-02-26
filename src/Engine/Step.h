@@ -97,7 +97,7 @@ public:
 	//! Moves the center of orthogonality by one to the left
 	void moveLeft(SymmetryLocalType& symm,size_t currentSite,const FiniteLoop& finiteLoop)
 	{
-		if (currentSite+1==model_.geometry().numberOfSites()) return;
+//		if (currentSite+1==model_.geometry().numberOfSites()) return;
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 
@@ -114,14 +114,10 @@ public:
 	{
 		std::vector<size_t> quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
-
 		symm.moveRight(currentSite+1,quantumNumbers);
-//		std::cout<<"normB="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_B,symm)<<" ";
-//		std::cout<<"normA="<<mps_.norm(MpsLocalType::MpsFactorType::TYPE_A,symm)<<"\n";
-//		TruncationType truncation(symm(currentSite).right().size());
+		if (currentSite+1==model_.geometry().numberOfSites()) return;
 		internalmove(currentSite,TO_THE_RIGHT,symm(currentSite+1));
 		contractedLocal_.move(currentSite,TO_THE_RIGHT,symm);
-//		truncation.truncate(symm(currentSite).left().size());
 		truncation_(symm,currentSite,ProgramGlobals::PART_LEFT,finiteLoop.keptStates);
 	}
 
@@ -137,7 +133,7 @@ public:
 //		TruncationType truncation(symm(center).right().size());
 		internalmove(center,TO_THE_RIGHT,symm(center+1));
 		internalmove(center+1,TO_THE_LEFT,symm(center+1));
-//		truncation_(symm,center,ProgramGlobals::PART_LEFT,solverParams_.keptStatesInfinite);
+		truncation_(symm,center,ProgramGlobals::PART_LEFT,solverParams_.keptStatesInfinite);
 	}
 
 	void printReport(std::ostream& os) const

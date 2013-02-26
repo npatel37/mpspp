@@ -98,11 +98,11 @@ public:
 			  size_t nsites)
 	{
 		assert(site+1<nsites);
-		SymmetryComponentType onesiteRight(SymmetryComponentType::COMPONENT_RIGHT,0,site+1,quantumNumbers);
+		SymmetryComponentType onesiteRight(SymmetryComponentType::COMPONENT_RIGHT,0,site,quantumNumbers);
 		left_.combine(previous.left(),onesiteRight);
 
 		size_t siteRight = nsites - 1 -site;
-		SymmetryComponentType onesiteRight3(SymmetryComponentType::COMPONENT_LEFT,0,siteRight-1,quantumNumbers);
+		SymmetryComponentType onesiteRight3(SymmetryComponentType::COMPONENT_LEFT,0,siteRight,quantumNumbers);
 		if (site==0) {
 			right_=previous.right();
 		} else {
@@ -136,6 +136,22 @@ public:
 			left_.truncate(cutoff);
 		else
 			right_.truncate(cutoff);
+		super_.combine(left_,right_);
+	}
+
+	void set(size_t part,const SymmetryComponentType& c)
+	{
+		switch(part) {
+		case SymmetryComponent::COMPONENT_LEFT:
+			left_=c;
+			break;
+		case SymmetryComponent::COMPONENT_RIGHT:
+			right_=c;
+			break;
+		case SymmetryComponent::COMPONENT_SUPER:
+			super_=c;
+			break;
+		}
 		super_.combine(left_,right_);
 	}
 
