@@ -68,6 +68,7 @@ public:
 	typedef typename MpsFactorType::SparseMatrixType SparseMatrixType;
 	typedef typename MpsFactorType::MatrixType MatrixType;
 	typedef typename MpsFactorType::VectorRealType VectorRealType;
+	typedef typename MpsFactorType::VectorIntegerType VectorIntegerType;
 
 	MpsLocal(size_t nsites)
 	: nsites_(nsites),center_(0)
@@ -170,13 +171,14 @@ public:
 		}
 	}
 
-	void truncate(size_t site,size_t part,size_t cutoff,size_t nsites)
+	template<typename SomeTruncationType>
+	void truncate(size_t site,size_t part,size_t cutoff,size_t nsites,const SomeTruncationType& trunc)
 	{
 		if (part==ProgramGlobals::PART_LEFT) {
-			A_[site]->truncate(cutoff);
+			A_[site]->truncate(cutoff,trunc);
 		} else {
 			size_t siteToSet = nsites-site-1;
-			B_[siteToSet]->truncate(cutoff);
+			B_[siteToSet]->truncate(cutoff,trunc);
 		}
 	}
 

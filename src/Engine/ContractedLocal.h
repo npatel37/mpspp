@@ -62,6 +62,8 @@ public:
 	typedef MatrixProductOperatorType_ MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
 	typedef typename MatrixProductOperatorType::MpsLocalType MpsLocalType;
+	typedef typename MpsLocalType::MpsFactorType MpsFactorType;
+	typedef typename MpsFactorType::VectorIntegerType VectorIntegerType;
 	typedef typename MpsLocalType::SymmetryLocalType SymmetryLocalType;
 	typedef typename MpsLocalType::ComplexOrRealType ComplexOrRealType;
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
@@ -91,14 +93,15 @@ public:
 		}
 	}
 
-	void truncate(size_t site,size_t part,size_t cutoff,size_t nsites)
+	template<typename SomeTruncationType>
+	void truncate(size_t site,size_t part,size_t cutoff,size_t nsites,const SomeTruncationType& trunc)
 	{
 		if (part==ProgramGlobals::PART_LEFT) {
 			if (site+1>=L_.size()) return;
-			L_[site+1].truncate(cutoff);
+			L_[site+1].truncate(cutoff,trunc);
 		} else {
 			size_t siteToSet = nsites - site;
-			R_[siteToSet].truncate(cutoff);
+			R_[siteToSet].truncate(cutoff,trunc);
 		}
 	}
 

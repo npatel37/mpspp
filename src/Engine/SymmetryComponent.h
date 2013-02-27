@@ -132,12 +132,15 @@ public:
 		leftSize_ = left.size();
 	}
 
-	void truncate(size_t cutoff)
+	void truncate(size_t cutoff,const VectorType& perm)
 	{
 		if (size()<=cutoff) return;
 		VectorType q(cutoff);
-		for (size_t i=0;i<cutoff;i++)
-			q[i] = quantumNumbers_[i];
+		assert(quantumNumbers_.size()==perm.size());
+		for (size_t i=0;i<quantumNumbers_.size();i++) {
+			if (perm[i]>=q.size()) continue;
+			q[perm[i]] = quantumNumbers_[i];
+		}
 		quantumNumbers_ = q;
 		findPermutationAndPartition();
 	}

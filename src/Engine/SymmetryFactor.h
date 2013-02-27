@@ -56,6 +56,7 @@ public:
 	typedef SymmetryComponent SymmetryComponentType;
 	typedef typename SymmetryComponentType::IoInputType IoInputType;
 	typedef typename SymmetryComponentType::PairType PairType;
+	typedef typename SymmetryComponent::VectorType VectorIntegerType;
 
 	enum {CORNER_LEFT = SymmetryComponentType::CORNER_LEFT,
 		  CORNER_RIGHT = SymmetryComponentType::CORNER_RIGHT};
@@ -130,12 +131,12 @@ public:
 		super_.combine(left_,right_);
 	}
 
-	void truncate(size_t part,size_t cutoff)
+	void truncate(size_t part,size_t cutoff,const VectorIntegerType& perm)
 	{
 		if (part==ProgramGlobals::PART_LEFT)
-			left_.truncate(cutoff);
+			left_.truncate(cutoff,perm);
 		else
-			right_.truncate(cutoff);
+			right_.truncate(cutoff,perm);
 		super_.combine(left_,right_);
 	}
 

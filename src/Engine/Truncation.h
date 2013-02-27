@@ -55,6 +55,8 @@ class Truncation {
 	
 	typedef typename ContractedLocalType::MatrixProductOperatorType MpoLocalType;
 	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
+	typedef typename MpsLocalType::MatrixType MatrixType;
+	typedef typename MpsLocalType::SparseMatrixType SparseMatrixType;
 	typedef typename MpsLocalType::VectorRealType VectorRealType;
 	typedef typename VectorRealType::value_type RealType;
 	typedef typename ProgramGlobals::Vector<size_t>::Type VectorIntegerType;
@@ -67,33 +69,90 @@ public:
 		: mps_(mps),contracted_(contracted),enabled_(enabled)
 	{}
 
+	void setSize(size_t size)
+	{
+		s_.resize(size);
+		for (size_t i=0;i<s_.size();i++)
+			s_[i] = 0.0;
+	}
+
 //	size_t size() const { return s_.size(); }
 
-//	RealType& operator()(size_t i) { return s_[i]; }
+	RealType& operator()(size_t i)
+	{
+		assert(i<s_.size());
+		return s_[i];
+	}
 
 	void operator()(SymmetryLocalType& symm,size_t site,size_t part,size_t cutoff)
 	{
 		if (!enabled_) return;
 		size_t siteForSymm = (part==ProgramGlobals::PART_LEFT) ? site+1 : site;
+		size_t rightSize = symm(siteForSymm).right().size();
+		size_t leftSize  = symm(siteForSymm).left().size();
 
 		if (part==ProgramGlobals::PART_LEFT) {
-			if (symm(siteForSymm).left().size()<=cutoff) return;
+			if (leftSize<=cutoff) return;
+//			cutoff = std::min(cutoff,rightSize);
 		} else {
-			if (symm(siteForSymm).right().size()<=cutoff) return;
+			if (rightSize<=cutoff) return;
+//			cutoff = std::min(cutoff,leftSize);
 		}
 
+		order();
 		size_t nsites = symm(siteForSymm).super().block().size();
-		mps_.truncate(site,part,cutoff,nsites);
-		contracted_.truncate(site,part,cutoff,nsites);
+		mps_.truncate(site,part,cutoff,nsites,*this);
+		contracted_.truncate(site,part,cutoff,nsites,*this);
 
-		symm.truncate(siteForSymm,part,cutoff);
+		symm.truncate(siteForSymm,part,cutoff,perm_);
 	}
 
-//	void order() const
-//	{
-//		Sort<VectorRealType> sort;
-//		sort.sort(s_,perm_);
-//	}
+	void matrixRow(SparseMatrixType& m,size_t cutoff) const
+	{
+		SparseMatrixType newdata(m.row(),cutoff);
+		size_t counter = 0;
+		for (size_t i=0;i<m.row();i++) {
+			newdata.setRow(i,counter);
+			for (int k=m.getRowPtr(i);k<m.getRowPtr(i+1);k++) {
+				size_t col = m.getCol(k);
+				if (col>=perm_.size()) continue;
+				col = perm_[col];
+				if (col>=cutoff) continue;
+				newdata.pushCol(col);
+				newdata.pushValue(m.getValue(k));
+				counter++;
+			}
+		}
+		newdata.setRow(m.row(),counter);
+		m=newdata;
+		m.checkValidity();
+	}
+
+	void matrixRowCol(SparseMatrixType& m,size_t cutoff) const
+	{
+
+		assert(m.row()==m.col());
+		if (m.row()<=cutoff) return;
+		MatrixType newmatrix(cutoff,cutoff);
+		for (size_t i=0;i<m.row();i++) {
+			if (perm_[i]>=cutoff) continue;
+			for (int k=m.getRowPtr(i);k<m.getRowPtr(i+1);k++) {
+				size_t col = m.getCol(k);
+				if (col>=perm_.size()) continue;
+				if (perm_[col]>=cutoff) continue;
+				newmatrix(perm_[i],perm_[col]) = m.getValue(k);
+			}
+		}
+		fullMatrixToCrsMatrix(m,newmatrix);
+		m.checkValidity();
+	}
+
+	void order()
+	{
+		perm_.resize(s_.size());
+		Sort<VectorRealType> sort;
+		sort.sort(s_,perm_);
+	}
 
 //	void print(std::ostream& os) const
 //	{
@@ -136,6 +195,8 @@ private:
 	MpsLocalType& mps_;
 	ContractedLocalType& contracted_;
 	bool enabled_;
+	VectorRealType s_;
+	VectorIntegerType perm_;
 
 //	VectorRealType s_;
 //	VectorIntegerType perm_;

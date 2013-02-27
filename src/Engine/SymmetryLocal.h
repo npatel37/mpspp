@@ -58,6 +58,7 @@ public:
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 	typedef typename SymmetryFactorType::PairType PairType;
 	typedef typename SymmetryFactorType::IoInputType IoInputType;
+	typedef typename SymmetryFactorType::VectorIntegerType VectorIntegerType;
 
 	SymmetryLocal()
 	{}
@@ -139,10 +140,10 @@ public:
 		std::cout<<symmFactor;
 	}
 
-	void truncate(size_t site,size_t part,size_t cutoff)
+	void truncate(size_t site,size_t part,size_t cutoff,const VectorIntegerType& perm)
 	{
 		assert(site<data_.size());
-		data_[site].truncate(part,cutoff);
+		data_[site].truncate(part,cutoff,perm);
 	}
 
 	friend std::ostream& operator<<(std::ostream& os,const SymmetryLocal& symm);

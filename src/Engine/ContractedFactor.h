@@ -63,6 +63,7 @@ class ContractedFactor {
 	typedef typename MpsLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::PairType PairType;
 	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
+	typedef typename MpsFactorType::VectorIntegerType VectorIntegerType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -105,10 +106,11 @@ public:
 		}
 	}
 
-	void truncate(size_t cutoff)
+	template<typename SomeTruncationType>
+	void truncate(size_t cutoff,const SomeTruncationType& trunc)
 	{
 		for (size_t i=0;i<data_.size();i++)
-			truncate(data_[i],cutoff);
+			trunc.matrixRowCol(data_[i],cutoff);
 	}
 
 	const SparseMatrixType& operator()(size_t b1) const
@@ -282,27 +284,6 @@ private:
 				} // k
 			} // blm1
 		} // kb
-	}
-
-	void truncate(SparseMatrixType& m,size_t cutoff)
-	{
-		assert(m.row()==m.col());
-		if (m.row()<=cutoff) return;
-		size_t counter = 0;
-		SparseMatrixType newmatrix(cutoff,cutoff);
-		for (size_t i=0;i<cutoff;i++) {
-			newmatrix.setRow(i,counter);
-			for (int k=m.getRowPtr(i);k<m.getRowPtr(i+1);k++) {
-				size_t col = m.getCol(k);
-				if (col>=cutoff) continue;
-				newmatrix.pushCol(col);
-				newmatrix.pushValue(m.getValue(k));
-				counter++;
-			}
-		}
-		newmatrix.setRow(cutoff,counter);
-		m=newmatrix;
-		m.checkValidity();
 	}
 
 	std::string partToString() const
