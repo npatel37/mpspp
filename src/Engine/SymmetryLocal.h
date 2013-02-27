@@ -96,6 +96,7 @@ public:
 		assert(site+1<data_.size());
 		symmFactor.moveLeft(data_[site].left(),onesite, data_[site+1].right());
 		data_[site] = symmFactor;
+		std::cout<<symmFactor;
 	}
 
 	void moveRight(size_t site,const std::vector<size_t>& quantumNumbers)
@@ -103,22 +104,23 @@ public:
 		if (site==0) return;
 		assert(site>0);
 		std::vector<size_t> qn(1,0);
-		bool flag=false;
 
 		if (site==data_.size()) {
 			size_t nsites = data_[site-1].super().block().size();
 			assert(site<=nsites);
 			assert(nsites-site<data_.size());
 			data_.push_back(data_[nsites-site]);
-			if (site==nsites) flag=true;
+			SymmetryComponentType onesite2(SymmetryComponentType::COMPONENT_RIGHT,0,site,qn);
+			if (site==nsites)
+				data_[data_.size()-1].set(SymmetryFactorType::SymmetryComponentType::COMPONENT_RIGHT,onesite2);
 		}
 		assert(site<data_.size());
 		SymmetryFactorType symmFactor;
 		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_RIGHT,0,site-1,quantumNumbers);
 		symmFactor.moveRight(data_[site-1].left(),onesite,data_[site].right());
-		SymmetryComponentType onesite2(SymmetryComponentType::COMPONENT_RIGHT,0,site,qn);
-		if (flag) symmFactor.set(SymmetryFactorType::SymmetryComponentType::COMPONENT_RIGHT,onesite2);
+
 		data_[site] = symmFactor;
+		std::cout<<symmFactor;
 	}
 
 	// left = prev.left + one site

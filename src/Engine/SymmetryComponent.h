@@ -114,6 +114,7 @@ public:
 	{
 		block_.clear();
 		blockUnion(block_,left.block_,right.block_); //! B= pS.block Union X
+		assert(isValidBlock());
 
 		size_t ns = left.size();
 		size_t ne = right.size();
@@ -273,6 +274,16 @@ private:
 	{
 		A=B;
 		for (size_t i=0;i<C.size();i++) A.push_back(C[i]);
+	}
+
+	bool isValidBlock() const
+	{
+		if (block_.size()<2) return true;
+		for (size_t i=0;i<block_.size()-1;i++) {
+			if (block_[i]>=block_[i+1])
+				return false;
+		}
+		return true;
 	}
 
 	size_t type_;
