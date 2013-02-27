@@ -218,6 +218,7 @@ private:
 			std::cerr<<__FILE__<<" "<<__LINE__<<"\n";
 			std::cerr<<"getSymmetrySector ";
 			std::cerr<<"WARNING: minDiff="<<minDiff<<" is non zero\n";
+			throw std::runtime_error("error\n");
 		}
 		return imin;
 	}

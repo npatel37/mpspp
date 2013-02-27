@@ -140,10 +140,11 @@ public:
 		std::cout<<symmFactor;
 	}
 
-	void truncate(size_t site,size_t part,size_t cutoff,const VectorIntegerType& perm)
+	template<typename SomeTruncationType>
+	void truncate(size_t site,size_t part,size_t cutoff,const SomeTruncationType& trunc)
 	{
 		assert(site<data_.size());
-		data_[site].truncate(part,cutoff,perm);
+		data_[site].truncate(part,cutoff,trunc);
 	}
 
 	friend std::ostream& operator<<(std::ostream& os,const SymmetryLocal& symm);

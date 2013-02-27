@@ -104,21 +104,37 @@ public:
 		mps_.truncate(site,part,cutoff,nsites,*this);
 		contracted_.truncate(site,part,cutoff,nsites,*this);
 
-		symm.truncate(siteForSymm,part,cutoff,perm_);
+		symm.truncate(siteForSymm,part,cutoff,*this);
+	}
+
+	void vector(VectorIntegerType& quantumNumbers,size_t cutoff) const
+	{
+		if (quantumNumbers.size()<=cutoff) return;
+		size_t toRemove = quantumNumbers.size()-cutoff;
+		VectorIntegerType q(cutoff);
+
+		assert(quantumNumbers.size()==perm_.size());
+		for (size_t i=0;i<quantumNumbers.size();i++) {
+			if (perm_[i]<toRemove) continue;
+			q[perm_[i]-toRemove] = quantumNumbers[i];
+		}
+		quantumNumbers = q;
 	}
 
 	void matrixRow(SparseMatrixType& m,size_t cutoff) const
 	{
+		if (m.col()<=cutoff) return;
+		assert(m.col()==perm_.size());
+		size_t toRemove = m.col()-cutoff;
 		SparseMatrixType newdata(m.row(),cutoff);
 		size_t counter = 0;
 		for (size_t i=0;i<m.row();i++) {
 			newdata.setRow(i,counter);
 			for (int k=m.getRowPtr(i);k<m.getRowPtr(i+1);k++) {
 				size_t col = m.getCol(k);
-				if (col>=perm_.size()) continue;
 				col = perm_[col];
-				if (col>=cutoff) continue;
-				newdata.pushCol(col);
+				if (col<toRemove) continue;
+				newdata.pushCol(col-toRemove);
 				newdata.pushValue(m.getValue(k));
 				counter++;
 			}
@@ -130,17 +146,17 @@ public:
 
 	void matrixRowCol(SparseMatrixType& m,size_t cutoff) const
 	{
-
 		assert(m.row()==m.col());
 		if (m.row()<=cutoff) return;
+		assert(m.col()==perm_.size());
 		MatrixType newmatrix(cutoff,cutoff);
+		size_t toRemove = m.col()-cutoff;
 		for (size_t i=0;i<m.row();i++) {
-			if (perm_[i]>=cutoff) continue;
+			if (perm_[i]<toRemove) continue;
 			for (int k=m.getRowPtr(i);k<m.getRowPtr(i+1);k++) {
 				size_t col = m.getCol(k);
-				if (col>=perm_.size()) continue;
-				if (perm_[col]>=cutoff) continue;
-				newmatrix(perm_[i],perm_[col]) = m.getValue(k);
+				if (perm_[col]<toRemove) continue;
+				newmatrix(perm_[i]-toRemove,perm_[col]-toRemove) = m.getValue(k);
 			}
 		}
 		fullMatrixToCrsMatrix(m,newmatrix);

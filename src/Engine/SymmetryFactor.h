@@ -131,12 +131,13 @@ public:
 		super_.combine(left_,right_);
 	}
 
-	void truncate(size_t part,size_t cutoff,const VectorIntegerType& perm)
+	template<typename SomeTruncationType>
+	void truncate(size_t part,size_t cutoff,const SomeTruncationType& trunc)
 	{
 		if (part==ProgramGlobals::PART_LEFT)
-			left_.truncate(cutoff,perm);
+			left_.truncate(cutoff,trunc);
 		else
-			right_.truncate(cutoff,perm);
+			right_.truncate(cutoff,trunc);
 		super_.combine(left_,right_);
 	}
 
