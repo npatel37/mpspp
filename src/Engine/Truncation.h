@@ -170,6 +170,8 @@ public:
 		sort.sort(s_,perm_);
 	}
 
+private:
+
 //	void print(std::ostream& os) const
 //	{
 //		os<<"s.size= "<<s_.size()<<"\n";
@@ -205,8 +207,6 @@ public:
 //			}
 //		}
 //	}
-
-private:
 
 	MpsLocalType& mps_;
 	ContractedLocalType& contracted_;

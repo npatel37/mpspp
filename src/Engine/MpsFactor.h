@@ -171,11 +171,10 @@ private:
 		const SymmetryComponentType& summed = (aOrB_==TYPE_A) ? symm.left() : symm.right();
 		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
 
+		size_t max = std::max(summed.size(),nonSummed.size());
 		MatrixType finalU(summed.size(),summed.size());
-//		MatrixType finalVt; //(nonSummed.size(),nonSummed.size());
-//		assert(truncation.size()==nonSummed.size());
 
-		truncation.setSize(nonSummed.size());
+		truncation.setSize(max);
 		for (size_t i=0;i<summed.partitions()-1;i++) {
 			size_t istart = summed.partitionOffset(i);
 			size_t itotal = summed.partitionSize(i);
@@ -187,11 +186,7 @@ private:
 				MatrixType vt;
 				svdThisSector(u,s,vt,istart,itotal,jstart,jtotal,m);
 				setFinalU(finalU,istart,itotal,jstart,jtotal,u);
-//				if (jtotal<itotal)
-					setFinalS(truncation,jstart,jtotal,s);
-//				else
-//					setFinalS(truncation,istart,itotal,s);
-//				setFinalVt(finalVt,istart,itotal,jstart,jtotal,vt);
+				setFinalS(truncation,jstart,jtotal,s);
 			}
 		}
 
