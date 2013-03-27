@@ -63,6 +63,8 @@ class Truncation {
 	typedef typename ContractedLocalType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 
+	enum {PERMUTE_ROW=1, PERMUTE_COL=2};
+
 public:
 
 	Truncation(MpsLocalType& mps,ContractedLocalType& contracted,bool enabled)
@@ -76,7 +78,12 @@ public:
 			s_[i] = 0.0;
 	}
 
-//	size_t size() const { return s_.size(); }
+	void set(VectorRealType& s)
+	{
+		s_=s;
+	}
+
+	size_t size() const { return s_.size(); }
 
 	RealType& operator()(size_t i)
 	{
@@ -109,8 +116,8 @@ public:
 
 	void vector(VectorIntegerType& quantumNumbers,size_t cutoff) const
 	{
-		if (quantumNumbers.size()<=cutoff) return;
-		size_t toRemove = quantumNumbers.size()-cutoff;
+		cutoff = std::min(cutoff,quantumNumbers.size());
+		size_t toRemove =  quantumNumbers.size()-cutoff;
 		VectorIntegerType q(cutoff);
 
 		assert(quantumNumbers.size()==perm_.size());
@@ -123,23 +130,24 @@ public:
 
 	void matrixRow(SparseMatrixType& m,size_t cutoff) const
 	{
-		if (m.col()<=cutoff) return;
+		cutoff = std::min(cutoff,m.col());
 		assert(m.col()==perm_.size());
 		size_t toRemove = m.col()-cutoff;
+		SparseMatrixType newmatrix;
+		permute(newmatrix,m, PERMUTE_COL);
 		SparseMatrixType newdata(m.row(),cutoff);
 		size_t counter = 0;
-		for (size_t i=0;i<m.row();i++) {
+		for (size_t i=0;i<newmatrix.row();i++) {
 			newdata.setRow(i,counter);
-			for (int k=m.getRowPtr(i);k<m.getRowPtr(i+1);k++) {
-				size_t col = m.getCol(k);
-				col = perm_[col];
+			for (int k=newmatrix.getRowPtr(i);k<newmatrix.getRowPtr(i+1);k++) {
+				size_t col = newmatrix.getCol(k);
 				if (col<toRemove) continue;
 				newdata.pushCol(col-toRemove);
 				newdata.pushValue(m.getValue(k));
 				counter++;
 			}
 		}
-		newdata.setRow(m.row(),counter);
+		newdata.setRow(newmatrix.row(),counter);
 		m=newdata;
 		m.checkValidity();
 	}
@@ -147,19 +155,21 @@ public:
 	void matrixRowCol(SparseMatrixType& m,size_t cutoff) const
 	{
 		assert(m.row()==m.col());
-		if (m.row()<=cutoff) return;
+		cutoff = std::min(cutoff,m.row());
 		assert(m.col()==perm_.size());
-		MatrixType newmatrix(cutoff,cutoff);
+		SparseMatrixType newmatrix;
+		permute(newmatrix,m,PERMUTE_ROW | PERMUTE_COL);
 		size_t toRemove = m.col()-cutoff;
-		for (size_t i=0;i<m.row();i++) {
-			if (perm_[i]<toRemove) continue;
-			for (int k=m.getRowPtr(i);k<m.getRowPtr(i+1);k++) {
-				size_t col = m.getCol(k);
-				if (perm_[col]<toRemove) continue;
-				newmatrix(perm_[i]-toRemove,perm_[col]-toRemove) = m.getValue(k);
+		MatrixType dest(cutoff,cutoff);
+		for (size_t i=0;i<newmatrix.row();i++) {
+			if (i<toRemove) continue;
+			for (int k=newmatrix.getRowPtr(i);k<newmatrix.getRowPtr(i+1);k++) {
+				size_t j = newmatrix.getCol(k);
+				if (j<toRemove) continue;
+				dest(i-toRemove,j-toRemove) = newmatrix.getValue(k);
 			}
 		}
-		fullMatrixToCrsMatrix(m,newmatrix);
+		fullMatrixToCrsMatrix(m,dest);
 		m.checkValidity();
 	}
 
@@ -172,41 +182,29 @@ public:
 
 private:
 
-//	void print(std::ostream& os) const
-//	{
-//		os<<"s.size= "<<s_.size()<<"\n";
-//		for (size_t i=0;i<s_.size();i++)
-//			os<<s_[i]<<" ";
-//		os<<"\n";
-//	}
+	void permute(SparseMatrixType& m,const SparseMatrixType& src,size_t what) const
+	{
+//		VectorIntegerType permInverse(perm_.size());
+//		getPermInverse(permInverse);
+		const VectorIntegerType& perm = perm_;
+		size_t row = src.row();
+		MatrixType dest(row,src.col());
+		for (size_t i=0;i<row;i++) {
+			size_t ind = (what & PERMUTE_ROW) ? perm[i] : i;
+			for (int k=src.getRowPtr(i);k<src.getRowPtr(i+1);k++) {
+				size_t j = src.getCol(k);
+				size_t jnd = (what & PERMUTE_COL) ? perm[j] : j;
+				dest(ind,jnd) = src.getValue(k);
+			}
+		}
+		fullMatrixToCrsMatrix(m,dest);
+	}
 
-//	void set(const VectorRealType& s) { s_ = s; }
-
-//	void truncate(size_t spaceSize)
-//	{
-//		std::cout<<"spaceSize= "<<spaceSize<<" truncate()= "<<s_.size()<<"   ";
-//		for (size_t i=0;i<s_.size();i++) {
-//			std::cout<<s_[i]<<" ";
-//		}
-//		std::cout<<"\n";
-//	}
-
-//	template<typename SomeMatrixType>
-//	void recoverSvd(SomeMatrixType& mat,const SomeMatrixType& u,const SomeMatrixType& vt) const
-//	{
-//		size_t m = mat.n_row();
-//		size_t n = vt.n_col();
-//		size_t min = s_.size();
-//		assert(u.n_col()>=min);
-//		assert(vt.n_row()>=min);
-//		for (size_t i=0;i<m;i++) {
-//			for (size_t j=0;j<n;j++) {
-//				mat(i,j) = 0.0;
-//				for (size_t k=0;k<min;k++)
-//					mat(i,j) += u(i,k) * s_[k] * vt(k,j);
-//			}
-//		}
-//	}
+	void getPermInverse(VectorIntegerType& permInverse) const
+	{
+		for (size_t i=0;i<perm_.size();i++)
+			permInverse[perm_[i]]=i;
+	}
 
 	MpsLocalType& mps_;
 	ContractedLocalType& contracted_;
