@@ -181,10 +181,14 @@ private:
 			for (size_t j=0;j<nonSummed.partitions()-1;j++) {
 				size_t jstart = nonSummed.partitionOffset(j);
 				size_t jtotal = nonSummed.partitionSize(j);
-				VectorRealType s;
+
 				MatrixType u(itotal,jtotal);
+				setThisSector(u,istart,itotal,jstart,jtotal,m);
+
+				VectorRealType s;
 				MatrixType vt;
-				svdThisSector(u,s,vt,istart,itotal,jstart,jtotal,m);
+				svd('A',u,s,vt);
+
 				setFinalU(finalU,istart,itotal,jstart,jtotal,u);
 				setFinalS(truncation,istart,itotal,s);
 			}
@@ -209,9 +213,7 @@ private:
 		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? finalU : mtranspose);
 	}
 
-	void svdThisSector(MatrixType& u,
-					   VectorRealType& s,
-					   MatrixType& vt,
+	void setThisSector(MatrixType& u,
 					   size_t istart,
 					   size_t itotal,
 					   size_t jstart,
@@ -223,7 +225,6 @@ private:
 				u(i,j) = m(i+istart,j+jstart);
 			}
 		}
-		svd('A',u,s,vt);
 	}
 
 	void setFinalU(MatrixType& finalU,

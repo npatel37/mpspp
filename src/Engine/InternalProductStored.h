@@ -78,10 +78,18 @@ namespace Mpspp {
 			if (!rs) {
 				matrixStored_[0].clear();
 				model->fullHamiltonian(matrixStored_[0],*modelHelper);
-				if (matrixStored_[0].row()<16) {
-					MatrixType m(matrixStored_[0]);
-					std::cout<<m;
+				if (model_->solverParams().options.find("debugmatrix")!=std::string::npos) {
+					MatrixType fullm(matrixStored_[0]);
+					if (PsimagLite::isZero(fullm)) std::cerr<<"Matrix is zero\n";
+					if (fullm.n_row()>40) {
+						printNonZero(fullm,std::cerr);
+					} else {
+						std::cout<<fullm;
+	//					printFullMatrix(fullm,"matrix",1);
+					}
+
 				}
+
 				assert(isHermitian(matrixStored_[0],true));
 				std::ostringstream msg;
 				msg<<"fullHamiltonian has rank="<<matrixStored_[0].row()<<" nonzeros="<<matrixStored_[0].nonZero();

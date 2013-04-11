@@ -152,6 +152,9 @@ private:
 		RealType energy = internalmove(v,currentSite,direction,symm,symmetrySector);
 		mps_.move(truncation_,currentSite,v,direction,symmetrySector,symm);
 		statePredictor_.push(energy,v,symmetrySector);
+		if (solverParams_.options.find("test")!=std::string::npos)
+			throw std::logic_error
+					 ("Exiting due to option test in the input file\n");
 	}
 
 	RealType internalmove(VectorType& tmpVec,size_t currentSite,size_t direction,const SymmetryFactorType& symm,size_t symmetrySector)
