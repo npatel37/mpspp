@@ -99,8 +99,9 @@ public:
 		std::vector<std::string> registerOpts;
 
 		//			registerOpts.push_back("restart");
-		//			registerOpts.push_back("debugmatrix");
-		//			registerOpts.push_back("test");
+		registerOpts.push_back("debugmatrix");
+		registerOpts.push_back("test");
+		registerOpts.push_back("notruncation");
 		//			registerOpts.push_back("useDavidson");
 		//			registerOpts.push_back("verbose");
 		//			registerOpts.push_back("nofiniteloops");
@@ -108,7 +109,7 @@ public:
 		//			registerOpts.push_back("inflate");
 		//			registerOpts.push_back("none");
 		//			registerOpts.push_back("ChebyshevSolver");
-		//			registerOpts.push_back("InternalProductStored");
+		registerOpts.push_back("InternalProductStored");
 		//			registerOpts.push_back("InternalProductKron");
 		//			registerOpts.push_back("useSu2Symmetry");
 		//			registerOpts.push_back("TimeStepTargetting");
@@ -118,7 +119,7 @@ public:
 		//			registerOpts.push_back("CorrectionTargetting");
 		//			registerOpts.push_back("MettsTargetting");
 
-		PsimagLite::Options::Writeable optWriteable(registerOpts,PsimagLite::Options::Writeable::DISABLED);
+		PsimagLite::Options::Writeable optWriteable(registerOpts,PsimagLite::Options::Writeable::PERMISSIVE);
 		optsReadable_ = new  OptionsReadableType(optWriteable,val);
 	}
 

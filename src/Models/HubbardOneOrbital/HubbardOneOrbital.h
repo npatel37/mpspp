@@ -83,6 +83,8 @@ class HubbardOneOrbital : public ModelBase<ParametersSolverType,
 
 	typedef typename ModelBaseType::MpoLocalType MpoLocalType;
 	typedef typename MpoLocalType::MpoFactorType MpoFactorType;
+	typedef typename MpoFactorType::OperatorType OperatorType;
+	typedef typename OperatorType::PairType PairForOperatorType;
 	typedef typename ModelBaseType::SparseMatrixType SparseMatrixType;
 	typedef typename ModelBaseType::ModelHelperType ModelHelperType;
 	typedef typename ModelBaseType::VectorType VectorType;
@@ -92,7 +94,7 @@ class HubbardOneOrbital : public ModelBase<ParametersSolverType,
 
 	typedef ParametersModelHubbard<RealType> ParametersModelType;
 
-	static const int MAX_SITES = 100;
+	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
 
 public:
 
@@ -131,37 +133,37 @@ public:
 
 		MpoFactorType mleft(1,wdim);
 		RealType mysign = 1;
-		mleft(0,0) = mp_.hubbardU[0]* nupndown;
-		mleft(0,1) = tiip1 * cdaggerUp;
-		mleft(0,2) = mysign * tiip1 * cup;
-		mleft(0,3) = tiip1 * cdaggerDown;
-		mleft(0,4) = mysign * tiip1 * cdown;
-		mleft(0,5) = identity;
+		mleft(0,0) = PairForOperatorType(mp_.hubbardU[0]* nupndown,1);
+		mleft(0,1) = PairForOperatorType(tiip1 * cdaggerUp,-1);
+		mleft(0,2) = PairForOperatorType(mysign * tiip1 * cup,-1);
+		mleft(0,3) = PairForOperatorType(tiip1 * cdaggerDown,-1);
+		mleft(0,4) = PairForOperatorType(mysign * tiip1 * cdown,-1);
+		mleft(0,5) = PairForOperatorType(identity,1);
 		hamiltonian_(0)=mleft;
 
 		for (size_t i=1;i<n-1;i++) {
 			MpoFactorType m(wdim,wdim);
-			m(0,0) = identity;
-			m(1,0) = cup;
-			m(2,0) = cdaggerUp;
-			m(3,0) = cdown;
-			m(4,0) = cdaggerDown;
-			m(5,0) = mp_.hubbardU[i]* nupndown;
-			m(5,1) = tiip1 * cdaggerUp;
-			m(5,2) = mysign * tiip1 * cup;
-			m(5,3) = tiip1 * cdaggerDown;
-			m(5,4) = mysign * tiip1 * cdown;
-			m(5,5) = identity;
+			m(0,0) =PairForOperatorType( identity,1);
+			m(1,0) = PairForOperatorType(cup,-1);
+			m(2,0) = PairForOperatorType(cdaggerUp,-1);
+			m(3,0) = PairForOperatorType(cdown,-1);
+			m(4,0) = PairForOperatorType(cdaggerDown,-1);
+			m(5,0) = PairForOperatorType(mp_.hubbardU[i]* nupndown,1);
+			m(5,1) = PairForOperatorType(tiip1 * cdaggerUp,-1);
+			m(5,2) = PairForOperatorType(mysign * tiip1 * cup,-1);
+			m(5,3) = PairForOperatorType(tiip1 * cdaggerDown,-1);
+			m(5,4) = PairForOperatorType(mysign * tiip1 * cdown,-1);
+			m(5,5) = PairForOperatorType(identity,1);
 			hamiltonian_(i)=m;
 		}
 
 		MpoFactorType mright(wdim,1);
-		mright(5,0) = mp_.hubbardU[n-1]* nupndown;
-		mright(4,0) = cdaggerDown;
-		mright(3,0) = cdown;
-		mright(2,0) = cdaggerUp;
-		mright(1,0) = cup;
-		mright(0,0) = identity;
+		mright(5,0) = PairForOperatorType(mp_.hubbardU[n-1]* nupndown,1);
+		mright(4,0) = PairForOperatorType(cdaggerDown,-1);
+		mright(3,0) = PairForOperatorType(cdown,-1);
+		mright(2,0) = PairForOperatorType(cdaggerUp,-1);
+		mright(1,0) = PairForOperatorType(cup,-1);
+		mright(0,0) = PairForOperatorType(identity,1);
 		hamiltonian_(n-1)=mright;
 	}
 

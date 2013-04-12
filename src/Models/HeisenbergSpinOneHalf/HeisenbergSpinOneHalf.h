@@ -90,7 +90,7 @@ class HeisenbergSpinOneHalf : public ModelBase<ParametersSolverType,
 
 	typedef ParametersHeisenbergSpinOneHalf<RealType> ParametersModelType;
 
-	static const int MAX_SITES = 100;
+	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
 
 public:
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, UT-Battelle, LLC
+Copyright (c) 2012-2013, UT-Battelle, LLC
 All rights reserved
 
 [MPS++, Version 0.1]
@@ -42,67 +42,58 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef MPO_FACTOR_H
-#define MPO_FACTOR_H
+#ifndef OPERATOR_H
+#define OPERATOR_H
 
 #include "ProgramGlobals.h"
-#include "Operator.h"
+#include "MpsLocal.h"
+#include "MpoFactor.h"
 
 namespace Mpspp {
 
-template<typename RealType,typename ComplexOrRealType>
-class MpoFactor {
+template<typename ComplexOrRealType>
+class Operator {
 
-	typedef Operator<ComplexOrRealType> OperatorType_;
-	typedef typename OperatorType_::SparseMatrixType SparseMatrixType;
-	typedef typename ProgramGlobals::Matrix<OperatorType_>::Type MatrixType;
-
-	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
+	typedef Operator<ComplexOrRealType> ThisType;
 
 public:
 
-	typedef OperatorType_ OperatorType;
+	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
+	typedef std::pair<SparseMatrixType,int> PairType;
 
-	MpoFactor(size_t wdim1,size_t wdim2)
-		: data_(wdim1,wdim2) {}
-
-	const OperatorType& operator()(size_t i,size_t j) const
+	ThisType& operator=(const PairType& pair)
 	{
-		assert(i<n_row() && j<n_col());
-		return data_(i,j);
+		data_=pair.first;
+		fermionSign_=pair.second;
+		return *this;
 	}
 
-	OperatorType& operator()(size_t i,size_t j)
+	ThisType& operator=(const SparseMatrixType& m)
 	{
-		assert(i<n_row() && j<n_col());
-		return data_(i,j);
+		data_=m;
+		fermionSign_=1;
+		return *this;
 	}
 
-	size_t n_row() const { return data_.n_row(); }
+	const SparseMatrixType& matrix() const
+	{
+		return data_;
+	}
 
-	size_t n_col() const { return data_.n_col(); }
-
-//	size_t electronsFromQn(size_t qn) const
-//	{
-//		div_t q = div(qn, MAX_SITES);
-//		return q.quot + q.rem;
-//	}
-
-//	size_t electronsFromState(size_t state,size_t site) const
-//	{
-//		std::vector<size_t> quantumNumbers;
-//		model_.getOneSite(quantumNumbers,site);
-//		return quantumNumbers[state];
-//	}
+	const int fermionSign() const
+	{
+		return fermionSign_;
+	}
 
 private:
 
-	typename ProgramGlobals::Matrix<OperatorType>::Type data_;
+	SparseMatrixType data_;
+	int fermionSign_;
 
-}; // MpoFactor
+}; // Operator
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // MPO_FACTOR_H
+#endif // OPERATOR_H
 

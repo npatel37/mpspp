@@ -64,6 +64,8 @@ class ContractedFactor {
 	typedef typename SymmetryFactorType::PairType PairType;
 	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
 	typedef typename MpsFactorType::VectorIntegerType VectorIntegerType;
+	typedef typename MpoFactorType::OperatorType OperatorType;
+	typedef typename OperatorType::PairType PairForOperatorType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -158,7 +160,8 @@ private:
 				size_t sigma2 = a1sigma2.second;
 
 				for (size_t b1=0;b1<h.n_row();b1++) {
-					const SparseMatrixType& w = h(b1,b);
+					const OperatorType& wOp = h(b1,b);
+					const SparseMatrixType& w = wOp.matrix();
 					if (w.row()==0) continue;
 					const SparseMatrixType& l1 = dataPrev[b1];
 
@@ -268,7 +271,8 @@ private:
 			size_t sigmalm1 = sigmalm1alm1.first;
 			size_t alm1 = sigmalm1alm1.second;
 			for (size_t blm1=0;blm1<dataPrev.size();blm1++) {
-				const SparseMatrixType& w = h(blm2,blm1);
+				const OperatorType& wOp = h(blm2,blm1);
+				const SparseMatrixType& w = wOp.matrix();
 				if (w.row()==0) continue;
 				for (int k=w.getRowPtr(sigmalm1);k<w.getRowPtr(sigmalm1+1);k++) {
 					size_t sigmaplm1 = w.getCol(k);

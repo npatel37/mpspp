@@ -98,6 +98,7 @@ public:
 
 	virtual void getOneSite(std::vector<size_t>& quantumNumbers,size_t site) const=0;
 
+
 }; // ModelBase
 
 } // namespace Mpspp

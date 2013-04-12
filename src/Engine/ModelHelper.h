@@ -66,6 +66,8 @@ public:
 	typedef typename ProgramGlobals::Vector<ComplexOrRealType>::Type VectorType;
 	typedef typename ContractedPartType::MatrixProductOperatorType MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
+	typedef typename MpoFactorType::OperatorType OperatorType;
+	typedef typename OperatorType::PairType PairForOperatorType;
 
 	ModelHelper(const ContractedPartType& contractedPart,
 				size_t symmetrySector,
@@ -109,7 +111,8 @@ public:
 		for (size_t blm1=0;blm1<cL.size();blm1++) {
 			const SparseMatrixType& l1 = cL(blm1);
 			for (size_t bl=0;bl<cR.size();bl++) {
-				const SparseMatrixType& w =  hamiltonian_(blm1,bl);
+				const OperatorType& wOp =  hamiltonian_(blm1,bl);
+				const SparseMatrixType& w = wOp.matrix();
 				if (w.row()==0) continue;
 //				SparseMatrixType w;
 //				transposeConjugate(w,w1);
@@ -119,17 +122,22 @@ public:
 					size_t alm1=0;
 					size_t sigmaL=0;
 					size_t alB=0;
+					size_t electronsLeft = hamiltonian_.electronsFromQn(symm.left().qn(ab.first),symm.left().size());
 					if (direction_==TO_THE_RIGHT) {
 						PairType tmpPair1 = symm.left().unpack(ab.first);
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
 						alB = ab.second;
+						size_t electronsBlock = hamiltonian_.electronsFromState(sigmaL);
+						assert(electronsBlock<=electronsLeft);
+						electronsLeft -= electronsBlock;
 					} else {
 						PairType tmpPair1 = symm.right().unpack(ab.second);
 						alB=tmpPair1.second;
 						sigmaL=tmpPair1.first;
 						alm1=ab.first;
 					}
+					RealType fermionSign = (electronsLeft & 1 ) ? hamiltonian_.fermionSign() : 1.0;
 
 					for (int k1=l1.getRowPtr(alm1);k1<l1.getRowPtr(alm1+1);k1++) {
 						size_t alm1p=l1.getCol(k1);
@@ -146,7 +154,7 @@ public:
 									j = symm.super().pack(alm1p,tmp1);
 								}
 								if (j<offset || j>=offset+total) continue;
-								x[i] += y[j-offset]*l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2);
+								x[i] += y[j-offset]*l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2)*fermionSign;
 							} // k2 right
 						} // kw Hamiltonian
 					} // k1 left
@@ -186,7 +194,8 @@ public:
 			matrix.setRow(i,counter);
 			for (size_t blm1=0;blm1<cL.size();blm1++) {
 				for (size_t bl=0;bl<cR.size();bl++) {
-					const SparseMatrixType& w = hamiltonian_(blm1,bl);
+					const OperatorType& wOp = hamiltonian_(blm1,bl);
+					const SparseMatrixType& w = wOp.matrix();
 					if (w.row()==0) continue;
 //					SparseMatrixType w;
 //					transposeConjugate(w,w1);
@@ -196,17 +205,24 @@ public:
 					size_t alm1=0;
 					size_t sigmaL=0;
 					size_t alB=0;
+
+					size_t electronsLeft = hamiltonian_.electronsFromQn(symm.left().qn(ab.first),symm.left().size());
 					if (direction_==TO_THE_RIGHT) {
 						PairType tmpPair1 = symm.left().unpack(ab.first);
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
 						alB = ab.second;
+						size_t electronsBlock = hamiltonian_.electronsFromState(sigmaL);
+						assert(electronsBlock<=electronsLeft);
+						electronsLeft -= electronsBlock;
 					} else {
 						PairType tmpPair1 = symm.right().unpack(ab.second);
 						alB=tmpPair1.second;
 						sigmaL=tmpPair1.first;
 						alm1=ab.first;
 					}
+
+					RealType fermionSign = (electronsLeft & 1 ) ? hamiltonian_.fermionSign() : 1.0;
 
 					for (int k1=l1.getRowPtr(alm1);k1<l1.getRowPtr(alm1+1);k1++) {
 						size_t alm1p=l1.getCol(k1);
@@ -224,7 +240,7 @@ public:
 								}
 //								v[j] += l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2);
 								if (j<offset || j>=offset+total) continue;
-								v[j-offset] += l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2);
+								v[j-offset] += l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2)*fermionSign;
 							} // k2 right
 						} // kw Hamiltonian
 					} // k1 left
