@@ -58,6 +58,8 @@ template<typename ParametersSolverType_,
 		 typename ConcurrencyType_>
 class ModelBase {
 
+	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
+
 public:
 
 	typedef ParametersSolverType_ ParametersSolverType;
@@ -98,6 +100,11 @@ public:
 
 	virtual void getOneSite(std::vector<size_t>& quantumNumbers,size_t site) const=0;
 
+	virtual size_t electronsFromQn(size_t qn) const
+	{
+		div_t q = div(qn, MAX_SITES);
+		return q.quot + q.rem;
+	}
 
 }; // ModelBase
 

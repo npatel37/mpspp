@@ -54,6 +54,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <vector>
 #include "StatePredictor.h"
 #include "Truncation.h"
+#include "FermionSign.h"
 
 namespace Mpspp {
 
@@ -168,7 +169,9 @@ private:
 
 		ReflectionSymmetryType *rs = 0;
 		size_t hamiltonianSite = (direction == TO_THE_RIGHT) ? currentSite : currentSite;
-		ModelHelperType modelHelper(contractedLocal_,symmetrySector,currentSite,direction,model_.hamiltonian()(hamiltonianSite),symm);
+		FermionSign<ModelType> fermionSign(model_,currentSite);
+		typename ModelHelperType::SymmetryHelperType symmetryHelper(fermionSign,symm);
+		ModelHelperType modelHelper(contractedLocal_,symmetrySector,currentSite,direction,model_.hamiltonian()(hamiltonianSite),symmetryHelper);
 		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 
 		RealType eps=ProgramGlobals::LanczosTolerance;

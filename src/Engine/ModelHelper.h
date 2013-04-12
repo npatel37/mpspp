@@ -45,6 +45,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef MODEL_HELPER_H
 #define MODEL_HELPER_H
 #include "ProgramGlobals.h"
+#include "SymmetryHelper.h"
 
 namespace Mpspp {
 
@@ -68,13 +69,14 @@ public:
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
 	typedef typename MpoFactorType::OperatorType OperatorType;
 	typedef typename OperatorType::PairType PairForOperatorType;
+	typedef SymmetryHelper<SymmetryFactorType> SymmetryHelperType;
 
 	ModelHelper(const ContractedPartType& contractedPart,
 				size_t symmetrySector,
 				size_t currentSite,
 				size_t direction,
 				const MpoFactorType& hamiltonian,
-				const SymmetryFactorType& symmetry)
+				const SymmetryHelperType& symmetry)
 	: contractedPart_(contractedPart),
 	  symmetrySector_(symmetrySector),
 	  currentSite_(currentSite),
@@ -85,7 +87,7 @@ public:
 
 	size_t size() const
 	{
-		return symmetry_.super().partitionSize(symmetrySector_);
+		return symmetry_.symm().super().partitionSize(symmetrySector_);
 	}
 
 	size_t symmetrySector() const { return symmetrySector_; }
@@ -99,15 +101,15 @@ public:
 	//! Eq. (201) but very modified
 	void matrixVectorProduct(VectorType& x,const VectorType& y) const
 	{
-		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
-		size_t total = symmetry_.super().partitionSize(symmetrySector_);
+		size_t offset = symmetry_.symm().super().partitionOffset(symmetrySector_);
+		size_t total = symmetry_.symm().super().partitionSize(symmetrySector_);
 
 		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
 		size_t rightIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
 
 		const ContractedFactorType& cL = contractedPart_(leftIndex,ProgramGlobals::PART_LEFT);
 		const ContractedFactorType& cR = contractedPart_(rightIndex,ProgramGlobals::PART_RIGHT);
-		const SymmetryFactorType& symm = symmetry_;
+		const SymmetryFactorType& symm = symmetry_.symm();
 		for (size_t blm1=0;blm1<cL.size();blm1++) {
 			const SparseMatrixType& l1 = cL(blm1);
 			for (size_t bl=0;bl<cR.size();bl++) {
@@ -122,13 +124,13 @@ public:
 					size_t alm1=0;
 					size_t sigmaL=0;
 					size_t alB=0;
-					size_t electronsLeft = hamiltonian_.electronsFromQn(symm.left().qn(ab.first),symm.left().size());
+					size_t electronsLeft = symmetry_.electronsFromQn(symm.left().qn(ab.first));
 					if (direction_==TO_THE_RIGHT) {
 						PairType tmpPair1 = symm.left().unpack(ab.first);
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
 						alB = ab.second;
-						size_t electronsBlock = hamiltonian_.electronsFromState(sigmaL);
+						size_t electronsBlock = symmetry_.electronsFromState(sigmaL);
 						assert(electronsBlock<=electronsLeft);
 						electronsLeft -= electronsBlock;
 					} else {
@@ -137,7 +139,7 @@ public:
 						sigmaL=tmpPair1.first;
 						alm1=ab.first;
 					}
-					RealType fermionSign = (electronsLeft & 1 ) ? hamiltonian_.fermionSign() : 1.0;
+					RealType fermionSign = (electronsLeft & 1 ) ? wOp.fermionSign() : 1.0;
 
 					for (int k1=l1.getRowPtr(alm1);k1<l1.getRowPtr(alm1+1);k1++) {
 						size_t alm1p=l1.getCol(k1);
@@ -166,9 +168,9 @@ public:
 	//! Used only for stored option
 	void fullHamiltonian(SparseMatrixType& matrix) const
 	{
-		size_t offset = symmetry_.super().partitionOffset(symmetrySector_);
-		size_t total = symmetry_.super().partitionSize(symmetrySector_);
-		size_t nsites = symmetry_.super().block().size();
+		size_t offset = symmetry_.symm().super().partitionOffset(symmetrySector_);
+		size_t total = symmetry_.symm().super().partitionSize(symmetrySector_);
+		size_t nsites = symmetry_.symm().super().block().size();
 
 		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_;
 		size_t rightIndex = (direction_ == TO_THE_RIGHT) ? nsites-currentSite_-1 : nsites-currentSite_-1;
@@ -176,7 +178,7 @@ public:
 		matrix.resize(total,total);
 		const ContractedFactorType& cL = contractedPart_(leftIndex,ProgramGlobals::PART_LEFT);
 		const ContractedFactorType& cR = contractedPart_(rightIndex,ProgramGlobals::PART_RIGHT);
-		const SymmetryFactorType& symm = symmetry_;
+		const SymmetryFactorType& symm = symmetry_.symm();
 		VectorType v(total,0);
 		size_t counter = 0;
 		assert(hamiltonian_.n_row()>=cL.size());
@@ -206,13 +208,13 @@ public:
 					size_t sigmaL=0;
 					size_t alB=0;
 
-					size_t electronsLeft = hamiltonian_.electronsFromQn(symm.left().qn(ab.first),symm.left().size());
+					size_t electronsLeft = symmetry_.electronsFromQn(symm.left().qn(ab.first));
 					if (direction_==TO_THE_RIGHT) {
 						PairType tmpPair1 = symm.left().unpack(ab.first);
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
 						alB = ab.second;
-						size_t electronsBlock = hamiltonian_.electronsFromState(sigmaL);
+						size_t electronsBlock = symmetry_.electronsFromState(sigmaL);
 						assert(electronsBlock<=electronsLeft);
 						electronsLeft -= electronsBlock;
 					} else {
@@ -222,7 +224,7 @@ public:
 						alm1=ab.first;
 					}
 
-					RealType fermionSign = (electronsLeft & 1 ) ? hamiltonian_.fermionSign() : 1.0;
+					RealType fermionSign = (electronsLeft & 1 ) ? wOp.fermionSign() : 1.0;
 
 					for (int k1=l1.getRowPtr(alm1);k1<l1.getRowPtr(alm1+1);k1++) {
 						size_t alm1p=l1.getCol(k1);
@@ -266,7 +268,7 @@ private:
 	size_t direction_;
 	size_t hilbertSize_;
 	const MpoFactorType& hamiltonian_;
-	const SymmetryFactorType& symmetry_;
+	const SymmetryHelperType& symmetry_;
 
 }; // ModelHelper
 

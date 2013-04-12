@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, UT-Battelle, LLC
+Copyright (c) 2012-2013, UT-Battelle, LLC
 All rights reserved
 
 [MPS++, Version 0.1]
@@ -42,54 +42,69 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef MPO_FACTOR_H
-#define MPO_FACTOR_H
+#ifndef SYMMETRY_HELPER_H
+#define SYMMETRY_HELPER_H
 
 #include "ProgramGlobals.h"
-#include "Operator.h"
+#include "MpsLocal.h"
+#include "MpoFactor.h"
 
 namespace Mpspp {
 
-template<typename RealType,typename ComplexOrRealType>
-class MpoFactor {
+template<typename SymmetryFactorType>
+class SymmetryHelper {
 
-	typedef Operator<ComplexOrRealType> OperatorType_;
-	typedef typename OperatorType_::SparseMatrixType SparseMatrixType;
-	typedef typename ProgramGlobals::Matrix<OperatorType_>::Type MatrixType;
+	typedef ProgramGlobals::Vector<size_t>::Type VectorIntegerType;
 
+	static VectorIntegerType electronsFromQn_;
 	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
 
 public:
 
-	typedef OperatorType_ OperatorType;
-
-	MpoFactor(size_t wdim1,size_t wdim2)
-		: data_(wdim1,wdim2) {}
-
-	const OperatorType& operator()(size_t i,size_t j) const
+	template<typename SomeFermionSignType>
+	SymmetryHelper(const SomeFermionSignType& fermionSign,const SymmetryFactorType& symm)
+		: symm_(symm)
 	{
-		assert(i<n_row() && j<n_col());
-		return data_(i,j);
+		VectorIntegerType qn = fermionSign.quantumNumbers();
+		electronsOneSite_.resize(qn.size());
+		for (size_t i=0;i<qn.size();i++)
+			electronsOneSite_[i] = fermionSign.electronsFromQn(qn[i]);
+
+		if (electronsFromQn_.size()>0) return;
+
+		electronsFromQn_.resize(MAX_SITES*MAX_SITES);
+
+		for (size_t q=0;q<electronsFromQn_.size();q++)
+			electronsFromQn_[q] = fermionSign.electronsFromQn(q);
 	}
 
-	OperatorType& operator()(size_t i,size_t j)
+	const SymmetryFactorType& symm() const
 	{
-		assert(i<n_row() && j<n_col());
-		return data_(i,j);
+		return symm_;
 	}
 
-	size_t n_row() const { return data_.n_row(); }
+	size_t electronsFromState(size_t state) const
+	{
+		return electronsOneSite_[state];
+	}
 
-	size_t n_col() const { return data_.n_col(); }
+	size_t electronsFromQn(size_t q) const
+	{
+		return electronsFromQn_[q];
+	}
 
 private:
 
-	typename ProgramGlobals::Matrix<OperatorType>::Type data_;
+	const SymmetryFactorType& symm_;
+	VectorIntegerType electronsOneSite_;
 
-}; // MpoFactor
+}; // SymmetryHelper
+
+template<typename SymmetryFactorType>
+typename SymmetryHelper<SymmetryFactorType>::VectorIntegerType SymmetryHelper<SymmetryFactorType>::electronsFromQn_;
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // MPO_FACTOR_H
+#endif // SYMMETRY_HELPER_H
 

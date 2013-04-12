@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2012, UT-Battelle, LLC
+Copyright (c) 2012-2013, UT-Battelle, LLC
 All rights reserved
 
 [MPS++, Version 0.1]
@@ -42,54 +42,45 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 /** \ingroup MPSPP */
 /*@{*/
 
-#ifndef MPO_FACTOR_H
-#define MPO_FACTOR_H
+#ifndef FERMION_SIGN_H
+#define FERMION_SIGN_H
 
 #include "ProgramGlobals.h"
-#include "Operator.h"
+#include "MpsLocal.h"
+#include "MpoFactor.h"
 
 namespace Mpspp {
 
-template<typename RealType,typename ComplexOrRealType>
-class MpoFactor {
-
-	typedef Operator<ComplexOrRealType> OperatorType_;
-	typedef typename OperatorType_::SparseMatrixType SparseMatrixType;
-	typedef typename ProgramGlobals::Matrix<OperatorType_>::Type MatrixType;
-
-	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
+template<typename ModelType>
+class FermionSign {
 
 public:
 
-	typedef OperatorType_ OperatorType;
+	FermionSign(const ModelType& model,size_t site)
+		: model_(model),site_(site)
+	{}
 
-	MpoFactor(size_t wdim1,size_t wdim2)
-		: data_(wdim1,wdim2) {}
-
-	const OperatorType& operator()(size_t i,size_t j) const
+	size_t electronsFromQn(size_t qn) const
 	{
-		assert(i<n_row() && j<n_col());
-		return data_(i,j);
+		return model_.electronsFromQn(qn);
 	}
 
-	OperatorType& operator()(size_t i,size_t j)
+	ProgramGlobals::Vector<size_t>::Type quantumNumbers() const
 	{
-		assert(i<n_row() && j<n_col());
-		return data_(i,j);
+		std::vector<size_t> quantumNumbers;
+		model_.getOneSite(quantumNumbers,site_);
+		return quantumNumbers;
 	}
-
-	size_t n_row() const { return data_.n_row(); }
-
-	size_t n_col() const { return data_.n_col(); }
 
 private:
 
-	typename ProgramGlobals::Matrix<OperatorType>::Type data_;
+	const ModelType& model_;
+	size_t site_;
 
-}; // MpoFactor
+}; // FermionSign
 
 } // namespace Mpspp
 
 /*@}*/
-#endif // MPO_FACTOR_H
+#endif // FERMION_SIGN_H
 
