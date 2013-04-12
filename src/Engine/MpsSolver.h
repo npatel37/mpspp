@@ -64,7 +64,7 @@ class MpsSolver {
 	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ParametersSolverType::FiniteLoopsType FiniteLoopsType;
-//	typedef typename ModelBaseType::LeftRightSuperType LeftRightSuperType;
+	typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
 	typedef typename ModelBaseType::ContractedLocalType ContractedLocalType;
 	typedef typename ModelBaseType::SymmetryLocalType SymmetryLocalType;
 	typedef Step<ModelBaseType,InternalProductTemplate> StepType;
@@ -182,7 +182,7 @@ private:
 	ConcurrencyType& concurrency_;
 	PsimagLite::ProgressIndicator progress_;
 	int stepCurrent_;
-	std::vector<size_t> sitesIndices_;
+	VectorIntegerType sitesIndices_;
 }; // MpsSolver
 
 } // namespace Mpspp

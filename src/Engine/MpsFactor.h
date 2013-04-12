@@ -68,7 +68,7 @@ public:
 	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
 	typedef typename SymmetryFactorType::IoInputType IoInputType;
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
-	typedef typename SymmetryComponentType::VectorType VectorIntegerType;
+	typedef typename SymmetryComponentType::VectorIntegerType VectorIntegerType;
 	typedef typename ProgramGlobals::Vector<RealType>::Type VectorRealType;
 	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
 
@@ -92,7 +92,7 @@ public:
 //		MatrixType mpsFactor;
 //		findMpsFactor1(mpsFactor,mpsFactorM);
 
-//		std::vector<RealType> s;
+//		VectorRealType s;
 //		svd(mpsFactor,s);
 
 //		fullMatrixToCrsMatrix(data_,mpsFactor);

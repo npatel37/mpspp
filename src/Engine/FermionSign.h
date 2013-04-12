@@ -54,6 +54,10 @@ namespace Mpspp {
 template<typename ModelType>
 class FermionSign {
 
+	typedef typename ModelType::MpsLocalType MpsLocalType;
+	typedef typename MpsLocalType::VectorType VectorType;
+	typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
+
 public:
 
 	FermionSign(const ModelType& model,size_t site)
@@ -67,7 +71,7 @@ public:
 
 	ProgramGlobals::Vector<size_t>::Type quantumNumbers() const
 	{
-		std::vector<size_t> quantumNumbers;
+		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,site_);
 		return quantumNumbers;
 	}

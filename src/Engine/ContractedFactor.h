@@ -148,8 +148,8 @@ private:
 
 		m.resize(A.col(),A.col());
 		size_t counter=0;
-		std::vector<size_t> cols(m.row(),0);
-		std::vector<ComplexOrRealType> values(m.row(),0.0);
+		VectorIntegerType cols(m.row(),0);
+		VectorType values(m.row(),0.0);
 		assert(symm.left().split()==0 || symm.left().split()==dataPrev[0].row());
 		assert(symm.left().size()==A.row());
 		for (size_t a2=0;a2<Atranspose.row();a2++) {
@@ -233,8 +233,8 @@ private:
 		m.resize(someSize,someSize);
 
 		size_t counter = 0;
-		std::vector<size_t> cols(m.row(),0);
-		std::vector<ComplexOrRealType> values(m.row(),0.0);
+		VectorIntegerType cols(m.row(),0);
+		VectorType values(m.row(),0.0);
 
 		for (size_t alm2=0;alm2<m.row();alm2++) {
 			m.setRow(alm2,counter);

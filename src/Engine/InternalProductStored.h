@@ -124,7 +124,7 @@ namespace Mpspp {
 	private:
 		ModelType const *model_;
 		ModelHelperType const *modelHelper_;
-		std::vector<SparseMatrixType> matrixStored_;
+		typename ProgramGlobals::Vector<SparseMatrixType>::Type matrixStored_;
 		size_t pointer_;
 		PsimagLite::ProgressIndicator progress_;
 	}; // class InternalProductStored

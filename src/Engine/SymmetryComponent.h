@@ -58,7 +58,7 @@ public:
 
 	typedef PsimagLite::IoSimple::In IoInputType;
 	typedef std::pair<size_t,size_t> PairType;
-	typedef ProgramGlobals::Vector<size_t>::Type VectorType;
+	typedef ProgramGlobals::Vector<size_t>::Type VectorIntegerType;
 
 	enum {CORNER_LEFT,CORNER_RIGHT};
 	enum {COMPONENT_LEFT,COMPONENT_RIGHT,COMPONENT_SUPER};
@@ -67,7 +67,7 @@ public:
 		: type_(type),leftSize_(0)
 	{}
 
-	SymmetryComponent(size_t type,size_t hilbert, size_t site,const std::vector<size_t>& quantumNumbers)
+	SymmetryComponent(size_t type,size_t hilbert, size_t site,const VectorIntegerType& quantumNumbers)
 		: type_(type),
 		  leftSize_(hilbert),
 		  block_(1,site),
@@ -95,7 +95,7 @@ public:
 		type_=comp;
 	}
 
-	void grow(size_t site,const std::vector<size_t>& quantumNumbers,size_t nsites,size_t leftSize)
+	void grow(size_t site,const VectorIntegerType& quantumNumbers,size_t nsites,size_t leftSize)
 	{
 		assert(type_==COMPONENT_RIGHT);
 		SymmetryComponent sc1(type_,0,site,quantumNumbers);
@@ -206,7 +206,7 @@ public:
 
 	size_t split() const { return leftSize_; }
 
-	const std::vector<size_t>& block() const { return block_; }
+	const VectorIntegerType& block() const { return block_; }
 
 	friend std::ostream& operator<<(std::ostream& os,const SymmetryComponent& symm);
 
@@ -240,7 +240,7 @@ private:
 
 		permutation_.resize(size());
 
-		Sort<std::vector<size_t> > sort;
+		Sort<VectorIntegerType > sort;
 		sort.sort(quantumNumbers_,permutation_);
 
 		findPartition();
@@ -286,11 +286,11 @@ private:
 
 	size_t type_;
 	size_t leftSize_;
-	VectorType block_;
-	VectorType quantumNumbers_;
-	VectorType partition_;
-	VectorType permutation_;
-	VectorType permutationInverse_;
+	VectorIntegerType block_;
+	VectorIntegerType quantumNumbers_;
+	VectorIntegerType partition_;
+	VectorIntegerType permutation_;
+	VectorIntegerType permutationInverse_;
 
 
 }; // SymmetryComponent

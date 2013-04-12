@@ -88,7 +88,7 @@ public:
 		return data_[site];
 	}
 
-	void moveLeft(size_t site,const std::vector<size_t>& quantumNumbers)
+	void moveLeft(size_t site,const VectorIntegerType& quantumNumbers)
 	{
 		if (site+1==data_.size()) return;
 		assert(site+1<data_.size());
@@ -100,11 +100,11 @@ public:
 		std::cout<<symmFactor;
 	}
 
-	void moveRight(size_t site,const std::vector<size_t>& quantumNumbers)
+	void moveRight(size_t site,const VectorIntegerType& quantumNumbers)
 	{
 		if (site==0) return;
 		assert(site>0);
-		std::vector<size_t> qn(1,0);
+		VectorIntegerType qn(1,0);
 
 		if (site==data_.size()) {
 			size_t nsites = data_[site-1].super().block().size();
@@ -126,7 +126,7 @@ public:
 
 	// left = prev.left + one site
 	// right = prev.right + one site
-	void grow(size_t site,const std::vector<size_t>& quantumNumbers,size_t nsites)
+	void grow(size_t site,const VectorIntegerType& quantumNumbers,size_t nsites)
 	{
 
 		if (data_.size()==0) {

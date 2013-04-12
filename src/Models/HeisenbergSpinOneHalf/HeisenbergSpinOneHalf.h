@@ -87,6 +87,8 @@ class HeisenbergSpinOneHalf : public ModelBase<ParametersSolverType,
 	typedef typename ModelBaseType::ComplexOrRealType ComplexOrRealType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
+	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
+	typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
 
 	typedef ParametersHeisenbergSpinOneHalf<RealType> ParametersModelType;
 
@@ -161,7 +163,7 @@ public:
 
 	virtual const GeometryType& geometry() const { return geometry_; }
 
-	virtual void getOneSite(std::vector<size_t>& quantumNumbers,size_t site) const
+	virtual void getOneSite(VectorIntegerType& quantumNumbers,size_t site) const
 	{
 		quantumNumbers.push_back(1);
 		quantumNumbers.push_back(MAX_SITES);

@@ -91,7 +91,8 @@ class HubbardOneOrbital : public ModelBase<ParametersSolverType,
 	typedef typename ModelBaseType::ComplexOrRealType ComplexOrRealType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
-
+	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
+	typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
 	typedef ParametersModelHubbard<RealType> ParametersModelType;
 
 	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
@@ -176,13 +177,13 @@ public:
 
 	virtual const GeometryType& geometry() const { return geometry_; }
 
-	virtual void getOneSite(std::vector<size_t>& quantumNumbers,size_t site) const
+	virtual void getOneSite(VectorIntegerType& quantumNumbers,size_t site) const
 	{
 		quantumNumbers.push_back(0);
 		quantumNumbers.push_back(1);
 		quantumNumbers.push_back(MAX_SITES);
 		quantumNumbers.push_back(1+MAX_SITES);
-//		std::vector<size_t> partition_;
+//		VectorIntegerType partition_;
 //		ProgramGlobals::Vector<size_t>::Type permutation_;
 //		ProgramGlobals::Vector<size_t>::Type permutationInverse_;
 	}

@@ -56,7 +56,7 @@ public:
 	typedef SymmetryComponent SymmetryComponentType;
 	typedef typename SymmetryComponentType::IoInputType IoInputType;
 	typedef typename SymmetryComponentType::PairType PairType;
-	typedef typename SymmetryComponent::VectorType VectorIntegerType;
+	typedef typename SymmetryComponent::VectorIntegerType VectorIntegerType;
 
 	enum {CORNER_LEFT = SymmetryComponentType::CORNER_LEFT,
 		  CORNER_RIGHT = SymmetryComponentType::CORNER_RIGHT};
@@ -77,11 +77,11 @@ public:
 	{}
 
 	void growFirst(size_t site,
-				   const std::vector<size_t>& quantumNumbers,
+				   const VectorIntegerType& quantumNumbers,
 				   size_t nsites)
 	{
 		assert(site+1<nsites);
-		std::vector<size_t> qn(1,0);
+		VectorIntegerType qn(1,0);
 		SymmetryComponentType onesiteLeft(SymmetryComponentType::COMPONENT_LEFT,0,site,qn);
 		left_ = onesiteLeft;
 
@@ -94,7 +94,7 @@ public:
 	}
 
 	void grow(size_t site,
-			  const std::vector<size_t>& quantumNumbers,
+			  const VectorIntegerType& quantumNumbers,
 			  const SymmetryFactor& previous,
 			  size_t nsites)
 	{

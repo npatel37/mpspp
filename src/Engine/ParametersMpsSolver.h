@@ -120,7 +120,7 @@ struct FiniteLoop {
 };
 
 //!PTEX_LABEL{139}
-inline void checkFiniteLoops(const std::vector<FiniteLoop>& finiteLoop,size_t totalSites)
+inline void checkFiniteLoops(const typename ProgramGlobals::Vector<FiniteLoop>::Type& finiteLoop,size_t totalSites)
 {
 	std::string s = "checkFiniteLoops: I'm falling out of the lattice ";
 	std::string loops = "";
@@ -254,7 +254,8 @@ struct ParametersMpsSolver {
 
 	typedef RealType_ RealType;
 	typedef ComplexOrRealType_ ComplexOrRealType;
-	typedef std::vector<FiniteLoop> FiniteLoopsType;
+	typedef typename ProgramGlobals::Vector<FiniteLoop>::Type FiniteLoopsType;
+	typedef typename ProgramGlobals::Vector<RealType>::Type VectorRealType;
 
 	std::string filename;
 	size_t keptStatesInfinite;
@@ -262,7 +263,7 @@ struct ParametersMpsSolver {
 	std::string version;
 	std::string options;
 	std::string model;
-	std::vector<RealType> targetQuantumNumbers;
+	VectorRealType targetQuantumNumbers;
 	size_t electronsUp,electronsDown;
 //	std::string initialMps;
 //	RealType tolerance;
@@ -279,10 +280,10 @@ struct ParametersMpsSolver {
 		io.readline(version,"Version=");
 		io.readline(filename,"OutputFile=");
 		io.readline(keptStatesInfinite,"InfiniteLoopKeptStates=");
-		std::vector<RealType> tmpVec;
+		VectorRealType tmpVec;
 		io.read(tmpVec,"FiniteLoops");
 		for (size_t i=0;i<tmpVec.size();i+=3) {
-			std::vector<int> xTmp(3);
+			typename ProgramGlobals::Vector<int>::Type xTmp(3);
 			for (size_t j=0;j<xTmp.size();j++) xTmp[j]=int(tmpVec[i+j]);
 			FiniteLoop fl(xTmp[0],xTmp[1],xTmp[2]);
 			finiteLoops.push_back(fl);

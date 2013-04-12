@@ -75,6 +75,7 @@ class Step {
 	typedef StatePredictor<RealType,VectorType> StatePredictorType;
 	typedef typename MpsLocalType::VectorRealType VectorRealType;
 	typedef Truncation<ContractedLocalType> TruncationType;
+	typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -99,7 +100,7 @@ public:
 	void moveLeft(SymmetryLocalType& symm,size_t currentSite,const FiniteLoop& finiteLoop)
 	{
 		if (currentSite==model_.geometry().numberOfSites()) return;
-		std::vector<size_t> quantumNumbers;
+		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 
 		symm.moveLeft(currentSite,quantumNumbers);
@@ -112,7 +113,7 @@ public:
 	//! Moves the center of orthogonality by one to the right
 	void moveRight(SymmetryLocalType& symm,size_t currentSite,const FiniteLoop& finiteLoop)
 	{
-		std::vector<size_t> quantumNumbers;
+		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 		symm.moveRight(currentSite+1,quantumNumbers);
 		if (currentSite+1==model_.geometry().numberOfSites()) return;
@@ -124,7 +125,7 @@ public:
 	void grow(SymmetryLocalType& symm,size_t center)
 	{
 		size_t nsites = model_.geometry().numberOfSites();
-		std::vector<size_t> quantumNumbers;
+		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,center);
 		symm.grow(center,quantumNumbers,nsites);
 		mps_.grow(center,symm,quantumNumbers.size());
@@ -238,7 +239,7 @@ private:
 
 	size_t getQuantumSectorT(size_t sites,size_t direction) const
 	{
-		std::vector<size_t> targetQuantumNumbers(solverParams_.targetQuantumNumbers.size());
+		VectorIntegerType targetQuantumNumbers(solverParams_.targetQuantumNumbers.size());
 		for (size_t ii=0;ii<targetQuantumNumbers.size();ii++) 
 			targetQuantumNumbers[ii]=size_t(round(solverParams_.targetQuantumNumbers[ii]*sites));
 		return getQuantumSector(targetQuantumNumbers,direction);
@@ -246,7 +247,7 @@ private:
 
 	size_t getQuantumSectorUd(size_t sites,size_t direction) const
 	{
-		std::vector<size_t> targetQuantumNumbers(2);
+		VectorIntegerType targetQuantumNumbers(2);
 
 		size_t nsites = model_.geometry().numberOfSites();
 		targetQuantumNumbers[0]=static_cast<RealType>(solverParams_.electronsUp*sites)/nsites;
@@ -255,7 +256,7 @@ private:
 		return getQuantumSector(targetQuantumNumbers,direction);
 	}
 
-	size_t getQuantumSector(const std::vector<size_t>& targetQuantumNumbers,size_t direction) const
+	size_t getQuantumSector(const VectorIntegerType& targetQuantumNumbers,size_t direction) const
 	{
 		std::ostringstream msg;
 		msg<<"Integer target quantum numbers are: ";
@@ -266,7 +267,7 @@ private:
 		return encodeQuantumNumber(targetQuantumNumbers);
 	}
 	
-	static size_t encodeQuantumNumber(const std::vector<size_t>& v)
+	static size_t encodeQuantumNumber(const VectorIntegerType& v)
 	{
 		size_t x= v[0] + v[1]*MAX_;
 		if (v.size()==3) x += v[2]*MAX_*MAX_;

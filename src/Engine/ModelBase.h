@@ -70,6 +70,7 @@ public:
 	typedef ConcurrencyType_ ConcurrencyType;
 	typedef MpoLocal<ComplexOrRealType,SymmetryLocalType> MpoLocalType;
 	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
+	typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename ParametersSolverType::RealType RealType;
 	typedef typename ProgramGlobals::Vector<RealType>::Type VectorType;
@@ -98,7 +99,7 @@ public:
 		modelHelper.matrixVectorProduct(x,y);
 	}
 
-	virtual void getOneSite(std::vector<size_t>& quantumNumbers,size_t site) const=0;
+	virtual void getOneSite(VectorIntegerType& quantumNumbers,size_t site) const=0;
 
 	virtual size_t electronsFromQn(size_t qn) const
 	{

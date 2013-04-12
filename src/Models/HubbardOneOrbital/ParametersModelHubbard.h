@@ -54,7 +54,9 @@ namespace Mpspp {
 	//! Hubbard Model Parameters
 	template<typename Field>
 	struct ParametersModelHubbard {
-		
+
+		typedef typename ProgramGlobals::Vector<Field>::Type VectorType;
+
 		template<typename IoInputType>
 		ParametersModelHubbard(IoInputType& io) 
 		{	
@@ -73,12 +75,12 @@ namespace Mpspp {
 		// Do not include here connection parameters
 		// those are handled by the Geometry
 		// Hubbard U values (one for each site)
-		std::vector<Field> hubbardU; 
+		VectorType hubbardU;
 		// Onsite potential values, one for each site
-		std::vector<Field> potentialV;
+		VectorType potentialV;
 
 		// for time-dependent H:
-		std::vector<Field> potentialT;
+		VectorType potentialT;
 		Field omega;
 
 		// target number of electrons  in the system
