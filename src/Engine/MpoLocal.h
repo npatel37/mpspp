@@ -48,6 +48,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "ProgramGlobals.h"
 #include "MpsLocal.h"
 #include "MpoFactor.h"
+#include "SymmetryHelper.h"
 
 namespace Mpspp {
 
@@ -57,7 +58,7 @@ class MpoLocal {
 public:
 
 	typedef MpsLocal<ComplexOrRealType,SymmetryLocalType> MpsLocalType;
-//	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
+	typedef SymmetryHelper<SymmetryLocalType> SymmetryHelperType;
 	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
 	typedef MpoFactor<RealType,ComplexOrRealType> MpoFactorType;
 	typedef typename ProgramGlobals::Vector<MpoFactorType>::Type VectorType;

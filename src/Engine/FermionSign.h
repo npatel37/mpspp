@@ -46,8 +46,6 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define FERMION_SIGN_H
 
 #include "ProgramGlobals.h"
-#include "MpsLocal.h"
-#include "MpoFactor.h"
 
 namespace Mpspp {
 
@@ -74,6 +72,11 @@ public:
 		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,site_);
 		return quantumNumbers;
+	}
+
+	size_t site() const
+	{
+		return site_;
 	}
 
 private:

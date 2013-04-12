@@ -68,6 +68,7 @@ public:
 	typedef typename MpsLocalType::ComplexOrRealType ComplexOrRealType;
 	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
 	typedef ContractedFactor<MatrixProductOperatorType> ContractedFactorType;
+	typedef typename MatrixProductOperatorType::SymmetryHelperType SymmetryHelperType;
 
 	ContractedLocal(const MpsLocalType& abState,const MatrixProductOperatorType& h)
 		: abState_(abState),
@@ -76,20 +77,22 @@ public:
 		  L_(abState.sites(),ProgramGlobals::PART_LEFT)
 	{}
 
-	void grow(size_t currentSite,const SymmetryLocalType& symm,size_t nsites)
+	void grow(size_t currentSite,const SymmetryHelperType& symmHelper,size_t nsites)
 	{
-		L_[currentSite+1].build(abState_.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite+1));
+//		symmHelper.setSiteForSymm(currentSite+1);
 
-		R_[currentSite+1].build(abState_.B(currentSite),h_(nsites-1-currentSite),R_[currentSite],symm(currentSite+1));
+		L_[currentSite+1].build(abState_.A(currentSite),h_(currentSite),L_[currentSite],symmHelper,currentSite+1);
+
+		R_[currentSite+1].build(abState_.B(currentSite),h_(nsites-1-currentSite),R_[currentSite],symmHelper,currentSite+1);
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
-	void move(size_t currentSite,size_t direction,const SymmetryLocalType& symm)
+	void move(size_t currentSite,size_t direction,const SymmetryHelperType& symmHelper)
 	{
 		if (direction==TO_THE_RIGHT) {
-			moveLeft(currentSite,abState_,symm);
+			moveLeft(currentSite,abState_,symmHelper);
 		} else {
-			moveRight(currentSite,abState_,symm);
+			moveRight(currentSite,abState_,symmHelper);
 		}
 	}
 
@@ -121,20 +124,20 @@ public:
 
 private:
 
-	void moveLeft(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)
+	void moveLeft(size_t currentSite,const MpsLocalType& abState,const SymmetryHelperType& symm)
 	{
 		assert(currentSite+1<L_.size());
-		L_[currentSite+1].move(abState.A(currentSite),h_(currentSite),L_[currentSite],symm(currentSite+1));
+		L_[currentSite+1].move(abState.A(currentSite),h_(currentSite),L_[currentSite],symm,currentSite+1);
 		std::cout<<"set L_["<<(currentSite+1)<<"]="<<L_[currentSite+1].row()<<"\n";
 	}
 
-	void moveRight(size_t currentSite,const MpsLocalType& abState,const SymmetryLocalType& symm)
+	void moveRight(size_t currentSite,const MpsLocalType& abState,const SymmetryHelperType& symm)
 	{
-		size_t nsites = symm(currentSite).super().block().size();
+		size_t nsites = symm.symmLocal()(currentSite).super().block().size();
 		size_t siteToSet = nsites - currentSite;
 		if (siteToSet==R_.size()) return;
 		assert(siteToSet<R_.size());
-		R_[siteToSet].move(abState.B(siteToSet-1),h_(currentSite),R_[siteToSet-1],symm(currentSite));
+		R_[siteToSet].move(abState.B(siteToSet-1),h_(currentSite),R_[siteToSet-1],symm,currentSite);
 		std::cout<<"set R_["<<siteToSet<<"]="<<R_[siteToSet].row()<<"\n";
 	}
 

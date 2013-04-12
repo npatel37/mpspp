@@ -46,15 +46,14 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define SYMMETRY_HELPER_H
 
 #include "ProgramGlobals.h"
-#include "MpsLocal.h"
-#include "MpoFactor.h"
 
 namespace Mpspp {
 
-template<typename SymmetryFactorType>
+template<typename SymmetryLocalType>
 class SymmetryHelper {
 
 	typedef ProgramGlobals::Vector<size_t>::Type VectorIntegerType;
+	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 
 	static VectorIntegerType electronsFromQn_;
 	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
@@ -62,8 +61,8 @@ class SymmetryHelper {
 public:
 
 	template<typename SomeFermionSignType>
-	SymmetryHelper(const SomeFermionSignType& fermionSign,const SymmetryFactorType& symm)
-		: symm_(symm)
+	SymmetryHelper(const SomeFermionSignType& fermionSign,const SymmetryLocalType& symm)
+		: symm_(symm),currentSite_(fermionSign.site())
 	{
 		VectorIntegerType qn = fermionSign.quantumNumbers();
 		electronsOneSite_.resize(qn.size());
@@ -78,7 +77,12 @@ public:
 			electronsFromQn_[q] = fermionSign.electronsFromQn(q);
 	}
 
-	const SymmetryFactorType& symm() const
+	size_t currentSite() const
+	{
+		return currentSite_;
+	}
+
+	const SymmetryLocalType& symmLocal() const
 	{
 		return symm_;
 	}
@@ -95,7 +99,8 @@ public:
 
 private:
 
-	const SymmetryFactorType& symm_;
+	const SymmetryLocalType& symm_;
+	size_t currentSite_;
 	VectorIntegerType electronsOneSite_;
 
 }; // SymmetryHelper

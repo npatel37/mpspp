@@ -57,7 +57,9 @@ class ContractedFactor {
 	typedef typename MpsLocalType::SparseMatrixType SparseMatrixType;
 	typedef typename MpsLocalType::MpsFactorType  MpsFactorType;
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
+	typedef typename MatrixProductOperatorType::SymmetryHelperType SymmetryHelperType;
 	typedef typename MpsLocalType::ComplexOrRealType ComplexOrRealType;
+	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
 	typedef ContractedFactor<MatrixProductOperatorType> ThisType;
 	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type DenseMatrixType;
 	typedef typename MpsLocalType::SymmetryFactorType SymmetryFactorType;
@@ -81,30 +83,30 @@ public:
 		data_[0].makeDiagonal(1,1);
 	}
 
-	void build(const MpsFactorType& AorB,const MpoFactorType& h,const ThisType& prev,const SymmetryFactorType& symm)
+	void build(const MpsFactorType& AorB,const MpoFactorType& h,const ThisType& prev,const SymmetryHelperType& symmHelper,size_t siteForSymm)
 	{
 		if (leftOrRight_==PART_RIGHT) {
 			assert(AorB.type()==MpsFactorType::TYPE_B);
 
 			data_.resize(h.n_row());
-			moveRight(AorB,h,prev.data_,symm);
+			moveRight(AorB,h,prev.data_,symmHelper,siteForSymm);
 		} else {
 			assert(AorB.type()==MpsFactorType::TYPE_A);
 
 			data_.resize(h.n_col());
-			moveLeft(AorB,h,prev.data_,symm);
+			moveLeft(AorB,h,prev.data_,symmHelper,siteForSymm);
 		}
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
-	void move(const MpsFactorType& AorB,const MpoFactorType& h,const ThisType& dataPrev,const SymmetryFactorType& symm)
+	void move(const MpsFactorType& AorB,const MpoFactorType& h,const ThisType& dataPrev,const SymmetryHelperType& symm,size_t siteForSymm)
 	{
 		if (leftOrRight_ == PART_RIGHT) {
 			assert(AorB.type()==MpsFactorType::TYPE_B);
-			moveRight(AorB,h,dataPrev.data_,symm);
+			moveRight(AorB,h,dataPrev.data_,symm,siteForSymm);
 		} else {
 			assert(AorB.type()==MpsFactorType::TYPE_A);
-			moveLeft(AorB,h,dataPrev.data_,symm);
+			moveLeft(AorB,h,dataPrev.data_,symm,siteForSymm);
 		}
 	}
 
@@ -140,10 +142,10 @@ private:
 				   size_t b,
 				   const MpoFactorType& h,
 				   const DataType& dataPrev,
-				   const SymmetryFactorType& symm)
+				   const SymmetryHelperType& symmHelper,
+	              size_t siteForSymm)
 	{
-//		std::cerr<<"Start initLeft2\n";
-
+		const SymmetryFactorType& symm = symmHelper.symmLocal()(siteForSymm);
 		const SparseMatrixType& A = AorB();
 
 		m.resize(A.col(),A.col());
@@ -195,7 +197,7 @@ private:
 //		std::cerr<<"End initLeft2\n";
 	}
 
-	void moveLeft(const MpsFactorType& A,const MpoFactorType& h,const DataType& dataPrev,const SymmetryFactorType& symm)
+	void moveLeft(const MpsFactorType& A,const MpoFactorType& h,const DataType& dataPrev,const SymmetryHelperType& symm,size_t siteForSymm)
 	{
 		assert(leftOrRight_ == PART_LEFT);
 		assert(A.type()==MpsFactorType::TYPE_A);
@@ -205,10 +207,10 @@ private:
 			data_.resize(h.n_col());
 		assert(data_.size()==h.n_col());
 		for (size_t b1=0;b1<data_.size();b1++)
-			moveLeft(data_[b1],A,Atranspose,b1,h,dataPrev,symm);
+			moveLeft(data_[b1],A,Atranspose,b1,h,dataPrev,symm,siteForSymm);
 	}
 
-	void moveRight(const MpsFactorType& B,const MpoFactorType& h,const DataType& dataPrev,const SymmetryFactorType& symm)
+	void moveRight(const MpsFactorType& B,const MpoFactorType& h,const DataType& dataPrev,const SymmetryHelperType& symm,size_t siteForSymm)
 	{
 		assert(leftOrRight_ == PART_RIGHT);
 		assert(B.type()==MpsFactorType::TYPE_B);
@@ -218,16 +220,17 @@ private:
 			data_.resize(h.n_row());
 		assert(h.n_row()==data_.size());
 		for (size_t blm2=0;blm2<data_.size();blm2++)
-			moveRight(data_[blm2],blm2,B,Btranspose,h,dataPrev,symm);
+			moveRight(data_[blm2],blm2,B,Btranspose,h,dataPrev,symm,siteForSymm);
 	}
 
 	void moveRight(SparseMatrixType& m,
-					 size_t blm2,
-					 const MpsFactorType& B,
-					 const SparseMatrixType& Btranspose,
-					 const MpoFactorType& h,
-					 const DataType& dataPrev,
-					 const SymmetryFactorType& symm)
+	               size_t blm2,
+	               const MpsFactorType& B,
+	               const SparseMatrixType& Btranspose,
+	               const MpoFactorType& h,
+	               const DataType& dataPrev,
+	               const SymmetryHelperType& symm,
+	               size_t siteForSymm)
 	{
 		size_t someSize = B().row();
 		m.resize(someSize,someSize);
@@ -238,7 +241,7 @@ private:
 
 		for (size_t alm2=0;alm2<m.row();alm2++) {
 			m.setRow(alm2,counter);
-			moveRight(values,cols,alm2,blm2,B,Btranspose,h,dataPrev,symm);
+			moveRight(values,cols,alm2,blm2,B,Btranspose,h,dataPrev,symm,siteForSymm);
 			for (size_t i=0;i<cols.size();i++) {
 				if (cols[i]==0) continue;
 				cols[i]=0;
@@ -260,8 +263,10 @@ private:
 					 const SparseMatrixType& Btranspose,
 					 const MpoFactorType& h,
 					 const DataType& dataPrev,
-					 const SymmetryFactorType& symm)
+					 const SymmetryHelperType& symmHelper,
+	               size_t siteForSymm)
 	{
+		const SymmetryFactorType& symm = symmHelper.symmLocal()(siteForSymm);
 		const SparseMatrixType& Bmatrix = B();
 		assert(symm.right().split()==0 || symm.right().size()/symm.right().split()==dataPrev[0].row());
 		assert(Btranspose.row()==symm.right().size());
@@ -270,18 +275,21 @@ private:
 			PairType sigmalm1alm1 = symm.right().unpack(Bmatrix.getCol(kb));
 			size_t sigmalm1 = sigmalm1alm1.first;
 			size_t alm1 = sigmalm1alm1.second;
+			size_t electronsRight = symmHelper.electronsFromQn(symm.right().qn(alm1));
 			for (size_t blm1=0;blm1<dataPrev.size();blm1++) {
 				const OperatorType& wOp = h(blm2,blm1);
 				const SparseMatrixType& w = wOp.matrix();
 				if (w.row()==0) continue;
+				RealType fermionSign = (electronsRight &1 ) ? wOp.fermionSign() : 1.0;
 				for (int k=w.getRowPtr(sigmalm1);k<w.getRowPtr(sigmalm1+1);k++) {
 					size_t sigmaplm1 = w.getCol(k);
+					ComplexOrRealType tmp = std::conj(Bmatrix.getValue(kb))*w.getValue(k);
 					for (int kprev=dataPrev[blm1].getRowPtr(alm1);kprev<dataPrev[blm1].getRowPtr(alm1+1);kprev++) {
 						size_t aplm1 = dataPrev[blm1].getCol(kprev);
 						size_t i = symm.right().pack(sigmaplm1,aplm1);
 						for (int kb2=Btranspose.getRowPtr(i);kb2<Btranspose.getRowPtr(i+1);kb2++) {
 							size_t aplm2 = Btranspose.getCol(kb2);
-							values[aplm2] += std::conj(Bmatrix.getValue(kb))*w.getValue(k)*Btranspose.getValue(kb2) * dataPrev[blm1].getValue(kprev);
+							values[aplm2] += tmp*Btranspose.getValue(kb2) * dataPrev[blm1].getValue(kprev)*fermionSign;
 							cols[aplm2]=1;
 						} // kb2
 					} // kprev

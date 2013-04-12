@@ -120,6 +120,7 @@ public:
 
 		SparseMatrixType identity(hilbert_,hilbert_);
 		identity.makeDiagonal(hilbert_,1.0);
+		identity.toDense();
 		SparseMatrixType cup(hilbert_,hilbert_);
 		fillDestructionMatrix(cup,SPIN_UP);
 		SparseMatrixType cdaggerUp(hilbert_,hilbert_);
@@ -133,7 +134,7 @@ public:
 		SparseMatrixType nupndown = (cdaggerUp*cup) * (cdaggerDown*cdown);
 
 		MpoFactorType mleft(1,wdim);
-		RealType mysign = 1;
+		RealType mysign = -1.0;
 		mleft(0,0) = PairForOperatorType(mp_.hubbardU[0]* nupndown,1);
 		mleft(0,1) = PairForOperatorType(tiip1 * cdaggerUp,-1);
 		mleft(0,2) = PairForOperatorType(mysign * tiip1 * cup,-1);
@@ -194,11 +195,11 @@ private:
 	{
 		MatrixType m(4,4);
 		if (spin==SPIN_UP) {
-			m(1,0) = 1;
-			m(3,2) = 1;
+			m(0,1) = 1;
+			m(2,3) = 1;
 		} else {
-			m(2,0) = 1;
-			m(3,1) = -1;
+			m(0,2) = 1;
+			m(1,3) = -1;
 		}
 		fullMatrixToCrsMatrix(cm,m);
 	}

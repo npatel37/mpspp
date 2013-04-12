@@ -45,7 +45,6 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef MODEL_HELPER_H
 #define MODEL_HELPER_H
 #include "ProgramGlobals.h"
-#include "SymmetryHelper.h"
 
 namespace Mpspp {
 
@@ -69,25 +68,27 @@ public:
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
 	typedef typename MpoFactorType::OperatorType OperatorType;
 	typedef typename OperatorType::PairType PairForOperatorType;
-	typedef SymmetryHelper<SymmetryFactorType> SymmetryHelperType;
+	typedef typename MatrixProductOperatorType::SymmetryHelperType SymmetryHelperType;
 
 	ModelHelper(const ContractedPartType& contractedPart,
 				size_t symmetrySector,
 				size_t currentSite,
 				size_t direction,
 				const MpoFactorType& hamiltonian,
-				const SymmetryHelperType& symmetry)
+				const SymmetryHelperType& symmetry,
+	            size_t siteForSymm)
 	: contractedPart_(contractedPart),
 	  symmetrySector_(symmetrySector),
 	  currentSite_(currentSite),
 	  direction_(direction),
 	  hamiltonian_(hamiltonian),
-	  symmetry_(symmetry)
+	  symmetry_(symmetry),
+	  siteForSymm_(siteForSymm)
 	{}
 
 	size_t size() const
 	{
-		return symmetry_.symm().super().partitionSize(symmetrySector_);
+		return symmetry_.symmLocal()(siteForSymm_).super().partitionSize(symmetrySector_);
 	}
 
 	size_t symmetrySector() const { return symmetrySector_; }
@@ -101,15 +102,15 @@ public:
 	//! Eq. (201) but very modified
 	void matrixVectorProduct(VectorType& x,const VectorType& y) const
 	{
-		size_t offset = symmetry_.symm().super().partitionOffset(symmetrySector_);
-		size_t total = symmetry_.symm().super().partitionSize(symmetrySector_);
+		const SymmetryFactorType& symm = symmetry_.symmLocal()(siteForSymm_);
+		size_t offset = symm.super().partitionOffset(symmetrySector_);
+		size_t total = symm.super().partitionSize(symmetrySector_);
 
 		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
 		size_t rightIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
 
 		const ContractedFactorType& cL = contractedPart_(leftIndex,ProgramGlobals::PART_LEFT);
 		const ContractedFactorType& cR = contractedPart_(rightIndex,ProgramGlobals::PART_RIGHT);
-		const SymmetryFactorType& symm = symmetry_.symm();
 		for (size_t blm1=0;blm1<cL.size();blm1++) {
 			const SparseMatrixType& l1 = cL(blm1);
 			for (size_t bl=0;bl<cR.size();bl++) {
@@ -168,9 +169,10 @@ public:
 	//! Used only for stored option
 	void fullHamiltonian(SparseMatrixType& matrix) const
 	{
-		size_t offset = symmetry_.symm().super().partitionOffset(symmetrySector_);
-		size_t total = symmetry_.symm().super().partitionSize(symmetrySector_);
-		size_t nsites = symmetry_.symm().super().block().size();
+		const SymmetryFactorType& symm =  symmetry_.symmLocal()(siteForSymm_);
+		size_t offset = symm.super().partitionOffset(symmetrySector_);
+		size_t total = symm.super().partitionSize(symmetrySector_);
+		size_t nsites = symm.super().block().size();
 
 		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_;
 		size_t rightIndex = (direction_ == TO_THE_RIGHT) ? nsites-currentSite_-1 : nsites-currentSite_-1;
@@ -178,7 +180,6 @@ public:
 		matrix.resize(total,total);
 		const ContractedFactorType& cL = contractedPart_(leftIndex,ProgramGlobals::PART_LEFT);
 		const ContractedFactorType& cR = contractedPart_(rightIndex,ProgramGlobals::PART_RIGHT);
-		const SymmetryFactorType& symm = symmetry_.symm();
 		VectorType v(total,0);
 		size_t counter = 0;
 		assert(hamiltonian_.n_row()>=cL.size());
@@ -269,6 +270,7 @@ private:
 	size_t hilbertSize_;
 	const MpoFactorType& hamiltonian_;
 	const SymmetryHelperType& symmetry_;
+	size_t siteForSymm_;
 
 }; // ModelHelper
 

@@ -76,6 +76,8 @@ class Step {
 	typedef typename MpsLocalType::VectorRealType VectorRealType;
 	typedef Truncation<ContractedLocalType> TruncationType;
 	typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
+	typedef typename ModelType::ModelHelperType ModelHelperType;
+	typedef typename ModelHelperType::SymmetryHelperType SymmetryHelperType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -105,8 +107,11 @@ public:
 
 		symm.moveLeft(currentSite,quantumNumbers);
 		if (currentSite==0) return;
-		internalmove(currentSite,TO_THE_LEFT,symm(currentSite));
-		contractedLocal_.move(currentSite,TO_THE_LEFT,symm);
+
+		FermionSign<ModelType> fermionSign(model_,currentSite);
+		SymmetryHelperType symmetryHelper(fermionSign,symm);
+		internalmove(TO_THE_LEFT,symmetryHelper,currentSite);
+		contractedLocal_.move(currentSite,TO_THE_LEFT,symmetryHelper);
 		truncation_(symm,currentSite,ProgramGlobals::PART_RIGHT,finiteLoop.keptStates);
 	}
 
@@ -117,8 +122,11 @@ public:
 		model_.getOneSite(quantumNumbers,currentSite);
 		symm.moveRight(currentSite+1,quantumNumbers);
 		if (currentSite+1==model_.geometry().numberOfSites()) return;
-		internalmove(currentSite,TO_THE_RIGHT,symm(currentSite+1));
-		contractedLocal_.move(currentSite,TO_THE_RIGHT,symm);
+
+		FermionSign<ModelType> fermionSign(model_,currentSite);
+		SymmetryHelperType symmetryHelper(fermionSign,symm);
+		internalmove(TO_THE_RIGHT,symmetryHelper,currentSite+1);
+		contractedLocal_.move(currentSite,TO_THE_RIGHT,symmetryHelper);
 		truncation_(symm,currentSite,ProgramGlobals::PART_LEFT,finiteLoop.keptStates);
 	}
 
@@ -129,10 +137,18 @@ public:
 		model_.getOneSite(quantumNumbers,center);
 		symm.grow(center,quantumNumbers,nsites);
 		mps_.grow(center,symm,quantumNumbers.size());
-		contractedLocal_.grow(center,symm,nsites);
+
+		FermionSign<ModelType> fermionSign(model_,center);
+		SymmetryHelperType symmetryHelper(fermionSign,symm);
+		contractedLocal_.grow(center,symmetryHelper,nsites);
 		if (center==0) return;
-		internalmove(center,TO_THE_RIGHT,symm(center+1));
-		internalmove(center+1,TO_THE_LEFT,symm(center+1));
+
+		internalmove(TO_THE_RIGHT,symmetryHelper,center+1);
+
+		FermionSign<ModelType> fermionSign2(model_,center+1);
+		SymmetryHelperType symmetryHelper2(fermionSign2,symm);
+		internalmove(TO_THE_LEFT,symmetryHelper2,center+1);
+
 		truncation_(symm,center,ProgramGlobals::PART_LEFT,solverParams_.keptStatesInfinite);
 		truncation_(symm,center+1,ProgramGlobals::PART_RIGHT,solverParams_.keptStatesInfinite);
 	}
@@ -144,14 +160,16 @@ public:
 
 private:
 
-	void internalmove(size_t currentSite,size_t direction,const SymmetryFactorType& symm)
+	void internalmove(size_t direction,const SymmetryHelperType& symmetryHelper,size_t siteForSymm)
 	{
+		const SymmetryFactorType& symm = symmetryHelper.symmLocal()(siteForSymm);
+		size_t currentSite = symmetryHelper.currentSite();
 		size_t symmetrySector = getSymmetrySector(direction,symm.super());
 		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
 //		size_t total = symm.super().size();
 		size_t total = symm.super().partitionSize(symmetrySector);
 		VectorType v(total,0.0);
-		RealType energy = internalmove(v,currentSite,direction,symm,symmetrySector);
+		RealType energy = internalmove(v,currentSite,direction,symmetryHelper,symmetrySector,siteForSymm);
 		mps_.move(truncation_,currentSite,v,direction,symmetrySector,symm);
 		statePredictor_.push(energy,v,symmetrySector);
 		if (solverParams_.options.find("test")!=std::string::npos)
@@ -159,20 +177,16 @@ private:
 					 ("Exiting due to option test in the input file\n");
 	}
 
-	RealType internalmove(VectorType& tmpVec,size_t currentSite,size_t direction,const SymmetryFactorType& symm,size_t symmetrySector)
+	RealType internalmove(VectorType& tmpVec,size_t currentSite,size_t direction,const SymmetryHelperType& symmetryHelper,size_t symmetrySector,size_t siteForSymm)
 	{
 		const ParametersSolverType& solverParams = model_.solverParams();
 
 		typedef InternalProductTemplate<typename VectorType::value_type,ModelType> InternalProductType;
 		typedef PsimagLite::ParametersForSolver<RealType> ParametersForSolverType;
 		typedef PsimagLite::LanczosOrDavidsonBase<ParametersForSolverType,InternalProductType,VectorType> LanczosOrDavidsonBaseType;
-		typedef typename ModelType::ModelHelperType ModelHelperType;
 
 		ReflectionSymmetryType *rs = 0;
-		size_t hamiltonianSite = (direction == TO_THE_RIGHT) ? currentSite : currentSite;
-		FermionSign<ModelType> fermionSign(model_,currentSite);
-		typename ModelHelperType::SymmetryHelperType symmetryHelper(fermionSign,symm);
-		ModelHelperType modelHelper(contractedLocal_,symmetrySector,currentSite,direction,model_.hamiltonian()(hamiltonianSite),symmetryHelper);
+		ModelHelperType modelHelper(contractedLocal_,symmetrySector,currentSite,direction,model_.hamiltonian()(currentSite),symmetryHelper,siteForSymm);
 		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 
 		RealType eps=ProgramGlobals::LanczosTolerance;
