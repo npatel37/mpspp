@@ -194,7 +194,6 @@ private:
 
 		m.setRow(m.row(),counter);
 		m.checkValidity();
-//		std::cerr<<"End initLeft2\n";
 	}
 
 	void moveLeft(const MpsFactorType& A,const MpoFactorType& h,const DataType& dataPrev,const SymmetryHelperType& symm,size_t siteForSymm)
@@ -275,12 +274,12 @@ private:
 			PairType sigmalm1alm1 = symm.right().unpack(Bmatrix.getCol(kb));
 			size_t sigmalm1 = sigmalm1alm1.first;
 			size_t alm1 = sigmalm1alm1.second;
-			size_t electronsRight = symmHelper.electronsFromQn(symm.right().qn(alm1));
+//			size_t electronsRight = symmHelper.electronsFromQn(symm.right().qn(alm1));
 			for (size_t blm1=0;blm1<dataPrev.size();blm1++) {
 				const OperatorType& wOp = h(blm2,blm1);
 				const SparseMatrixType& w = wOp.matrix();
 				if (w.row()==0) continue;
-				RealType fermionSign = (electronsRight &1 ) ? wOp.fermionSign() : 1.0;
+				RealType fermionSign = 1.0; //(electronsRight &1 ) ? wOp.fermionSign() : 1.0;
 				for (int k=w.getRowPtr(sigmalm1);k<w.getRowPtr(sigmalm1+1);k++) {
 					size_t sigmaplm1 = w.getCol(k);
 					ComplexOrRealType tmp = std::conj(Bmatrix.getValue(kb))*w.getValue(k);

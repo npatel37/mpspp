@@ -114,7 +114,8 @@ public:
 	  hamiltonian_(geometry_.numberOfSites())
 	{
 		// FIXME: CONNECT WITH THE GEOMETRY HERE!!
-		RealType tiip1 = 1.0;
+		RealType tiip1up = -1.0;
+		RealType tiip1down = 0.0;
 		size_t n = hamiltonian_.size();
 		size_t wdim = 6;
 
@@ -131,15 +132,15 @@ public:
 		SparseMatrixType cdaggerDown(hilbert_,hilbert_);
 		transposeConjugate(cdaggerDown,cdown);
 
-		SparseMatrixType nupndown = (cdaggerUp*cup) * (cdaggerDown*cdown);
+//		SparseMatrixType nupndown = (cdaggerUp*cup) * (cdaggerDown*cdown);
 
 		MpoFactorType mleft(1,wdim);
 		RealType mysign = -1.0;
-		mleft(0,0) = PairForOperatorType(mp_.hubbardU[0]* nupndown,1);
-		mleft(0,1) = PairForOperatorType(tiip1 * cdaggerUp,-1);
-		mleft(0,2) = PairForOperatorType(mysign * tiip1 * cup,-1);
-		mleft(0,3) = PairForOperatorType(tiip1 * cdaggerDown,-1);
-		mleft(0,4) = PairForOperatorType(mysign * tiip1 * cdown,-1);
+//		mleft(0,0) = PairForOperatorType(mp_.hubbardU[0]* nupndown,1);
+		mleft(0,1) = PairForOperatorType(tiip1up * cdaggerUp,-1);
+		mleft(0,2) = PairForOperatorType((mysign * tiip1up) * cup,-1);
+		mleft(0,3) = PairForOperatorType(tiip1down * cdaggerDown,-1);
+		mleft(0,4) = PairForOperatorType((mysign * tiip1down) * cdown,-1);
 		mleft(0,5) = PairForOperatorType(identity,1);
 		hamiltonian_(0)=mleft;
 
@@ -150,17 +151,17 @@ public:
 			m(2,0) = PairForOperatorType(cdaggerUp,-1);
 			m(3,0) = PairForOperatorType(cdown,-1);
 			m(4,0) = PairForOperatorType(cdaggerDown,-1);
-			m(5,0) = PairForOperatorType(mp_.hubbardU[i]* nupndown,1);
-			m(5,1) = PairForOperatorType(tiip1 * cdaggerUp,-1);
-			m(5,2) = PairForOperatorType(mysign * tiip1 * cup,-1);
-			m(5,3) = PairForOperatorType(tiip1 * cdaggerDown,-1);
-			m(5,4) = PairForOperatorType(mysign * tiip1 * cdown,-1);
+//			m(5,0) = PairForOperatorType(mp_.hubbardU[i]* nupndown,1);
+			m(5,1) = PairForOperatorType(tiip1up * cdaggerUp,-1);
+			m(5,2) = PairForOperatorType((mysign * tiip1up) * cup,-1);
+			m(5,3) = PairForOperatorType(tiip1down * cdaggerDown,-1);
+			m(5,4) = PairForOperatorType((mysign * tiip1down) * cdown,-1);
 			m(5,5) = PairForOperatorType(identity,1);
 			hamiltonian_(i)=m;
 		}
 
 		MpoFactorType mright(wdim,1);
-		mright(5,0) = PairForOperatorType(mp_.hubbardU[n-1]* nupndown,1);
+//		mright(5,0) = PairForOperatorType(mp_.hubbardU[n-1]* nupndown,1);
 		mright(4,0) = PairForOperatorType(cdaggerDown,-1);
 		mright(3,0) = PairForOperatorType(cdown,-1);
 		mright(2,0) = PairForOperatorType(cdaggerUp,-1);
