@@ -240,7 +240,7 @@ private:
 
 		permutation_.resize(size());
 
-		Sort<VectorIntegerType > sort;
+		PsimagLite::Sort<VectorIntegerType > sort;
 		sort.sort(quantumNumbers_,permutation_);
 
 		findPartition();

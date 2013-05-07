@@ -176,7 +176,7 @@ public:
 	void order()
 	{
 		perm_.resize(s_.size());
-		Sort<VectorRealType> sort;
+		PsimagLite::Sort<VectorRealType> sort;
 		sort.sort(s_,perm_);
 	}
 
