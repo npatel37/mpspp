@@ -55,10 +55,10 @@ class SymmetryLocal {
 public:
 
 	typedef SymmetryFactor SymmetryFactorType;
-	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
-	typedef typename SymmetryFactorType::PairType PairType;
-	typedef typename SymmetryFactorType::IoInputType IoInputType;
-	typedef typename SymmetryFactorType::VectorIntegerType VectorIntegerType;
+	typedef SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
+	typedef SymmetryFactorType::PairType PairType;
+	typedef SymmetryFactorType::IoInputType IoInputType;
+	typedef SymmetryFactorType::VectorIntegerType VectorIntegerType;
 
 	SymmetryLocal()
 	{}

@@ -58,7 +58,7 @@ typedef Mpspp::ModelBase<ParametersSolverType,
 						 ConcurrencyType> ModelBaseType;
 typedef Mpspp::ModelSelector<ModelBaseType> ModelSelectorType;
 typedef ModelBaseType::MpoLocalType MpoLocalType;
-typedef typename MpoLocalType::MpsLocalType MpsLocalType;
+typedef MpoLocalType::MpsLocalType MpsLocalType;
 
 // FIXME: make configurable at runtime:
 

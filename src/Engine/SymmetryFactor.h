@@ -54,9 +54,9 @@ class SymmetryFactor {
 public:
 
 	typedef SymmetryComponent SymmetryComponentType;
-	typedef typename SymmetryComponentType::IoInputType IoInputType;
-	typedef typename SymmetryComponentType::PairType PairType;
-	typedef typename SymmetryComponent::VectorIntegerType VectorIntegerType;
+	typedef SymmetryComponentType::IoInputType IoInputType;
+	typedef SymmetryComponentType::PairType PairType;
+	typedef SymmetryComponent::VectorIntegerType VectorIntegerType;
 
 	enum {CORNER_LEFT = SymmetryComponentType::CORNER_LEFT,
 		  CORNER_RIGHT = SymmetryComponentType::CORNER_RIGHT};

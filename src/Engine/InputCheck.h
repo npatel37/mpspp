@@ -59,7 +59,7 @@ namespace Mpspp {
 class InputCheck {
 
 	typedef PsimagLite::Options::Readable OptionsReadableType;
-	typedef typename ProgramGlobals::Vector<std::string>::Type VectorStringType;
+	typedef ProgramGlobals::Vector<std::string>::Type VectorStringType;
 
 public:
 

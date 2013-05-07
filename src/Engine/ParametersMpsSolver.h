@@ -120,7 +120,7 @@ struct FiniteLoop {
 };
 
 //!PTEX_LABEL{139}
-inline void checkFiniteLoops(const typename ProgramGlobals::Vector<FiniteLoop>::Type& finiteLoop,size_t totalSites)
+inline void checkFiniteLoops(const ProgramGlobals::Vector<FiniteLoop>::Type& finiteLoop,size_t totalSites)
 {
 	std::string s = "checkFiniteLoops: I'm falling out of the lattice ";
 	std::string loops = "";
