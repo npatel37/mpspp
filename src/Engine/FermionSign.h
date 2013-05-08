@@ -67,7 +67,7 @@ public:
 		return model_.electronsFromQn(qn);
 	}
 
-	ProgramGlobals::Vector<size_t>::Type quantumNumbers() const
+	PsimagLite::Vector<size_t>::Type quantumNumbers() const
 	{
 		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,site_);

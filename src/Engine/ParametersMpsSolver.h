@@ -120,7 +120,7 @@ struct FiniteLoop {
 };
 
 //!PTEX_LABEL{139}
-inline void checkFiniteLoops(const ProgramGlobals::Vector<FiniteLoop>::Type& finiteLoop,size_t totalSites)
+inline void checkFiniteLoops(const PsimagLite::Vector<FiniteLoop>::Type& finiteLoop,size_t totalSites)
 {
 	std::string s = "checkFiniteLoops: I'm falling out of the lattice ";
 	std::string loops = "";
@@ -254,8 +254,8 @@ struct ParametersMpsSolver {
 
 	typedef RealType_ RealType;
 	typedef ComplexOrRealType_ ComplexOrRealType;
-	typedef typename ProgramGlobals::Vector<FiniteLoop>::Type FiniteLoopsType;
-	typedef typename ProgramGlobals::Vector<RealType>::Type VectorRealType;
+	typedef typename PsimagLite::Vector<FiniteLoop>::Type FiniteLoopsType;
+	typedef typename PsimagLite::Vector<RealType>::Type VectorRealType;
 
 	std::string filename;
 	size_t keptStatesInfinite;
@@ -283,7 +283,7 @@ struct ParametersMpsSolver {
 		VectorRealType tmpVec;
 		io.read(tmpVec,"FiniteLoops");
 		for (size_t i=0;i<tmpVec.size();i+=3) {
-			typename ProgramGlobals::Vector<int>::Type xTmp(3);
+			typename PsimagLite::Vector<int>::Type xTmp(3);
 			for (size_t j=0;j<xTmp.size();j++) xTmp[j]=int(tmpVec[i+j]);
 			FiniteLoop fl(xTmp[0],xTmp[1],xTmp[2]);
 			finiteLoops.push_back(fl);

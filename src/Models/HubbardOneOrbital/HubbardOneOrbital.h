@@ -186,8 +186,8 @@ public:
 		quantumNumbers.push_back(MAX_SITES);
 		quantumNumbers.push_back(1+MAX_SITES);
 //		VectorIntegerType partition_;
-//		ProgramGlobals::Vector<size_t>::Type permutation_;
-//		ProgramGlobals::Vector<size_t>::Type permutationInverse_;
+//		PsimagLite::Vector<size_t>::Type permutation_;
+//		PsimagLite::Vector<size_t>::Type permutationInverse_;
 	}
 
 private:

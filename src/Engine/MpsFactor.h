@@ -69,7 +69,7 @@ public:
 	typedef typename SymmetryFactorType::IoInputType IoInputType;
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 	typedef typename SymmetryComponentType::VectorIntegerType VectorIntegerType;
-	typedef typename ProgramGlobals::Vector<RealType>::Type VectorRealType;
+	typedef typename PsimagLite::Vector<RealType>::Type VectorRealType;
 	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
 
 	MpsFactor(size_t aOrB)

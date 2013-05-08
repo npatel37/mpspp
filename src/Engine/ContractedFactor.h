@@ -75,7 +75,7 @@ class ContractedFactor {
 
 public:
 
-	typedef typename ProgramGlobals::Vector<SparseMatrixType>::Type DataType;
+	typedef typename PsimagLite::Vector<SparseMatrixType>::Type DataType;
 
 	ContractedFactor(size_t leftOrRight)
 		: data_(1),leftOrRight_(leftOrRight)
@@ -254,15 +254,15 @@ private:
 		m.checkValidity();
 	}
 
-	void moveRight(std::vector<ComplexOrRealType>& values,
-					 std::vector<size_t>& cols,
-					 size_t alm2,
-					 size_t blm2,
-					 const MpsFactorType& B,
-					 const SparseMatrixType& Btranspose,
-					 const MpoFactorType& h,
-					 const DataType& dataPrev,
-					 const SymmetryHelperType& symmHelper,
+	void moveRight(VectorType& values,
+	               VectorIntegerType& cols,
+	               size_t alm2,
+	               size_t blm2,
+	               const MpsFactorType& B,
+	               const SparseMatrixType& Btranspose,
+	               const MpoFactorType& h,
+	               const DataType& dataPrev,
+	               const SymmetryHelperType& symmHelper,
 	               size_t siteForSymm)
 	{
 		const SymmetryFactorType& symm = symmHelper.symmLocal()(siteForSymm);

@@ -143,8 +143,8 @@ private:
 
 	const MpsLocalType& abState_;
 	const MatrixProductOperatorType& h_;
-	typename ProgramGlobals::Vector<ContractedFactorType>::Type R_;
-	typename ProgramGlobals::Vector<ContractedFactorType>::Type L_;
+	typename PsimagLite::Vector<ContractedFactorType>::Type R_;
+	typename PsimagLite::Vector<ContractedFactorType>::Type L_;
 
 }; // ContractedLocal
 

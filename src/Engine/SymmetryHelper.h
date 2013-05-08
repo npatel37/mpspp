@@ -52,7 +52,7 @@ namespace Mpspp {
 template<typename SymmetryLocalType>
 class SymmetryHelper {
 
-	typedef ProgramGlobals::Vector<size_t>::Type VectorIntegerType;
+	typedef PsimagLite::Vector<size_t>::Type VectorIntegerType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 
 	static VectorIntegerType electronsFromQn_;

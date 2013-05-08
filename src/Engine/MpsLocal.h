@@ -331,8 +331,8 @@ private:
 //	const SymmetryLocalType& symm_;
 	size_t nsites_;
 	size_t center_;
-	typename ProgramGlobals::Vector<MpsFactorType*>::Type B_;
-	typename ProgramGlobals::Vector<MpsFactorType*>::Type A_;
+	typename PsimagLite::Vector<MpsFactorType*>::Type B_;
+	typename PsimagLite::Vector<MpsFactorType*>::Type A_;
 }; // MpsLocal
 
 template<typename ComplexOrRealType,typename SymmetryLocalType>

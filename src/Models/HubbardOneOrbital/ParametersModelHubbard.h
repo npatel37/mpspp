@@ -55,7 +55,7 @@ namespace Mpspp {
 	template<typename Field>
 	struct ParametersModelHubbard {
 
-		typedef typename ProgramGlobals::Vector<Field>::Type VectorType;
+		typedef typename PsimagLite::Vector<Field>::Type VectorType;
 
 		template<typename IoInputType>
 		ParametersModelHubbard(IoInputType& io) 

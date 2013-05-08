@@ -91,8 +91,8 @@ namespace Mpspp {
 	public:
 		typedef FieldType value_type;
 		typedef std::pair<size_t,size_t> PairType;
-		typedef typename ProgramGlobals::Vector<FieldType>::Type VectorType;
-		typedef typename ProgramGlobals::Vector<size_t>::Type VectorIntegerType;
+		typedef typename PsimagLite::Vector<FieldType>::Type VectorType;
+		typedef typename PsimagLite::Vector<size_t>::Type VectorIntegerType;
 
 		static const FieldType zero_;
 
@@ -127,7 +127,7 @@ namespace Mpspp {
 		}
 
 		template<typename SomeBasisType>
-		void set(const typename ProgramGlobals::Vector<VectorType>::Type& v,
+		void set(const typename PsimagLite::Vector<VectorType>::Type& v,
 		         const SomeBasisType& someBasis)
 		{
 			bool found = false;

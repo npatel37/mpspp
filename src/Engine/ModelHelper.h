@@ -63,7 +63,7 @@ public:
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::PairType PairType;
 	typedef typename ContractedPartType::SparseMatrixType SparseMatrixType;
-	typedef typename ProgramGlobals::Vector<ComplexOrRealType>::Type VectorType;
+	typedef typename PsimagLite::Vector<ComplexOrRealType>::Type VectorType;
 	typedef typename ContractedPartType::MatrixProductOperatorType MatrixProductOperatorType;
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
 	typedef typename MpoFactorType::OperatorType OperatorType;

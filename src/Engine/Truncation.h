@@ -59,7 +59,7 @@ class Truncation {
 	typedef typename MpsLocalType::SparseMatrixType SparseMatrixType;
 	typedef typename MpsLocalType::VectorRealType VectorRealType;
 	typedef typename VectorRealType::value_type RealType;
-	typedef typename ProgramGlobals::Vector<size_t>::Type VectorIntegerType;
+	typedef typename PsimagLite::Vector<size_t>::Type VectorIntegerType;
 	typedef typename ContractedLocalType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 

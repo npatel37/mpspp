@@ -58,7 +58,7 @@ public:
 
 	typedef PsimagLite::IoSimple::In IoInputType;
 	typedef std::pair<size_t,size_t> PairType;
-	typedef ProgramGlobals::Vector<size_t>::Type VectorIntegerType;
+	typedef PsimagLite::Vector<size_t>::Type VectorIntegerType;
 
 	enum {CORNER_LEFT,CORNER_RIGHT};
 	enum {COMPONENT_LEFT,COMPONENT_RIGHT,COMPONENT_SUPER};

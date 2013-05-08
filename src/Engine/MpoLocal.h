@@ -61,7 +61,7 @@ public:
 	typedef SymmetryHelper<SymmetryLocalType> SymmetryHelperType;
 	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
 	typedef MpoFactor<RealType,ComplexOrRealType> MpoFactorType;
-	typedef typename ProgramGlobals::Vector<MpoFactorType>::Type VectorType;
+	typedef typename PsimagLite::Vector<MpoFactorType>::Type VectorType;
 
 	MpoLocal(size_t nsites) : data_(nsites,MpoFactorType(0,0)) {}
 

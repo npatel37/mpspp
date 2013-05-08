@@ -151,7 +151,7 @@ public:
 
 private:
 
-	ProgramGlobals::Vector<SymmetryFactorType>::Type data_;
+	PsimagLite::Vector<SymmetryFactorType>::Type data_;
 
 }; // SymmetryLocal
 
