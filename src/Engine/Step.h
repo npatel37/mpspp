@@ -225,12 +225,12 @@ private:
 		size_t sites = super.block().size();
 		size_t targetQuantumNumber = getQuantumSector(sites,direction);
 		size_t imin=0;
-		size_t minDiff=1e10;
+		size_t minDiff=0;
 		for (size_t i=0;i<super.partitions()-1;i++) {
 			size_t state = super.partitionOffset(i);
 			size_t q = super.qn(state);
 			size_t diff = (q<targetQuantumNumber) ? targetQuantumNumber - q : q-targetQuantumNumber;
-			if (diff<minDiff) {
+			if (diff<minDiff || i==0) {
 				imin = i;
 				minDiff = diff;
 			}
@@ -264,8 +264,8 @@ private:
 		VectorIntegerType targetQuantumNumbers(2);
 
 		size_t nsites = model_.geometry().numberOfSites();
-		targetQuantumNumbers[0]=static_cast<RealType>(solverParams_.electronsUp*sites)/nsites;
-		targetQuantumNumbers[1]=static_cast<RealType>(solverParams_.electronsDown*sites)/nsites;
+		targetQuantumNumbers[0]=size_t(static_cast<RealType>(solverParams_.electronsUp*sites)/nsites);
+		targetQuantumNumbers[1]=size_t(static_cast<RealType>(solverParams_.electronsDown*sites)/nsites);
 
 		return getQuantumSector(targetQuantumNumbers,direction);
 	}
