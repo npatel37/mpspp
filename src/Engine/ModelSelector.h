@@ -45,7 +45,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef MODEL_SELECTOR_H
 #define MODEL_SELECTOR_H
 
-#include <string>
+#include "String.h"
 #include <stdexcept>
 #include "HubbardOneOrbital.h"
 #include "HeisenbergSpinOneHalf.h"
@@ -82,7 +82,7 @@ public:
 					  GeometryType,
 					  ConcurrencyType> ModelBaseType;
 
-	ModelSelector(const std::string& name)
+	ModelSelector(const PsimagLite::String& name)
 	: name_(name),model_(0)
 	{}
 
@@ -101,7 +101,7 @@ public:
 		} else if (name_ == "HeisenbergSpinOneHalf") {
 			model_ = new HeisenbergSpinOneHalfType(solverParams,io,geometry,concurrency);
 		} else {
-			std::string str(__FILE__);
+			PsimagLite::String str(__FILE__);
 			str += " " + ttos(__LINE__) + "\n";
 			str += "Unknown model " + name_ + "\n";
 			throw std::runtime_error(str.c_str());
@@ -111,7 +111,7 @@ public:
 
 private:
 
-	std::string name_;
+	PsimagLite::String name_;
 	ModelBaseType* model_;
 
 }; // ModelSelector

@@ -7,7 +7,7 @@ CPPFLAGS = -Werror -Wall  -IEngine -I../../PsimagLite/src -I../../PsimagLite/src
  -IModels/HubbardOneOrbital -IModels/HeisenbergSpinOneHalf
 #CXX = g++  -O3 -DNDEBUG -g3
 #Comment out line below for debugging (COMMENT ALSO THE strip commands): 
-CXX = g++ -g3 #ALSO COMMENT OUT strip command below
+CXX = g++ -g3 #-DUSE_CUSTOM_ALLOCATOR #ALSO COMMENT OUT strip command below
 EXENAME = mpspp 
 all: $(EXENAME)
 

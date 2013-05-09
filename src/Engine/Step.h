@@ -95,7 +95,7 @@ public:
 	  contractedLocal_(contractedLocal),
 	  model_(model),
 	  statePredictor_(),
-	  truncation_(mps,contractedLocal,solverParams_.options.find("notruncation")==std::string::npos)
+	  truncation_(mps,contractedLocal,solverParams_.options.find("notruncation")==PsimagLite::String::npos)
 	{}
 
 	//! Moves the center of orthogonality by one to the left
@@ -172,8 +172,8 @@ private:
 		RealType energy = internalmove(v,currentSite,direction,symmetryHelper,symmetrySector,siteForSymm);
 		mps_.move(truncation_,currentSite,v,direction,symmetrySector,symm);
 		statePredictor_.push(energy,v,symmetrySector);
-		if (solverParams_.options.find("test")!=std::string::npos)
-			throw std::logic_error
+		if (solverParams_.options.find("test")!=PsimagLite::String::npos)
+			throw PsimagLite::LogicError
 					 ("Exiting due to option test in the input file\n");
 	}
 
@@ -197,11 +197,11 @@ private:
 		params.tolerance = eps;
 		params.stepsForEnergyConvergence =ProgramGlobals::MaxLanczosSteps;
 		params.options= solverParams.options;
-		params.lotaMemory=false; //!(parameters_.options.find("DoNotSaveLanczosVectors")!=std::string::npos);
+		params.lotaMemory=false; //!(parameters_.options.find("DoNotSaveLanczosVectors")!=PsimagLite::String::npos);
 
 		LanczosOrDavidsonBaseType* lanczosOrDavidson = 0;
 
-		bool useDavidson = (solverParams.options.find("useDavidson")!=std::string::npos);
+		bool useDavidson = (solverParams.options.find("useDavidson")!=PsimagLite::String::npos);
 		if (useDavidson) {
 			lanczosOrDavidson = new PsimagLite::DavidsonSolver<ParametersForSolverType,InternalProductType,VectorType>(lanczosHelper,params);
 		} else {
@@ -272,7 +272,7 @@ private:
 
 	size_t getQuantumSector(const VectorIntegerType& targetQuantumNumbers,size_t direction) const
 	{
-		std::ostringstream msg;
+		PsimagLite::OstringStream msg;
 		msg<<"Integer target quantum numbers are: ";
 		for (size_t ii=0;ii<targetQuantumNumbers.size();ii++)
 			msg<<targetQuantumNumbers[ii]<<" ";

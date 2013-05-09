@@ -64,7 +64,7 @@ public:
 //	SymmetryFactor(IoInputType& io,size_t nk)
 //		: left_(io,nk),right_(io,nk),super_(io,right_.size())
 //	{
-//		std::string str("SymmetryFactor: super=");
+//		PsimagLite::String str("SymmetryFactor: super=");
 //		str += ttos(super_.size()) + " left=" + ttos(left_.size());
 //		str += " right=" + ttos(right_.size()) + "\n";
 //		std::cerr<<str;

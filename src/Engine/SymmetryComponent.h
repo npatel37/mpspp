@@ -140,7 +140,7 @@ public:
 		findPermutationAndPartition();
 	}
 
-	std::string typeToString() const
+	PsimagLite::String typeToString() const
 	{
 		switch (type_) {
 		case COMPONENT_LEFT:

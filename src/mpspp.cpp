@@ -1,5 +1,5 @@
-#include <string>
-const std::string license=
+#include "String.h"
+const PsimagLite::String license=
 "Copyright (c) 2012, UT-Battelle, LLC\n"
 "All rights reserved\n"
 "[MPS++, Version 0.1]\n"
@@ -85,9 +85,9 @@ ConcurrencyType& concurrency)
 int main(int argc,char *argv[])
 {
 	Mpspp::InputCheck inputCheck;
-	std::string filename="";
+	PsimagLite::String filename="";
 	int opt = 0;
-	std::string strUsage(argv[0]);
+	PsimagLite::String strUsage(argv[0]);
 	strUsage += " -f filename";
 	while ((opt = getopt(argc, argv,"f:")) != -1) {
 		switch (opt) {
@@ -131,9 +131,9 @@ int main(int argc,char *argv[])
 
 	//MpsLocalType psi(ioForMps);
 
-	if (mpsSolverParams.options.find("InternalProductStored")!=std::string::npos) {
+	if (mpsSolverParams.options.find("InternalProductStored")!=PsimagLite::String::npos) {
 		mainLoop<ModelBaseType,Mpspp::InternalProductStored,ConcurrencyType>(mpsSolverParams,model,concurrency);
-		//} else if (mpsSolverParams.options.find("InternalProductKron")!=std::string::npos) {
+		//} else if (mpsSolverParams.options.find("InternalProductKron")!=PsimagLite::String::npos) {
 		//	mainLoop<ModelBaseType,Mpspp::InternalProductKron,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
 	} else {
 		mainLoop<ModelBaseType,Mpspp::InternalProductOnTheFly,ConcurrencyType>(mpsSolverParams,model,concurrency);

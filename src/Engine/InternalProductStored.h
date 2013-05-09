@@ -78,7 +78,7 @@ namespace Mpspp {
 			if (!rs) {
 				matrixStored_[0].clear();
 				model->fullHamiltonian(matrixStored_[0],*modelHelper);
-				if (model_->solverParams().options.find("debugmatrix")!=std::string::npos) {
+				if (model_->solverParams().options.find("debugmatrix")!=PsimagLite::String::npos) {
 					MatrixType fullm(matrixStored_[0]);
 					if (PsimagLite::isZero(fullm)) std::cerr<<"Matrix is zero\n";
 					if (fullm.n_row()>40) {
@@ -91,7 +91,7 @@ namespace Mpspp {
 				}
 
 				assert(isHermitian(matrixStored_[0],true));
-				std::ostringstream msg;
+				PsimagLite::OstringStream msg;
 				msg<<"fullHamiltonian has rank="<<matrixStored_[0].row()<<" nonzeros="<<matrixStored_[0].nonZero();
 				progress_.printline(msg,std::cout);
 				return;
@@ -99,7 +99,7 @@ namespace Mpspp {
 			SparseMatrixType matrix2;
 			model->fullHamiltonian(matrix2,*modelHelper);
 			rs->transform(matrixStored_[0],matrixStored_[1],matrix2);
-			std::ostringstream msg;
+			PsimagLite::OstringStream msg;
 			msg<<" sector="<<matrixStored_[0].row()<<" and sector="<<matrixStored_[1].row();
 			progress_.printline(msg,std::cout);
 		}

@@ -96,7 +96,7 @@ public:
 
 		growLattice(psi,contracted,center,symm);
 
-		if (solverParams_.options.find("nofiniteloops")!=std::string::npos)
+		if (solverParams_.options.find("nofiniteloops")!=PsimagLite::String::npos)
 			return;
 
 		StepType step(solverParams_,psi,contracted,model_);
@@ -155,9 +155,9 @@ private:
 		}
 	}
 
-	void printProgress(const SymmetryLocalType& symm,size_t center,const std::string& direction) const
+	void printProgress(const SymmetryLocalType& symm,size_t center,const PsimagLite::String& direction) const
 	{
-		std::ostringstream msg;
+		PsimagLite::OstringStream msg;
 		msg<<"center="<<center<<" direction="<<direction;
 		msg<<" left space= "<<symm(center).left().size();
 		msg<<" right space="<<symm(center).right().size()<<"\n";
@@ -167,12 +167,12 @@ private:
 	void printMemoryUsage() const
 	{
 		PsimagLite::MemoryUsage musage;
-		std::string vmPeak = musage.findEntry("VmPeak:");
-		std::string vmSize = musage.findEntry("VmSize:");
-		std::ostringstream msg;
+		PsimagLite::String vmPeak = musage.findEntry("VmPeak:");
+		PsimagLite::String vmSize = musage.findEntry("VmSize:");
+		PsimagLite::OstringStream msg;
 		msg<<"Current virtual memory is "<<vmSize<<" maximum was "<<vmPeak;
 		progress_.printline(msg,std::cout);
-		std::ostringstream msg2;
+		PsimagLite::OstringStream msg2;
 		msg2<<"Amount of time scheduled (user plus system): "<<musage.time()<<" clock ticks";
 		progress_.printline(msg2,std::cout);
 	}

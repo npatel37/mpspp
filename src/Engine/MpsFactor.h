@@ -80,7 +80,7 @@ public:
 //	: symm_(symm),rng_(0)
 //	{
 ////		if (site==0 || site+1 ==symm_.super().block().size()) {
-////			std::string str(__FILE__);
+////			PsimagLite::String str(__FILE__);
 ////			str += " " + ttos(__LINE__) + "\n";
 ////			str += "Needs corner cases. I cannot go further until this is implemented\n";
 ////			std::cerr<<str;
@@ -151,7 +151,7 @@ public:
 //		data_ *= (1.0/value);
 //	}
 
-	std::string typeToString() const
+	PsimagLite::String typeToString() const
 	{
 		return (aOrB_==TYPE_A) ? "A" : "B";
 	}

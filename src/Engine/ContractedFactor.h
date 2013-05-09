@@ -297,7 +297,7 @@ private:
 		} // kb
 	}
 
-	std::string partToString() const
+	PsimagLite::String partToString() const
 	{
 		return (leftOrRight_==PART_LEFT) ? "left" : "right";
 	}

@@ -122,8 +122,8 @@ struct FiniteLoop {
 //!PTEX_LABEL{139}
 inline void checkFiniteLoops(const PsimagLite::Vector<FiniteLoop>::Type& finiteLoop,size_t totalSites)
 {
-	std::string s = "checkFiniteLoops: I'm falling out of the lattice ";
-	std::string loops = "";
+	PsimagLite::String s = "checkFiniteLoops: I'm falling out of the lattice ";
+	PsimagLite::String loops = "";
 	int x = totalSites/2-1; // must be signed
 	if (finiteLoop[0].stepLength<0) x++;
 	int prevDeltaSign = 1;
@@ -139,7 +139,7 @@ inline void checkFiniteLoops(const PsimagLite::Vector<FiniteLoop>::Type& finiteL
 		if (sopt == 0 && thisSaveOption ==1) {
 			sopt = 1;
 			if (size_t(x) != 1 && size_t(x)!=totalSites-2) {
-				s = __FILE__ + std::string(": FATAL: for finite loop number ")
+				s = __FILE__ + PsimagLite::String(": FATAL: for finite loop number ")
 						+ ttos(i) + "\n";
 				s += "Saving finite loops must start at the left or";
 				s += " right end of the lattice\n";
@@ -196,7 +196,7 @@ std::ostream &operator<<(std::ostream& os,const FiniteLoop& fl)
 
 struct DmrgCheckPoint {
 	bool enabled;
-	std::string filename;
+	PsimagLite::String filename;
 };
 
 std::istream &operator>>(std::istream& is,DmrgCheckPoint& c)
@@ -257,20 +257,20 @@ struct ParametersMpsSolver {
 	typedef typename PsimagLite::Vector<FiniteLoop>::Type FiniteLoopsType;
 	typedef typename PsimagLite::Vector<RealType>::Type VectorRealType;
 
-	std::string filename;
+	PsimagLite::String filename;
 	size_t keptStatesInfinite;
 	FiniteLoopsType finiteLoops;
-	std::string version;
-	std::string options;
-	std::string model;
+	PsimagLite::String version;
+	PsimagLite::String options;
+	PsimagLite::String model;
 	VectorRealType targetQuantumNumbers;
 	size_t electronsUp,electronsDown;
-//	std::string initialMps;
+//	PsimagLite::String initialMps;
 //	RealType tolerance;
 //	DmrgCheckPoint checkpoint;
 	size_t nthreads;
 //	int useReflectionSymmetry;
-//	std::string fileForDensityMatrixEigs;
+//	PsimagLite::String fileForDensityMatrixEigs;
 
 	//! Read Dmrg parameters from inp file
 	ParametersMpsSolver(InputValidatorType& io)
@@ -306,13 +306,13 @@ struct ParametersMpsSolver {
 		}  catch (std::exception& e) {}
 
 		if (upToFl>=finiteLoops.size()) {
-			std::string s (__FILE__);
+			PsimagLite::String s (__FILE__);
 			s += "\nFATAL: RepeatFiniteLoopsTo=" + ttos(upToFl) + " is larger than current finite loops\n";
 			s += "\nMaximum is " + ttos(finiteLoops.size())+ "\n";
 			throw std::runtime_error(s.c_str());
 		}
 		if (fromFl>upToFl) {
-			std::string s (__FILE__);
+			PsimagLite::String s (__FILE__);
 			s += "\nFATAL: RepeatFiniteLoopsFrom=" + ttos(fromFl) + " is larger than RepeatFiniteLoopsTo\n";
 			s += "\nMaximum is " + ttos(upToFl)+ "\n";
 			throw std::runtime_error(s.c_str());
@@ -326,8 +326,8 @@ struct ParametersMpsSolver {
 			}
 		}
 
-		if (options.find("hasQuantumNumbers")!=std::string::npos) {
-			std::string s = "*** WARNING: hasQuantumNumbers ";
+		if (options.find("hasQuantumNumbers")!=PsimagLite::String::npos) {
+			PsimagLite::String s = "*** WARNING: hasQuantumNumbers ";
 			s += "option is obsolete in input file\n";
 			std::cerr<<s;
 		}
@@ -343,20 +343,20 @@ struct ParametersMpsSolver {
 		} catch (std::exception& e) {}
 
 		if (hasElectrons && targetQuantumNumbers.size()>0) {
-			std::string s (__FILE__);
+			PsimagLite::String s (__FILE__);
 			s += "\nFATAL: Specifying both TargetElectronsUp/Down and TargetQuantumNumbers is an error.";
 			s += "\nSpecify one or the other only.\n";
 			throw std::runtime_error(s.c_str());
 		}
 
 		if (!hasElectrons && targetQuantumNumbers.size()==0) {
-			std::string s (__FILE__);
+			PsimagLite::String s (__FILE__);
 			s += "\nFATAL: Either TargetElectronsUp/Down or TargetQuantumNumbers must be specified.\n";
 			throw std::runtime_error(s.c_str());
 		}
 
-		if (options.find("useSu2Symmetry")!=std::string::npos && hasElectrons) {
-			std::string s (__FILE__);
+		if (options.find("useSu2Symmetry")!=PsimagLite::String::npos && hasElectrons) {
+			PsimagLite::String s (__FILE__);
 			s += "\nFATAL: TargetElectronsUp/Down cannot be specified while using SU(2) symmetry\n";
 			s += "\nTargetQuantumNumbers must be specified instead.\n";
 			throw std::runtime_error(s.c_str());
@@ -368,9 +368,9 @@ struct ParametersMpsSolver {
 //			io.readline(tolerance,"TruncationTolerance=");
 //		} catch (std::exception& e) {}
 
-//		if (options.find("checkpoint")!=std::string::npos)
+//		if (options.find("checkpoint")!=PsimagLite::String::npos)
 //			io.readline(checkpoint.filename,"CheckpointFilename=");
-//		else if (options.find("restart")!=std::string::npos)
+//		else if (options.find("restart")!=PsimagLite::String::npos)
 //			io.readline(checkpoint.filename,"RestartFilename=");
 
 		nthreads=1; // provide a default value
@@ -379,7 +379,7 @@ struct ParametersMpsSolver {
 		} catch (std::exception& e) {}
 
 		if (nthreads==0) {
-			std::string s (__FILE__);
+			PsimagLite::String s (__FILE__);
 			s += "\nFATAL: nthreads cannot be zero\n";
 			throw std::runtime_error(s.c_str());
 		}

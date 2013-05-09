@@ -191,7 +191,7 @@ namespace Mpspp {
 		}
 
 		template<typename IoOutputter>
-		void save(IoOutputter& io,const std::string& label) const
+		void save(IoOutputter& io,const PsimagLite::String& label) const
 		{
 			io.print(label);
 			io.print("#size=",size_);
@@ -201,7 +201,7 @@ namespace Mpspp {
 		}
 
 		template<typename IoInputter>
-		void load(IoInputter& io,const std::string& label,size_t counter=0)
+		void load(IoInputter& io,const PsimagLite::String& label,size_t counter=0)
 		{
 			io.advance(label,counter);
 			int x = 0;
