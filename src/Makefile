@@ -3,11 +3,11 @@
 # MPI: 0
 
 LDFLAGS =      /usr/lib64/liblapack.so.3 /usr/lib64/libblas.so.3      -lpthread 
-CPPFLAGS = -Werror -Wall  -IEngine -I../../PsimagLite/src -I../../PsimagLite/src/Geometry  \
+CPPFLAGS = -Werror -Wall  -IEngine -I../../PsimagLite/src -I../../PsimagLite  \
  -IModels/HubbardOneOrbital -IModels/HeisenbergSpinOneHalf
 #CXX = g++  -O3 -DNDEBUG -g3
 #Comment out line below for debugging (COMMENT ALSO THE strip commands): 
-CXX = g++ -g3 #-DUSE_CUSTOM_ALLOCATOR #ALSO COMMENT OUT strip command below
+CXX = g++ -g3 -DUSE_CUSTOM_ALLOCATOR #ALSO COMMENT OUT strip command below
 EXENAME = mpspp 
 all: $(EXENAME)
 

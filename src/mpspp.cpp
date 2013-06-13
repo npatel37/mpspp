@@ -32,7 +32,7 @@ const PsimagLite::String license=
 #include "Provenance.h"
 #include "Concurrency.h"
 #include "InputNg.h"
-#include "Geometry.h"
+#include "Geometry/Geometry.h"
 #include "ParametersMpsSolver.h"
 #include "ModelSelector.h"
 #include "MpsSolver.h"
