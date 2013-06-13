@@ -59,28 +59,24 @@ class ModelSelector {
 	typedef typename ModelType::InputValidatorType InputValidatorType;
 	typedef typename ModelType::SymmetryLocalType SymmetryLocalType;
 	typedef typename ModelType::GeometryType GeometryType;
-	typedef typename ModelType::ConcurrencyType ConcurrencyType;
 	typedef typename ModelType::MpoLocalType MpoLocalType;
 
 	typedef HubbardOneOrbital<ParametersSolverType,
 							  InputValidatorType,
 							  SymmetryLocalType,
-							  GeometryType,
-							  ConcurrencyType> HubbardOneOrbitalType;
+							  GeometryType> HubbardOneOrbitalType;
 
 	typedef HeisenbergSpinOneHalf<ParametersSolverType,
 							  InputValidatorType,
 							  SymmetryLocalType,
-							  GeometryType,
-							  ConcurrencyType> HeisenbergSpinOneHalfType;
+							  GeometryType> HeisenbergSpinOneHalfType;
 
 public:
 
 	typedef ModelBase<ParametersSolverType,
 					  InputValidatorType,
 					  SymmetryLocalType,
-					  GeometryType,
-					  ConcurrencyType> ModelBaseType;
+					  GeometryType> ModelBaseType;
 
 	ModelSelector(const PsimagLite::String& name)
 	: name_(name),model_(0)
@@ -93,13 +89,12 @@ public:
 
 	const ModelBaseType& operator()(const ParametersSolverType& solverParams,
 						  InputValidatorType& io,
-						  const GeometryType& geometry,
-						  ConcurrencyType& concurrency)
+						  const GeometryType& geometry)
 	{
 		if (name_ == "HubbardOneBand") {
-			model_ = new HubbardOneOrbitalType(solverParams,io,geometry,concurrency);
+			model_ = new HubbardOneOrbitalType(solverParams,io,geometry);
 		} else if (name_ == "HeisenbergSpinOneHalf") {
-			model_ = new HeisenbergSpinOneHalfType(solverParams,io,geometry,concurrency);
+			model_ = new HeisenbergSpinOneHalfType(solverParams,io,geometry);
 		} else {
 			PsimagLite::String str(__FILE__);
 			str += " " + ttos(__LINE__) + "\n";

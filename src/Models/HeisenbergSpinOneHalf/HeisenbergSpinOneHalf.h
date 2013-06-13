@@ -65,19 +65,16 @@ namespace Mpspp {
 template<typename ParametersSolverType,
 		 typename InputValidatorType,
 		 typename SymmetryLocalType,
-		 typename GeometryType,
-		 typename ConcurrencyType>
+		 typename GeometryType>
 class HeisenbergSpinOneHalf : public ModelBase<ParametersSolverType,
 										   InputValidatorType,
 										   SymmetryLocalType,
-										   GeometryType,
-										   ConcurrencyType> {
+										   GeometryType> {
 
 	typedef ModelBase<ParametersSolverType,
 					  InputValidatorType,
 					  SymmetryLocalType,
-					  GeometryType,
-					  ConcurrencyType> ModelBaseType;
+					  GeometryType> ModelBaseType;
 
 	typedef typename ModelBaseType::MpoLocalType MpoLocalType;
 	typedef typename MpoLocalType::MpoFactorType MpoFactorType;
@@ -98,12 +95,10 @@ public:
 
 	HeisenbergSpinOneHalf(const ParametersSolverType& solverParams,
 					  InputValidatorType& io,
-					  const GeometryType& geometry,
-					  ConcurrencyType& concurrency)
+					  const GeometryType& geometry)
 	: solverParams_(solverParams),
 	  io_(io),
 	  geometry_(geometry),
-	  concurrency_(concurrency),
 	  hilbert_(2),
 	  mp_(io),
 	  hamiltonian_(geometry_.numberOfSites())
@@ -189,7 +184,6 @@ private:
 	const ParametersSolverType& solverParams_;
 	InputValidatorType& io_;
 	const GeometryType& geometry_;
-	ConcurrencyType& concurrency_;
 	size_t hilbert_;
 	ParametersModelType mp_;
 	MpoLocalType hamiltonian_;

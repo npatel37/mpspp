@@ -49,6 +49,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "ProgramGlobals.h"
 #include "ProgressIndicator.h"
 #include "MemoryUsage.h"
+#include "Concurrency.h"
 
 namespace Mpspp {
 
@@ -59,7 +60,6 @@ class MpsSolver {
 	typedef typename ModelBaseType::ParametersSolverType ParametersSolverType;
 	typedef typename ModelBaseType::InputValidatorType InputValidatorType;
 	typedef typename ModelBaseType::GeometryType GeometryType;
-	typedef typename ModelBaseType::ConcurrencyType ConcurrencyType;
 	typedef typename ModelBaseType::MpoLocalType MpoLocalType;
 	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
 	typedef typename ParametersSolverType::RealType RealType;
@@ -74,12 +74,10 @@ class MpsSolver {
 public:
 
 	MpsSolver(const ParametersSolverType& solverParams,
-			  const ModelBaseType& model,
-			  ConcurrencyType& concurrency)
+			  const ModelBaseType& model)
 		: solverParams_(solverParams),
 		  model_(model),
-		  concurrency_(concurrency),
-		  progress_("MpsSolver",concurrency.rank()),
+		  progress_("MpsSolver",PsimagLite::Concurrency::rank()),
 		  stepCurrent_(0),
 		  sitesIndices_(model.geometry().numberOfSites())
 	{
@@ -179,7 +177,6 @@ private:
 
 	const ParametersSolverType& solverParams_;
 	const ModelBaseType& model_;
-	ConcurrencyType& concurrency_;
 	PsimagLite::ProgressIndicator progress_;
 	int stepCurrent_;
 	VectorIntegerType sitesIndices_;

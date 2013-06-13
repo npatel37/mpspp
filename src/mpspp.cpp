@@ -30,7 +30,7 @@ const PsimagLite::String license=
 #include "ProgramGlobals.h"
 #include "InputCheck.h"
 #include "Provenance.h"
-#include "ConcurrencySerial.h"
+#include "Concurrency.h"
 #include "InputNg.h"
 #include "Geometry.h"
 #include "ParametersMpsSolver.h"
@@ -44,7 +44,7 @@ const PsimagLite::String license=
 
 typedef double RealType;
 typedef double ComplexOrRealType;
-typedef PsimagLite::ConcurrencySerial<RealType> ConcurrencyType;
+typedef PsimagLite::Concurrency ConcurrencyType;
 typedef PsimagLite::InputNg<Mpspp::InputCheck> InputNgType;
 typedef Mpspp::SymmetryLocal SymmetryLocalType;
 typedef PsimagLite::Geometry<RealType,Mpspp::ProgramGlobals> GeometryType;
@@ -54,8 +54,7 @@ typedef PsimagLite::InputNg<Mpspp::InputCheck>::Readable InputValidatorType;
 typedef Mpspp::ModelBase<ParametersSolverType,
 						 InputValidatorType,
 						 SymmetryLocalType,
-						 GeometryType,
-						 ConcurrencyType> ModelBaseType;
+						 GeometryType> ModelBaseType;
 typedef Mpspp::ModelSelector<ModelBaseType> ModelSelectorType;
 typedef ModelBaseType::MpoLocalType MpoLocalType;
 typedef MpoLocalType::MpsLocalType MpsLocalType;
@@ -63,13 +62,11 @@ typedef MpoLocalType::MpsLocalType MpsLocalType;
 // FIXME: make configurable at runtime:
 
 template<typename ModelBaseType,
-template<typename,typename> class InternalProductTemplate,
-typename ConcurrencyType>
+template<typename,typename> class InternalProductTemplate>
 void mainLoop(const typename ModelBaseType::ParametersSolverType& mpsSolverParams,
-const ModelBaseType& model,
-ConcurrencyType& concurrency)
+const ModelBaseType& model)
 {
-	Mpspp::MpsSolver<ModelBaseType,InternalProductTemplate> mpsSolver(mpsSolverParams,model,concurrency);
+	Mpspp::MpsSolver<ModelBaseType,InternalProductTemplate> mpsSolver(mpsSolverParams,model);
 
 	mpsSolver.computeGroundState();
 
@@ -110,7 +107,7 @@ int main(int argc,char *argv[])
 	ConcurrencyType concurrency(argc,argv);
 
 	// print license
-	if (concurrency.root()) {
+	if (ConcurrencyType::root()) {
 		std::cerr<<license;
 		Provenance provenance;
 		std::cout<<provenance;
@@ -125,18 +122,18 @@ int main(int argc,char *argv[])
 
 	ModelSelectorType modelSelector(mpsSolverParams.model);
 
-	const ModelBaseType& model = modelSelector(mpsSolverParams,io,geometry,concurrency);
+	const ModelBaseType& model = modelSelector(mpsSolverParams,io,geometry);
 
 	//typename MpsLocalType::IoInputType ioForMps(mpsSolverParams.initialMps);
 
 	//MpsLocalType psi(ioForMps);
 
 	if (mpsSolverParams.options.find("InternalProductStored")!=PsimagLite::String::npos) {
-		mainLoop<ModelBaseType,Mpspp::InternalProductStored,ConcurrencyType>(mpsSolverParams,model,concurrency);
+		mainLoop<ModelBaseType,Mpspp::InternalProductStored>(mpsSolverParams,model);
 		//} else if (mpsSolverParams.options.find("InternalProductKron")!=PsimagLite::String::npos) {
-		//	mainLoop<ModelBaseType,Mpspp::InternalProductKron,ConcurrencyType>(psi,mpsSolverParams,model,concurrency);
+		//	mainLoop<ModelBaseType,Mpspp::InternalProductKron>(psi,mpsSolverParams,model);
 	} else {
-		mainLoop<ModelBaseType,Mpspp::InternalProductOnTheFly,ConcurrencyType>(mpsSolverParams,model,concurrency);
+		mainLoop<ModelBaseType,Mpspp::InternalProductOnTheFly>(mpsSolverParams,model);
 	}
 }
 

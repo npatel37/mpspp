@@ -54,8 +54,7 @@ namespace Mpspp {
 template<typename ParametersSolverType_,
 		 typename InputValidatorType_,
 		 typename SymmetryLocalType_,
-		 typename GeometryType_,
-		 typename ConcurrencyType_>
+		 typename GeometryType_>
 class ModelBase {
 
 	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
@@ -67,7 +66,6 @@ public:
 	typedef InputValidatorType_ InputValidatorType;
 	typedef SymmetryLocalType_ SymmetryLocalType;
 	typedef GeometryType_ GeometryType;
-	typedef ConcurrencyType_ ConcurrencyType;
 	typedef MpoLocal<ComplexOrRealType,SymmetryLocalType> MpoLocalType;
 	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
 	typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
