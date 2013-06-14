@@ -104,7 +104,8 @@ int main(int argc,char *argv[])
 	}
 
 	//! setup distributed parallelization
-	ConcurrencyType concurrency(argc,argv);
+	SizeType npthreads = 1;
+	ConcurrencyType concurrency(argc,argv,npthreads);
 
 	// print license
 	if (ConcurrencyType::root()) {
