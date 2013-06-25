@@ -89,7 +89,7 @@ public:
 		 MpsLocalType& mps,
 		 ContractedLocalType& contractedLocal,
 		 const ModelType& model)
-	: progress_("Step",0),
+	: progress_("Step"),
 	  solverParams_(solverParams),
 	  mps_(mps),
 	  contractedLocal_(contractedLocal),

@@ -77,7 +77,7 @@ public:
 			  const ModelBaseType& model)
 		: solverParams_(solverParams),
 		  model_(model),
-		  progress_("MpsSolver",PsimagLite::Concurrency::rank()),
+		  progress_("MpsSolver"),
 		  stepCurrent_(0),
 		  sitesIndices_(model.geometry().numberOfSites())
 	{
