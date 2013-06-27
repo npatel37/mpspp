@@ -108,7 +108,7 @@ public:
 		data_.resize(n,n);
 		data_.makeDiagonal(n,1.0);
 
-		assert(isNormalized(data_));
+		//assert(isNormalized(data_));
 	}
 
 	template<typename SomeTruncationType>

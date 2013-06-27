@@ -79,7 +79,8 @@ namespace Mpspp {
 				matrixStored_[0].clear();
 				model->fullHamiltonian(matrixStored_[0],*modelHelper);
 				if (model_->solverParams().options.find("debugmatrix")!=PsimagLite::String::npos) {
-					MatrixType fullm(matrixStored_[0]);
+					MatrixType fullm;
+					crsMatrixToFullMatrix(fullm,matrixStored_[0]);
 					if (PsimagLite::isZero(fullm)) std::cerr<<"Matrix is zero\n";
 					if (fullm.n_row()>40) {
 						printNonZero(fullm,std::cerr);
