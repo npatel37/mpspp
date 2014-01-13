@@ -47,7 +47,7 @@ typedef double ComplexOrRealType;
 typedef PsimagLite::Concurrency ConcurrencyType;
 typedef PsimagLite::InputNg<Mpspp::InputCheck> InputNgType;
 typedef Mpspp::SymmetryLocal SymmetryLocalType;
-typedef PsimagLite::Geometry<RealType,Mpspp::ProgramGlobals> GeometryType;
+typedef PsimagLite::Geometry<RealType,InputNgType::Readable,Mpspp::ProgramGlobals> GeometryType;
 typedef Mpspp::ParametersMpsSolver<RealType,ComplexOrRealType,InputNgType::Readable> ParametersSolverType;
 typedef PsimagLite::InputNg<Mpspp::InputCheck>::Readable InputValidatorType;
 
