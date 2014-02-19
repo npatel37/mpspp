@@ -78,6 +78,8 @@ class Step {
 	typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
 	typedef typename ModelType::ModelHelperType ModelHelperType;
 	typedef typename ModelHelperType::SymmetryHelperType SymmetryHelperType;
+	typedef PsimagLite::ParametersForSolver<RealType> ParametersForSolverType;
+	typedef typename ParametersSolverType::InputValidatorType InputValidatorType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
@@ -86,14 +88,16 @@ class Step {
 public:
 
 	Step(const ParametersSolverType& solverParams,
-		 MpsLocalType& mps,
-		 ContractedLocalType& contractedLocal,
-		 const ModelType& model)
+	     MpsLocalType& mps,
+	     ContractedLocalType& contractedLocal,
+	     const ModelType& model,
+	     InputValidatorType& io)
 	: progress_("Step"),
 	  solverParams_(solverParams),
 	  mps_(mps),
 	  contractedLocal_(contractedLocal),
 	  model_(model),
+	  paramsForSolver_(io,"Lanczos"),
 	  statePredictor_(),
 	  truncation_(mps,contractedLocal,solverParams_.options.find("notruncation")==PsimagLite::String::npos)
 	{}
@@ -182,30 +186,19 @@ private:
 		const ParametersSolverType& solverParams = model_.solverParams();
 
 		typedef InternalProductTemplate<typename VectorType::value_type,ModelType> InternalProductType;
-		typedef PsimagLite::ParametersForSolver<RealType> ParametersForSolverType;
 		typedef PsimagLite::LanczosOrDavidsonBase<ParametersForSolverType,InternalProductType,VectorType> LanczosOrDavidsonBaseType;
 
 		ReflectionSymmetryType *rs = 0;
 		ModelHelperType modelHelper(contractedLocal_,symmetrySector,currentSite,direction,model_.hamiltonian()(currentSite),symmetryHelper,siteForSymm);
 		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 
-		RealType eps=ProgramGlobals::LanczosTolerance;
-		int iter=ProgramGlobals::LanczosSteps;
-
-		ParametersForSolverType params;
-		params.steps = iter;
-		params.tolerance = eps;
-		params.stepsForEnergyConvergence =ProgramGlobals::MaxLanczosSteps;
-		params.options= solverParams.options;
-		params.lotaMemory=false; //!(parameters_.options.find("DoNotSaveLanczosVectors")!=PsimagLite::String::npos);
-
 		LanczosOrDavidsonBaseType* lanczosOrDavidson = 0;
 
 		bool useDavidson = (solverParams.options.find("useDavidson")!=PsimagLite::String::npos);
 		if (useDavidson) {
-			lanczosOrDavidson = new PsimagLite::DavidsonSolver<ParametersForSolverType,InternalProductType,VectorType>(lanczosHelper,params);
+			lanczosOrDavidson = new PsimagLite::DavidsonSolver<ParametersForSolverType,InternalProductType,VectorType>(lanczosHelper,paramsForSolver_);
 		} else {
-			lanczosOrDavidson = new PsimagLite::LanczosSolver<ParametersForSolverType,InternalProductType,VectorType>(lanczosHelper,params);
+			lanczosOrDavidson = new PsimagLite::LanczosSolver<ParametersForSolverType,InternalProductType,VectorType>(lanczosHelper,paramsForSolver_);
 		}
 
 		RealType energyTmp = 0;
@@ -293,6 +286,7 @@ private:
 	MpsLocalType& mps_;
 	ContractedLocalType& contractedLocal_;
 	const ModelType& model_;
+	ParametersForSolverType paramsForSolver_;
 	StatePredictorType statePredictor_;
 	TruncationType truncation_;
 }; // Step

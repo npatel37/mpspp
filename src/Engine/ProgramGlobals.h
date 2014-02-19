@@ -56,12 +56,8 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 struct ProgramGlobals {
-	//		static size_t const MaxNumberOfSites = 300; // max number of sites that a model can use
-	static size_t const MaxLanczosSteps = 1000000; // max number of internal Lanczos steps
-	static size_t const LanczosSteps = 200; // max number of external Lanczos steps
-	static double const LanczosTolerance; // tolerance of the Lanczos Algorithm
+
 	static const int MAX_SITES = 100;
-	//		enum {FERMION,BOSON};
 
 	enum {TO_THE_RIGHT,TO_THE_LEFT};
 
@@ -110,7 +106,6 @@ struct ProgramGlobals {
 	};
 }; // ProgramGlobals
 
-	double const ProgramGlobals::LanczosTolerance = 1e-12;
 }; // namespace Mpspp
 /*@}*/
 #endif

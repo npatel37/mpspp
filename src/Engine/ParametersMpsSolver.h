@@ -249,13 +249,14 @@ std::istream &operator>>(std::istream& is,DmrgCheckPoint& c)
  where $n_\\uparrow$, and $n_\\downarrow$ are the densities of up and down
  electrons respectively, and $j$ is twice the angular momentum divided by the number of sites.
  */
-template<typename RealType_,typename ComplexOrRealType_,typename InputValidatorType>
+template<typename RealType_,typename ComplexOrRealType_,typename InputValidatorType_>
 struct ParametersMpsSolver {
 
 	typedef RealType_ RealType;
 	typedef ComplexOrRealType_ ComplexOrRealType;
 	typedef typename PsimagLite::Vector<FiniteLoop>::Type FiniteLoopsType;
 	typedef typename PsimagLite::Vector<RealType>::Type VectorRealType;
+	typedef InputValidatorType_ InputValidatorType;
 
 	PsimagLite::String filename;
 	size_t keptStatesInfinite;

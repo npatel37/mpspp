@@ -74,9 +74,11 @@ class MpsSolver {
 public:
 
 	MpsSolver(const ParametersSolverType& solverParams,
-			  const ModelBaseType& model)
+			  const ModelBaseType& model,
+	          InputValidatorType& io)
 		: solverParams_(solverParams),
 		  model_(model),
+	      io_(io),
 		  progress_("MpsSolver"),
 		  stepCurrent_(0),
 		  sitesIndices_(model.geometry().numberOfSites())
@@ -97,7 +99,7 @@ public:
 		if (solverParams_.options.find("nofiniteloops")!=PsimagLite::String::npos)
 			return;
 
-		StepType step(solverParams_,psi,contracted,model_);
+		StepType step(solverParams_,psi,contracted,model_,io_);
 		finiteLoops(step,center,symm);
 	}
 
@@ -107,7 +109,7 @@ private:
 	{
 		size_t nsites = model_.geometry().numberOfSites();
 
-		StepType step(solverParams_,psi,contracted,model_);
+		StepType step(solverParams_,psi,contracted,model_,io_);
 
 		if (nsites&1) {
 			throw std::runtime_error("growLattice: nsites must be even\n");
@@ -177,6 +179,7 @@ private:
 
 	const ParametersSolverType& solverParams_;
 	const ModelBaseType& model_;
+	InputValidatorType& io_;
 	PsimagLite::ProgressIndicator progress_;
 	int stepCurrent_;
 	VectorIntegerType sitesIndices_;

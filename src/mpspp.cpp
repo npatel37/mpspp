@@ -64,9 +64,12 @@ typedef MpoLocalType::MpsLocalType MpsLocalType;
 template<typename ModelBaseType,
 template<typename,typename> class InternalProductTemplate>
 void mainLoop(const typename ModelBaseType::ParametersSolverType& mpsSolverParams,
-const ModelBaseType& model)
+              const ModelBaseType& model,
+              InputValidatorType& io)
 {
-	Mpspp::MpsSolver<ModelBaseType,InternalProductTemplate> mpsSolver(mpsSolverParams,model);
+	Mpspp::MpsSolver<ModelBaseType,InternalProductTemplate> mpsSolver(mpsSolverParams,
+	                                                                  model,
+	                                                                  io);
 
 	mpsSolver.computeGroundState();
 
@@ -130,11 +133,11 @@ int main(int argc,char *argv[])
 	//MpsLocalType psi(ioForMps);
 
 	if (mpsSolverParams.options.find("InternalProductStored")!=PsimagLite::String::npos) {
-		mainLoop<ModelBaseType,Mpspp::InternalProductStored>(mpsSolverParams,model);
+		mainLoop<ModelBaseType,Mpspp::InternalProductStored>(mpsSolverParams,model,io);
 		//} else if (mpsSolverParams.options.find("InternalProductKron")!=PsimagLite::String::npos) {
 		//	mainLoop<ModelBaseType,Mpspp::InternalProductKron>(psi,mpsSolverParams,model);
 	} else {
-		mainLoop<ModelBaseType,Mpspp::InternalProductOnTheFly>(mpsSolverParams,model);
+		mainLoop<ModelBaseType,Mpspp::InternalProductOnTheFly>(mpsSolverParams,model,io);
 	}
 }
 
