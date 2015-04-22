@@ -45,7 +45,6 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef MODEL_SELECTOR_H
 #define MODEL_SELECTOR_H
 
-#include "String.h"
 #include <stdexcept>
 #include "HubbardOneOrbital.h"
 #include "HeisenbergSpinOneHalf.h"

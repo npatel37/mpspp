@@ -45,6 +45,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef TRUNCATION_H
 #define TRUNCATION_H
 
+#include "AllocatorCpu.h"
 #include "Sort.h"
 #include "ProgramGlobals.h"
 
@@ -52,7 +53,7 @@ namespace Mpspp {
 
 template<typename ContractedLocalType>
 class Truncation {
-	
+
 	typedef typename ContractedLocalType::MatrixProductOperatorType MpoLocalType;
 	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
 	typedef typename MpsLocalType::MatrixType MatrixType;

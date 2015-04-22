@@ -1,4 +1,4 @@
-#include "String.h"
+#include "AllocatorCpu.h"
 const PsimagLite::String license=
 "Copyright (c) 2012, UT-Battelle, LLC\n"
 "All rights reserved\n"
