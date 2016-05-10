@@ -60,7 +60,7 @@ class Truncation {
 	typedef typename MpsLocalType::SparseMatrixType SparseMatrixType;
 	typedef typename MpsLocalType::VectorRealType VectorRealType;
 	typedef typename VectorRealType::value_type RealType;
-	typedef typename PsimagLite::Vector<size_t>::Type VectorIntegerType;
+	typedef typename PsimagLite::Vector<SizeType>::Type VectorIntegerType;
 	typedef typename ContractedLocalType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 
@@ -72,10 +72,10 @@ public:
 		: mps_(mps),contracted_(contracted),enabled_(enabled)
 	{}
 
-	void setSize(size_t size)
+	void setSize(SizeType size)
 	{
 		s_.resize(size);
-		for (size_t i=0;i<s_.size();i++)
+		for (SizeType i=0;i<s_.size();i++)
 			s_[i] = 0.0;
 	}
 
@@ -84,20 +84,20 @@ public:
 		s_=s;
 	}
 
-	size_t size() const { return s_.size(); }
+	SizeType size() const { return s_.size(); }
 
-	RealType& operator()(size_t i)
+	RealType& operator()(SizeType i)
 	{
 		assert(i<s_.size());
 		return s_[i];
 	}
 
-	void operator()(SymmetryLocalType& symm,size_t site,size_t part,size_t cutoff)
+	void operator()(SymmetryLocalType& symm,SizeType site,SizeType part,SizeType cutoff)
 	{
 		if (!enabled_) return;
-		size_t siteForSymm = (part==ProgramGlobals::PART_LEFT) ? site+1 : site;
-		size_t rightSize = symm(siteForSymm).right().size();
-		size_t leftSize  = symm(siteForSymm).left().size();
+		SizeType siteForSymm = (part==ProgramGlobals::PART_LEFT) ? site+1 : site;
+		SizeType rightSize = symm(siteForSymm).right().size();
+		SizeType leftSize  = symm(siteForSymm).left().size();
 
 		if (part==ProgramGlobals::PART_LEFT) {
 			if (leftSize<=cutoff) return;
@@ -108,40 +108,40 @@ public:
 		}
 
 		order();
-		size_t nsites = symm(siteForSymm).super().block().size();
+		SizeType nsites = symm(siteForSymm).super().block().size();
 		mps_.truncate(site,part,cutoff,nsites,*this);
 		contracted_.truncate(site,part,cutoff,nsites,*this);
 
 		symm.truncate(siteForSymm,part,cutoff,*this);
 	}
 
-	void vector(VectorIntegerType& quantumNumbers,size_t cutoff) const
+	void vector(VectorIntegerType& quantumNumbers,SizeType cutoff) const
 	{
-		cutoff = std::min(cutoff,quantumNumbers.size());
-		size_t toRemove =  quantumNumbers.size()-cutoff;
+		cutoff = std::min(cutoff,static_cast<SizeType>(quantumNumbers.size()));
+		SizeType toRemove =  quantumNumbers.size()-cutoff;
 		VectorIntegerType q(cutoff);
 
 		assert(quantumNumbers.size()==perm_.size());
-		for (size_t i=0;i<quantumNumbers.size();i++) {
+		for (SizeType i=0;i<quantumNumbers.size();i++) {
 			if (perm_[i]<toRemove) continue;
 			q[perm_[i]-toRemove] = quantumNumbers[i];
 		}
 		quantumNumbers = q;
 	}
 
-	void matrixRow(SparseMatrixType& m,size_t cutoff) const
+	void matrixRow(SparseMatrixType& m,SizeType cutoff) const
 	{
 		cutoff = std::min(cutoff,m.col());
 		assert(m.col()==perm_.size());
-		size_t toRemove = m.col()-cutoff;
+		SizeType toRemove = m.col()-cutoff;
 		SparseMatrixType newmatrix;
 		permute(newmatrix,m, PERMUTE_COL);
 		SparseMatrixType newdata(m.row(),cutoff);
-		size_t counter = 0;
-		for (size_t i=0;i<newmatrix.row();i++) {
+		SizeType counter = 0;
+		for (SizeType i=0;i<newmatrix.row();i++) {
 			newdata.setRow(i,counter);
 			for (int k=newmatrix.getRowPtr(i);k<newmatrix.getRowPtr(i+1);k++) {
-				size_t col = newmatrix.getCol(k);
+				SizeType col = newmatrix.getCol(k);
 				if (col<toRemove) continue;
 				newdata.pushCol(col-toRemove);
 				newdata.pushValue(m.getValue(k));
@@ -153,19 +153,19 @@ public:
 		m.checkValidity();
 	}
 
-	void matrixRowCol(SparseMatrixType& m,size_t cutoff) const
+	void matrixRowCol(SparseMatrixType& m,SizeType cutoff) const
 	{
 		assert(m.row()==m.col());
 		cutoff = std::min(cutoff,m.row());
 		assert(m.col()==perm_.size());
 		SparseMatrixType newmatrix;
 		permute(newmatrix,m,PERMUTE_ROW | PERMUTE_COL);
-		size_t toRemove = m.col()-cutoff;
+		SizeType toRemove = m.col()-cutoff;
 		MatrixType dest(cutoff,cutoff);
-		for (size_t i=0;i<newmatrix.row();i++) {
+		for (SizeType i=0;i<newmatrix.row();i++) {
 			if (i<toRemove) continue;
 			for (int k=newmatrix.getRowPtr(i);k<newmatrix.getRowPtr(i+1);k++) {
-				size_t j = newmatrix.getCol(k);
+				SizeType j = newmatrix.getCol(k);
 				if (j<toRemove) continue;
 				dest(i-toRemove,j-toRemove) = newmatrix.getValue(k);
 			}
@@ -183,18 +183,18 @@ public:
 
 private:
 
-	void permute(SparseMatrixType& m,const SparseMatrixType& src,size_t what) const
+	void permute(SparseMatrixType& m,const SparseMatrixType& src,SizeType what) const
 	{
 //		VectorIntegerType permInverse(perm_.size());
 //		getPermInverse(permInverse);
 		const VectorIntegerType& perm = perm_;
-		size_t row = src.row();
+		SizeType row = src.row();
 		MatrixType dest(row,src.col());
-		for (size_t i=0;i<row;i++) {
-			size_t ind = (what & PERMUTE_ROW) ? perm[i] : i;
+		for (SizeType i=0;i<row;i++) {
+			SizeType ind = (what & PERMUTE_ROW) ? perm[i] : i;
 			for (int k=src.getRowPtr(i);k<src.getRowPtr(i+1);k++) {
-				size_t j = src.getCol(k);
-				size_t jnd = (what & PERMUTE_COL) ? perm[j] : j;
+				SizeType j = src.getCol(k);
+				SizeType jnd = (what & PERMUTE_COL) ? perm[j] : j;
 				dest(ind,jnd) = src.getValue(k);
 			}
 		}
@@ -203,7 +203,7 @@ private:
 
 	void getPermInverse(VectorIntegerType& permInverse) const
 	{
-		for (size_t i=0;i<perm_.size();i++)
+		for (SizeType i=0;i<perm_.size();i++)
 			permInverse[perm_[i]]=i;
 	}
 

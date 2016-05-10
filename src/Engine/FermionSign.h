@@ -58,23 +58,23 @@ class FermionSign {
 
 public:
 
-	FermionSign(const ModelType& model,size_t site)
+	FermionSign(const ModelType& model,SizeType site)
 		: model_(model),site_(site)
 	{}
 
-	size_t electronsFromQn(size_t qn) const
+	SizeType electronsFromQn(SizeType qn) const
 	{
 		return model_.electronsFromQn(qn);
 	}
 
-	PsimagLite::Vector<size_t>::Type quantumNumbers() const
+	PsimagLite::Vector<SizeType>::Type quantumNumbers() const
 	{
 		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,site_);
 		return quantumNumbers;
 	}
 
-	size_t site() const
+	SizeType site() const
 	{
 		return site_;
 	}
@@ -82,7 +82,7 @@ public:
 private:
 
 	const ModelType& model_;
-	size_t site_;
+	SizeType site_;
 
 }; // FermionSign
 

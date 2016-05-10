@@ -57,17 +57,20 @@ class SymmetryComponent {
 public:
 
 	typedef PsimagLite::IoSimple::In IoInputType;
-	typedef std::pair<size_t,size_t> PairType;
-	typedef PsimagLite::Vector<size_t>::Type VectorIntegerType;
+	typedef std::pair<SizeType,SizeType> PairType;
+	typedef PsimagLite::Vector<SizeType>::Type VectorIntegerType;
 
 	enum {CORNER_LEFT,CORNER_RIGHT};
 	enum {COMPONENT_LEFT,COMPONENT_RIGHT,COMPONENT_SUPER};
 
-	SymmetryComponent(size_t type)
+	SymmetryComponent(SizeType type)
 		: type_(type),leftSize_(0)
 	{}
 
-	SymmetryComponent(size_t type,size_t hilbert, size_t site,const VectorIntegerType& quantumNumbers)
+	SymmetryComponent(SizeType type,
+	                  SizeType hilbert,
+	                  SizeType site,
+	                  const VectorIntegerType& quantumNumbers)
 		: type_(type),
 		  leftSize_(hilbert),
 		  block_(1,site),
@@ -78,31 +81,31 @@ public:
 		findPermutationAndPartition();
 	}
 
-//	SymmetryComponent(IoInputType& io,size_t divisor)
+//	SymmetryComponent(IoInputType& io,SizeType divisor)
 //	{
 //		loadInternal(io);
 //		leftSize_ = size()/divisor;
 //	}
 
-	void setSite(size_t site)
+	void setSite(SizeType site)
 	{
 		assert(block_.size()==1);
 		block_[0] = site;
 	}
 
-	void setComponent(size_t comp)
+	void setComponent(SizeType comp)
 	{
 		type_=comp;
 	}
 
-	void grow(size_t site,const VectorIntegerType& quantumNumbers,size_t nsites,size_t leftSize)
+	void grow(SizeType site,const VectorIntegerType& quantumNumbers,SizeType nsites,SizeType leftSize)
 	{
 		assert(type_==COMPONENT_RIGHT);
 		SymmetryComponent sc1(type_,0,site,quantumNumbers);
 		SymmetryComponent sc(type_);
 		*this = sc1;
-		size_t site1 = site+1;
-		for (size_t i=site1;i<nsites;i++) {
+		SizeType site1 = site+1;
+		for (SizeType i=site1;i<nsites;i++) {
 			SymmetryComponent sc2(type_,0,i,quantumNumbers);
 			sc.combine(*this,sc2);
 			*this = sc;
@@ -116,13 +119,13 @@ public:
 		blockUnion(block_,left.block_,right.block_); //! B= pS.block Union X
 		assert(isValidBlock());
 
-		size_t ns = left.size();
-		size_t ne = right.size();
+		SizeType ns = left.size();
+		SizeType ne = right.size();
 
 		quantumNumbers_.clear();
 
-		for (size_t j=0;j<ne;j++) {
-			for (size_t i=0;i<ns;i++) {
+		for (SizeType j=0;j<ne;j++) {
+			for (SizeType i=0;i<ns;i++) {
 				quantumNumbers_.push_back(left.quantumNumbers_[i]+right.quantumNumbers_[j]);
 			}
 		}
@@ -133,7 +136,7 @@ public:
 	}
 
 	template<typename SomeTruncationType>
-	void truncate(size_t cutoff,const SomeTruncationType& trunc)
+	void truncate(SizeType cutoff,const SomeTruncationType& trunc)
 	{
 		if (size()<=cutoff) return;
 		trunc.vector(quantumNumbers_,cutoff);
@@ -153,24 +156,24 @@ public:
 		return "unknown";
 	}
 
-	size_t partitions() const { return partition_.size(); }
+	SizeType partitions() const { return partition_.size(); }
 
-	size_t partitionSize(size_t i) const
+	SizeType partitionSize(SizeType i) const
 	{
 		assert(i+1<partition_.size());
 		return partition_[i+1]-partition_[i];
 	}
 
-	size_t partitionOffset(size_t i) const
+	SizeType partitionOffset(SizeType i) const
 	{
 		assert(i<partition_.size());
 		return partition_[i];
 	}
 
-	PairType unpack(size_t i) const
+	PairType unpack(SizeType i) const
 	{
 		assert(i<permutation_.size());
-		size_t ip = permutation_[i];
+		SizeType ip = permutation_[i];
 		if (leftSize_==0 && type_==COMPONENT_LEFT)
 			return PairType(0,ip);
 		if (leftSize_==0 && type_==COMPONENT_RIGHT)
@@ -179,7 +182,7 @@ public:
 		return PairType(q.rem,q.quot);
 	}
 
-	size_t pack(size_t a1,size_t a2) const
+	SizeType pack(SizeType a1,SizeType a2) const
 	{
 		assert(a1+a2*leftSize_<permutationInverse_.size());
 		if (leftSize_==0 && type_==COMPONENT_LEFT) {
@@ -193,18 +196,18 @@ public:
 		return permutationInverse_[a1+a2*leftSize_];
 	}
 
-	size_t size() const
+	SizeType size() const
 	{
 		return quantumNumbers_.size();
 	}
 
-	size_t qn(size_t state) const
+	SizeType qn(SizeType state) const
 	{
 		assert(state<quantumNumbers_.size());
 		return quantumNumbers_[state];
 	}
 
-	size_t split() const { return leftSize_; }
+	SizeType split() const { return leftSize_; }
 
 	const VectorIntegerType& block() const { return block_; }
 
@@ -227,7 +230,7 @@ private:
 		io.read(partition_,"#PARTITION");
 		io.read(permutationInverse_,"#PERMUTATIONINVERSE");
 		permutation_.resize(permutationInverse_.size());
-		for (size_t i=0;i<permutation_.size();i++) permutation_[permutationInverse_[i]]=i;
+		for (SizeType i=0;i<permutation_.size();i++) permutation_[permutationInverse_[i]]=i;
 		/*dmrgTransformed_=false;
 		if (useSu2Symmetry_)
 			symmSu2_.load(io);
@@ -240,13 +243,13 @@ private:
 
 		permutation_.resize(size());
 
-		PsimagLite::Sort<VectorIntegerType > sort;
+		PsimagLite::Sort<VectorIntegerType> sort;
 		sort.sort(quantumNumbers_,permutation_);
 
 		findPartition();
 
 		permutationInverse_.resize(permutation_.size());
-		for (size_t i=0;i<permutationInverse_.size();i++)
+		for (SizeType i=0;i<permutationInverse_.size();i++)
 			permutationInverse_[permutation_[i]]=i;
 	}
 
@@ -255,9 +258,9 @@ private:
 	void findPartition()
 	{
 		assert(quantumNumbers_.size()>0);
-		size_t qtmp = quantumNumbers_[0]+1;
+		SizeType qtmp = quantumNumbers_[0]+1;
 		partition_.clear();
-		for (size_t i=0;i<size();i++) {
+		for (SizeType i=0;i<size();i++) {
 			if (quantumNumbers_[i]!=qtmp) {
 				partition_.push_back(i);
 				qtmp = quantumNumbers_[i];
@@ -271,21 +274,21 @@ private:
 	void blockUnion(Block &A,Block const &B,Block const &C)
 	{
 		A=B;
-		for (size_t i=0;i<C.size();i++) A.push_back(C[i]);
+		for (SizeType i=0;i<C.size();i++) A.push_back(C[i]);
 	}
 
 	bool isValidBlock() const
 	{
 		if (block_.size()<2) return true;
-		for (size_t i=0;i<block_.size()-1;i++) {
+		for (SizeType i=0;i<block_.size()-1;i++) {
 			if (block_[i]>=block_[i+1])
 				return false;
 		}
 		return true;
 	}
 
-	size_t type_;
-	size_t leftSize_;
+	SizeType type_;
+	SizeType leftSize_;
 	VectorIntegerType block_;
 	VectorIntegerType quantumNumbers_;
 	VectorIntegerType partition_;
@@ -299,7 +302,7 @@ std::ostream& operator<<(std::ostream& os,const SymmetryComponent& symm)
 {
 	os<<"type="<<symm.typeToString()<<" leftSize_= "<<symm.leftSize_<<" size= "<<symm.quantumNumbers_.size();
 	os<<" block= ";
-	for (size_t i=0;i<symm.block_.size();i++)
+	for (SizeType i=0;i<symm.block_.size();i++)
 		os<<symm.block_[i]<<" ";
 	os<<" ";
 	return os;

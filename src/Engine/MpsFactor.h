@@ -55,7 +55,7 @@ namespace Mpspp {
 template<typename ComplexOrRealType,typename SymmetryFactorType>
 class MpsFactor {
 
-	typedef std::pair<size_t,size_t> PairType;
+	typedef std::pair<SizeType,SizeType> PairType;
 
 public:
 
@@ -72,11 +72,11 @@ public:
 	typedef typename PsimagLite::Vector<RealType>::Type VectorRealType;
 	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
 
-	MpsFactor(size_t aOrB)
+	MpsFactor(SizeType aOrB)
 		: rng_(0),aOrB_(aOrB)
 	{}
 
-//	MpsFactor(IoInputType& io,const SymmetryFactorType& symm,size_t site)
+//	MpsFactor(IoInputType& io,const SymmetryFactorType& symm,SizeType site)
 //	: symm_(symm),rng_(0)
 //	{
 ////		if (site==0 || site+1 ==symm_.super().block().size()) {
@@ -98,10 +98,10 @@ public:
 //		fullMatrixToCrsMatrix(data_,mpsFactor);
 //	}
 
-	void setRandom(size_t site,size_t n)
+	void setRandom(SizeType site,SizeType n)
 	{
 //		MatrixType m(n,n);
-//		for (size_t i=0;i<n;i++)
+//		for (SizeType i=0;i<n;i++)
 //			m(i,i) = (rng_()<0.5) ? -1 : 1;
 
 //		fullMatrixToCrsMatrix(data_,m);
@@ -112,19 +112,19 @@ public:
 	}
 
 	template<typename SomeTruncationType>
-	void move(SomeTruncationType& truncation,const VectorType& v,size_t symmetrySector,const SymmetryFactorType& symm)
+	void move(SomeTruncationType& truncation,const VectorType& v,SizeType symmetrySector,const SymmetryFactorType& symm)
 	{
 
-		size_t row = symm.left().size();
-		size_t col = symm.right().size();
+		SizeType row = symm.left().size();
+		SizeType col = symm.right().size();
 		if (aOrB_==TYPE_B) std::swap(row,col);
 
 		MatrixType m(row,col);
 
-//		size_t total = symm.super().size();
-		size_t offset = symm.super().partitionOffset(symmetrySector);
-		size_t total = symm.super().partitionSize(symmetrySector);
-		for (size_t i=0;i<total;i++) {
+//		SizeType total = symm.super().size();
+		SizeType offset = symm.super().partitionOffset(symmetrySector);
+		SizeType total = symm.super().partitionSize(symmetrySector);
+		for (SizeType i=0;i<total;i++) {
 			PairType ab = symm.super().unpack(i+offset);
 			if (aOrB_==TYPE_A) {
 				m(ab.first,ab.second) = v[i];
@@ -139,7 +139,7 @@ public:
 	}
 
 	template<typename SomeTruncationType>
-	void truncate(size_t cutoff,const SomeTruncationType& trunc)
+	void truncate(SizeType cutoff,const SomeTruncationType& trunc)
 	{
 		trunc.matrixRow(data_,cutoff);
 	}
@@ -158,7 +158,7 @@ public:
 
 	const SparseMatrixType& operator()() const { return data_; }
 
-	const size_t type() const { return aOrB_; }
+	const SizeType type() const { return aOrB_; }
 
 	template<typename ComplexOrRealType2,typename SymmetryLocalType2>
 	friend std::ostream& operator<<(std::ostream& os,const MpsFactor<ComplexOrRealType2,SymmetryLocalType2>& mps);
@@ -166,21 +166,21 @@ public:
 private:
 
 	template<typename SomeTruncationType>
-	void moveFromVector(const MatrixType& m,SomeTruncationType& truncation,const SymmetryFactorType& symm,size_t symmetrySector)
+	void moveFromVector(const MatrixType& m,SomeTruncationType& truncation,const SymmetryFactorType& symm,SizeType symmetrySector)
 	{
 		const SymmetryComponentType& summed = (aOrB_==TYPE_A) ? symm.left() : symm.right();
 		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
 
-//		size_t max = std::max(summed.size(),nonSummed.size());
+//		SizeType max = std::max(summed.size(),nonSummed.size());
 		MatrixType finalU(summed.size(),summed.size());
 
 		truncation.setSize(summed.size());
-		for (size_t i=0;i<summed.partitions()-1;i++) {
-			size_t istart = summed.partitionOffset(i);
-			size_t itotal = summed.partitionSize(i);
-			for (size_t j=0;j<nonSummed.partitions()-1;j++) {
-				size_t jstart = nonSummed.partitionOffset(j);
-				size_t jtotal = nonSummed.partitionSize(j);
+		for (SizeType i=0;i<summed.partitions()-1;i++) {
+			SizeType istart = summed.partitionOffset(i);
+			SizeType itotal = summed.partitionSize(i);
+			for (SizeType j=0;j<nonSummed.partitions()-1;j++) {
+				SizeType jstart = nonSummed.partitionOffset(j);
+				SizeType jtotal = nonSummed.partitionSize(j);
 
 				MatrixType u(itotal,jtotal);
 				setThisSector(u,istart,itotal,jstart,jtotal,m);
@@ -214,30 +214,30 @@ private:
 	}
 
 	void setThisSector(MatrixType& u,
-					   size_t istart,
-					   size_t itotal,
-					   size_t jstart,
-					   size_t jtotal,
+					   SizeType istart,
+					   SizeType itotal,
+					   SizeType jstart,
+					   SizeType jtotal,
 					   const MatrixType& m) const
 	{
-		for (size_t i=0;i<itotal;i++) {
-			for (size_t j=0;j<jtotal;j++) {
+		for (SizeType i=0;i<itotal;i++) {
+			for (SizeType j=0;j<jtotal;j++) {
 				u(i,j) = m(i+istart,j+jstart);
 			}
 		}
 	}
 
 	void setFinalU(MatrixType& finalU,
-				   size_t istart,
-				   size_t itotal,
-				   size_t jstart,
-				   size_t jtotal,
+				   SizeType istart,
+				   SizeType itotal,
+				   SizeType jstart,
+				   SizeType jtotal,
 				   const MatrixType& u) const
 	{
 //		std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
-		size_t n = std::min(itotal,u.n_col());
-		for (size_t i=0;i<itotal;i++) {
-			for (size_t j=0;j<n;j++) {
+		SizeType n = std::min(itotal,u.n_col());
+		for (SizeType i=0;i<itotal;i++) {
+			for (SizeType j=0;j<n;j++) {
 				if (j+istart>=finalU.n_col()) continue;
 				finalU(i+istart,j+istart) = u(i,j);
 			}
@@ -246,13 +246,13 @@ private:
 
 	template<typename SomeTruncationType>
 	void setFinalS(SomeTruncationType& truncation,
-				   size_t jstart,
-				   size_t jtotal,
+				   SizeType jstart,
+				   SizeType jtotal,
 				   const VectorRealType& s) const
 	{
 //		std::cout<<"setFinalS from "<<jstart<<" to "<<(jstart+jtotal-1)<<"\n";
-		size_t n = std::min(jtotal,s.size());
-		for (size_t j=0;j<n;j++) {
+		SizeType n = std::min(jtotal,static_cast<SizeType>(s.size()));
+		for (SizeType j=0;j<n;j++) {
 //			assert(j+jstart<finalS.size());
 //			if (fabs(s[j])<1e-6) continue;
 			if (j+jstart>=truncation.size()) continue;
@@ -263,15 +263,15 @@ private:
 	}
 
 	void setFinalVt(MatrixType& finalVt,
-				   size_t istart,
-				   size_t itotal,
-				   size_t jstart,
-				   size_t jtotal,
+				   SizeType istart,
+				   SizeType itotal,
+				   SizeType jstart,
+				   SizeType jtotal,
 				   const MatrixType& vt) const
 	{
 		std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
-		for (size_t i=0;i<jtotal;i++) {
-			for (size_t j=0;j<jtotal;j++) {
+		for (SizeType i=0;i<jtotal;i++) {
+			for (SizeType j=0;j<jtotal;j++) {
 				finalVt(i+jstart,j+jstart) = vt(i,j);
 			}
 		}
@@ -284,8 +284,8 @@ private:
 		truncation.recoverSvd(m,u,vt);
 		std::cout<<"recovering matrix from svd:\n";
 		std::cout<<m;
-		for (size_t i=0;i<m.n_row();i++) {
-			for (size_t j=0;j<m.n_col();j++)
+		for (SizeType i=0;i<m.n_row();i++) {
+			for (SizeType j=0;j<m.n_col();j++)
 				if (fabs(m(i,j)-mat(i,j))>1e-6) return false;
 		}
 		return true;
@@ -295,10 +295,10 @@ private:
 	{
 		assert(m.n_row()<=summed.size());
 		assert(m.n_col()<=summed.size());
-		for (size_t i=0;i<m.n_row();i++) {
-			size_t qi = summed.qn(i);
-			for (size_t j=0;j<m.n_col();j++) {
-				size_t qj = summed.qn(j);
+		for (SizeType i=0;i<m.n_row();i++) {
+			SizeType qi = summed.qn(i);
+			for (SizeType j=0;j<m.n_col();j++) {
+				SizeType qj = summed.qn(j);
 				if (qi==qj) continue;
 				if (fabs(m(i,j))>1e-6) return false;
 			}
@@ -309,10 +309,10 @@ private:
 	bool isNormalized(const MatrixType& m) const
 	{
 //		assert(m.n_row()==m.n_col());
-		for (size_t i=0;i<m.n_col();i++) {
-			for (size_t j=0;j<m.n_col();j++) {
+		for (SizeType i=0;i<m.n_col();i++) {
+			for (SizeType j=0;j<m.n_col();j++) {
 				ComplexOrRealType sum = 0;
-				for (size_t k=0;k<m.n_row();k++) {
+				for (SizeType k=0;k<m.n_row();k++) {
 					sum += m(k,i) * std::conj(m(k,j));
 				}
 				if (i==j && fabs(sum-1.0)>1e-5)
@@ -326,7 +326,7 @@ private:
 
 	RandomNumberGeneratorType rng_;
 	SparseMatrixType data_;
-	size_t aOrB_;
+	SizeType aOrB_;
 }; // MpsFactor
 
 template<typename ComplexOrRealType,typename SymmetryLocalType>

@@ -52,7 +52,7 @@ namespace Mpspp {
 template<typename SymmetryLocalType>
 class SymmetryHelper {
 
-	typedef PsimagLite::Vector<size_t>::Type VectorIntegerType;
+	typedef PsimagLite::Vector<SizeType>::Type VectorIntegerType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 
 	static VectorIntegerType electronsFromQn_;
@@ -66,18 +66,18 @@ public:
 	{
 		VectorIntegerType qn = fermionSign.quantumNumbers();
 		electronsOneSite_.resize(qn.size());
-		for (size_t i=0;i<qn.size();i++)
+		for (SizeType i=0;i<qn.size();i++)
 			electronsOneSite_[i] = fermionSign.electronsFromQn(qn[i]);
 
 		if (electronsFromQn_.size()>0) return;
 
 		electronsFromQn_.resize(MAX_SITES*MAX_SITES);
 
-		for (size_t q=0;q<electronsFromQn_.size();q++)
+		for (SizeType q=0;q<electronsFromQn_.size();q++)
 			electronsFromQn_[q] = fermionSign.electronsFromQn(q);
 	}
 
-	size_t currentSite() const
+	SizeType currentSite() const
 	{
 		return currentSite_;
 	}
@@ -87,12 +87,12 @@ public:
 		return symm_;
 	}
 
-	size_t electronsFromState(size_t state) const
+	SizeType electronsFromState(SizeType state) const
 	{
 		return electronsOneSite_[state];
 	}
 
-	size_t electronsFromQn(size_t q) const
+	SizeType electronsFromQn(SizeType q) const
 	{
 		return electronsFromQn_[q];
 	}
@@ -100,7 +100,7 @@ public:
 private:
 
 	const SymmetryLocalType& symm_;
-	size_t currentSite_;
+	SizeType currentSite_;
 	VectorIntegerType electronsOneSite_;
 
 }; // SymmetryHelper

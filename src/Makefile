@@ -2,17 +2,19 @@
 # Platform: Linux
 # MPI: 0
 
-LDFLAGS =      /usr/lib64/liblapack.so.3 /usr/lib64/libblas.so.3      -lpthread 
+LDFLAGS = -L../../PsimagLite/lib -lpsimaglite /usr/lib64/liblapack.so.3 /usr/lib64/libblas.so.3  -lpthread 
 CPPFLAGS = -Werror -Wall  -IEngine -I../../PsimagLite/src -I../../PsimagLite  \
  -IModels/HubbardOneOrbital -IModels/HeisenbergSpinOneHalf
 #CXX = g++  -O3 -DNDEBUG -g3
 #Comment out line below for debugging (COMMENT ALSO THE strip commands): 
-CXX = g++ -g3 -DUSE_CUSTOM_ALLOCATOR #ALSO COMMENT OUT strip command below
-EXENAME = mpspp 
-all: $(EXENAME)
+CXX = g++ -g3 #ALSO COMMENT OUT strip command below
+all: mpspp 
 
-mpspp:  mpspp.o gitrev
-	$(CXX) -o mpspp mpspp.o $(LDFLAGS)  
+mpspp:  mpspp.o gitrev Makefile.dep
+	$(CXX) -o mpspp mpspp.o $(LDFLAGS) $(CPPFLAGS) 
+
+mpspp.o: Makefile.dep mpspp.cpp Makefile
+	$(CXX) $(CPPFLAGS) -c mpspp.cpp
 
 # dependencies brought about by Makefile.dep
 %.o: %.cpp Makefile gitrev Engine/Version.h
