@@ -44,65 +44,66 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 /*! \file ParametersModelHubbard.h
  *
- *  Contains the parameters for the Hubbard model and function to read them from a JSON file
+ *  Contains the parameters for the Hubbard model and function to read them from a file
  *
  */
 #ifndef PARAMETERSMODELHUBBARD_H
 #define PARAMETERSMODELHUBBARD_H
 
 namespace Mpspp {
-	//! Hubbard Model Parameters
-	template<typename Field>
-	struct ParametersModelHubbard {
+//! Hubbard Model Parameters
+template<typename Field>
+struct ParametersModelHubbard {
 
-		typedef typename PsimagLite::Vector<Field>::Type VectorType;
+	typedef typename PsimagLite::Vector<Field>::Type VectorType;
 
-		template<typename IoInputType>
-		ParametersModelHubbard(IoInputType& io) 
-		{	
-			io.read(hubbardU,"hubbardU");
-			io.read(potentialV,"potentialV");
-
-			try {
-				io.read(potentialT,"PotentialT"); //level,beQuiet);
-			} catch (std::exception& e) {}
-			omega=0;
-			try {
-				io.readline(omega,"omega=");
-			} catch (std::exception& e) {}
-		}
-		
-		// Do not include here connection parameters
-		// those are handled by the Geometry
-		// Hubbard U values (one for each site)
-		VectorType hubbardU;
-		// Onsite potential values, one for each site
-		VectorType potentialV;
-
-		// for time-dependent H:
-		VectorType potentialT;
-		Field omega;
-
-		// target number of electrons  in the system
-		int nOfElectrons;
-	};
-	
-	//! Function that prints model parameters to stream os
-	template<typename FieldType>
-	std::ostream& operator<<(std::ostream &os,const ParametersModelHubbard<FieldType>& parameters)
+	template<typename IoInputType>
+	ParametersModelHubbard(IoInputType& io)
 	{
-		os<<"hubbardU\n";
-		os<<parameters.hubbardU;
-		os<<"potentialV\n";
-		os<<parameters.potentialV;
-		if (parameters.potentialT.size()==0) return os;
+		io.read(hubbardU,"hubbardU");
+		io.read(potentialV,"potentialV");
 
-		// time-dependent stuff
-		os<<"potentialT\n";
-		os<<parameters.potentialT;
-		os<<"omega="<<parameters.omega<<"\n";
-		return os;
+		try {
+			io.read(potentialT,"PotentialT"); //level,beQuiet);
+		} catch (std::exception& e) {}
+		omega=0;
+		try {
+			io.readline(omega,"omega=");
+		} catch (std::exception& e) {}
 	}
+
+	// Do not include here connection parameters
+	// those are handled by the Geometry
+	// Hubbard U values (one for each site)
+	VectorType hubbardU;
+	// Onsite potential values, one for each site
+	VectorType potentialV;
+
+	// for time-dependent H:
+	VectorType potentialT;
+	Field omega;
+
+	// target number of electrons  in the system
+	int nOfElectrons;
+};
+
+//! Function that prints model parameters to stream os
+template<typename FieldType>
+std::ostream& operator<<(std::ostream &os,
+                         const ParametersModelHubbard<FieldType>& parameters)
+{
+	os<<"hubbardU\n";
+	os<<parameters.hubbardU;
+	os<<"potentialV\n";
+	os<<parameters.potentialV;
+	if (parameters.potentialT.size()==0) return os;
+
+	// time-dependent stuff
+	os<<"potentialT\n";
+	os<<parameters.potentialT;
+	os<<"omega="<<parameters.omega<<"\n";
+	return os;
+}
 } // namespace Mpspp
 
 /*@}*/

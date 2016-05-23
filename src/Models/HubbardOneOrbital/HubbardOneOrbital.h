@@ -65,18 +65,18 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 namespace Mpspp {
 
 template<typename ParametersSolverType,
-		 typename InputValidatorType,
-		 typename SymmetryLocalType,
-		 typename GeometryType>
+         typename InputValidatorType,
+         typename SymmetryLocalType,
+         typename GeometryType>
 class HubbardOneOrbital : public ModelBase<ParametersSolverType,
-										   InputValidatorType,
-										   SymmetryLocalType,
-										   GeometryType> {
+        InputValidatorType,
+        SymmetryLocalType,
+        GeometryType> {
 
 	typedef ModelBase<ParametersSolverType,
-					  InputValidatorType,
-					  SymmetryLocalType,
-					  GeometryType> ModelBaseType;
+	InputValidatorType,
+	SymmetryLocalType,
+	GeometryType> ModelBaseType;
 
 	typedef typename ModelBaseType::MpoLocalType MpoLocalType;
 	typedef typename MpoLocalType::MpoFactorType MpoFactorType;
@@ -99,20 +99,20 @@ public:
 	enum {SPIN_UP,SPIN_DOWN};
 
 	HubbardOneOrbital(const ParametersSolverType& solverParams,
-					  InputValidatorType& io,
-					  const GeometryType& geometry)
-	: solverParams_(solverParams),
-	  io_(io),
-	  geometry_(geometry),
-	  hilbert_(4),
-	  mp_(io),
-	  hamiltonian_(geometry_.numberOfSites())
+	                  InputValidatorType& io,
+	                  const GeometryType& geometry)
+	    : solverParams_(solverParams),
+	      io_(io),
+	      geometry_(geometry),
+	      hilbert_(4),
+	      mp_(io),
+	      hamiltonian_(geometry_.numberOfSites())
 	{
 		// FIXME: CONNECT WITH THE GEOMETRY HERE!!
 		RealType tiip1up = -1.0;
 		RealType tiip1down = 0.0;
-		size_t n = hamiltonian_.size();
-		size_t wdim = 6;
+		SizeType n = hamiltonian_.size();
+		SizeType wdim = 6;
 
 		SparseMatrixType identity(hilbert_,hilbert_);
 		identity.makeDiagonal(hilbert_,1.0);
@@ -127,11 +127,11 @@ public:
 		SparseMatrixType cdaggerDown(hilbert_,hilbert_);
 		transposeConjugate(cdaggerDown,cdown);
 
-//		SparseMatrixType nupndown = (cdaggerUp*cup) * (cdaggerDown*cdown);
+		//		SparseMatrixType nupndown = (cdaggerUp*cup) * (cdaggerDown*cdown);
 
 		MpoFactorType mleft(1,wdim);
 		RealType mysign = -1.0;
-//		mleft(0,0) = PairForOperatorType(mp_.hubbardU[0]* nupndown,1);
+		//		mleft(0,0) = PairForOperatorType(mp_.hubbardU[0]* nupndown,1);
 		mleft(0,1) = PairForOperatorType(tiip1up * cdaggerUp,-1);
 		mleft(0,2) = PairForOperatorType((mysign * tiip1up) * cup,-1);
 		mleft(0,3) = PairForOperatorType(tiip1down * cdaggerDown,-1);
@@ -139,14 +139,14 @@ public:
 		mleft(0,5) = PairForOperatorType(identity,1);
 		hamiltonian_(0)=mleft;
 
-		for (size_t i=1;i<n-1;i++) {
+		for (SizeType i=1;i<n-1;i++) {
 			MpoFactorType m(wdim,wdim);
-			m(0,0) =PairForOperatorType( identity,1);
+			m(0,0) = PairForOperatorType(identity,1);
 			m(1,0) = PairForOperatorType(cup,-1);
 			m(2,0) = PairForOperatorType(cdaggerUp,-1);
 			m(3,0) = PairForOperatorType(cdown,-1);
 			m(4,0) = PairForOperatorType(cdaggerDown,-1);
-//			m(5,0) = PairForOperatorType(mp_.hubbardU[i]* nupndown,1);
+			//			m(5,0) = PairForOperatorType(mp_.hubbardU[i]* nupndown,1);
 			m(5,1) = PairForOperatorType(tiip1up * cdaggerUp,-1);
 			m(5,2) = PairForOperatorType((mysign * tiip1up) * cup,-1);
 			m(5,3) = PairForOperatorType(tiip1down * cdaggerDown,-1);
@@ -156,7 +156,7 @@ public:
 		}
 
 		MpoFactorType mright(wdim,1);
-//		mright(5,0) = PairForOperatorType(mp_.hubbardU[n-1]* nupndown,1);
+		//		mright(5,0) = PairForOperatorType(mp_.hubbardU[n-1]* nupndown,1);
 		mright(4,0) = PairForOperatorType(cdaggerDown,-1);
 		mright(3,0) = PairForOperatorType(cdown,-1);
 		mright(2,0) = PairForOperatorType(cdaggerUp,-1);
@@ -174,20 +174,20 @@ public:
 
 	virtual const GeometryType& geometry() const { return geometry_; }
 
-	virtual void getOneSite(VectorIntegerType& quantumNumbers,size_t site) const
+	virtual void getOneSite(VectorIntegerType& quantumNumbers,SizeType site) const
 	{
 		quantumNumbers.push_back(0);
 		quantumNumbers.push_back(1);
 		quantumNumbers.push_back(MAX_SITES);
 		quantumNumbers.push_back(1+MAX_SITES);
-//		VectorIntegerType partition_;
-//		PsimagLite::Vector<size_t>::Type permutation_;
-//		PsimagLite::Vector<size_t>::Type permutationInverse_;
+		//		VectorIntegerType partition_;
+		//		PsimagLite::Vector<SizeType>::Type permutation_;
+		//		PsimagLite::Vector<SizeType>::Type permutationInverse_;
 	}
 
 private:
 
-	void fillDestructionMatrix(SparseMatrixType& cm,size_t spin) const
+	void fillDestructionMatrix(SparseMatrixType& cm,SizeType spin) const
 	{
 		MatrixType m(4,4);
 		if (spin==SPIN_UP) {
@@ -203,7 +203,7 @@ private:
 	const ParametersSolverType& solverParams_;
 	InputValidatorType& io_;
 	const GeometryType& geometry_;
-	size_t hilbert_;
+	SizeType hilbert_;
 	ParametersModelType mp_;
 	MpoLocalType hamiltonian_;
 

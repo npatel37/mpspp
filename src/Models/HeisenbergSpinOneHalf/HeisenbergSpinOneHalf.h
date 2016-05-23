@@ -63,18 +63,18 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 namespace Mpspp {
 
 template<typename ParametersSolverType,
-		 typename InputValidatorType,
-		 typename SymmetryLocalType,
-		 typename GeometryType>
+         typename InputValidatorType,
+         typename SymmetryLocalType,
+         typename GeometryType>
 class HeisenbergSpinOneHalf : public ModelBase<ParametersSolverType,
-										   InputValidatorType,
-										   SymmetryLocalType,
-										   GeometryType> {
+        InputValidatorType,
+        SymmetryLocalType,
+        GeometryType> {
 
 	typedef ModelBase<ParametersSolverType,
-					  InputValidatorType,
-					  SymmetryLocalType,
-					  GeometryType> ModelBaseType;
+	InputValidatorType,
+	SymmetryLocalType,
+	GeometryType> ModelBaseType;
 
 	typedef typename ModelBaseType::MpoLocalType MpoLocalType;
 	typedef typename MpoLocalType::MpoFactorType MpoFactorType;
@@ -94,21 +94,21 @@ class HeisenbergSpinOneHalf : public ModelBase<ParametersSolverType,
 public:
 
 	HeisenbergSpinOneHalf(const ParametersSolverType& solverParams,
-					  InputValidatorType& io,
-					  const GeometryType& geometry)
-	: solverParams_(solverParams),
-	  io_(io),
-	  geometry_(geometry),
-	  hilbert_(2),
-	  mp_(io),
-	  hamiltonian_(geometry_.numberOfSites())
+	                      InputValidatorType& io,
+	                      const GeometryType& geometry)
+	    : solverParams_(solverParams),
+	      io_(io),
+	      geometry_(geometry),
+	      hilbert_(2),
+	      mp_(io),
+	      hamiltonian_(geometry_.numberOfSites())
 	{
 		// FIXME: CONNECT WITH THE GEOMETRY HERE!!
 		RealType J = 1.0;
 		RealType Jz=1.0;
 		RealType Jover2 = 0.5*J;
-		size_t n = hamiltonian_.size();
-		size_t wdim = 5;
+		SizeType n = hamiltonian_.size();
+		SizeType wdim = 5;
 
 		SparseMatrixType identity(hilbert_,hilbert_);
 		identity.makeDiagonal(hilbert_,1.0);
@@ -127,7 +127,7 @@ public:
 		mleft(0,4) = identity;
 		hamiltonian_(0)=mleft;
 
-		for (size_t i=1;i<n-1;i++) {
+		for (SizeType i=1;i<n-1;i++) {
 			MpoFactorType m(wdim,wdim);
 			m(0,0) = identity;
 			m(1,0) = splus;
@@ -158,7 +158,7 @@ public:
 
 	virtual const GeometryType& geometry() const { return geometry_; }
 
-	virtual void getOneSite(VectorIntegerType& quantumNumbers,size_t site) const
+	virtual void getOneSite(VectorIntegerType& quantumNumbers,SizeType site) const
 	{
 		quantumNumbers.push_back(1);
 		quantumNumbers.push_back(MAX_SITES);
@@ -184,7 +184,7 @@ private:
 	const ParametersSolverType& solverParams_;
 	InputValidatorType& io_;
 	const GeometryType& geometry_;
-	size_t hilbert_;
+	SizeType hilbert_;
 	ParametersModelType mp_;
 	MpoLocalType hamiltonian_;
 

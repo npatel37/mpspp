@@ -1,21 +1,21 @@
 #include "AllocatorCpu.h"
 const PsimagLite::String license=
-"Copyright (c) 2012, UT-Battelle, LLC\n"
-"All rights reserved\n"
-"[MPS++, Version 0.1]\n"
-"\n"
-"--------------------------------------------------------------------------------\n"
-"\n"
-"THE SOFTWARE IS SUPPLIED BY THE COPYRIGHT HOLDERS AND\n"
-"CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED\n"
-"WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED\n"
-"WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A\n"
-"PARTICULAR PURPOSE ARE DISCLAIMED.\n"
-"\n"
-"Please see full disclaimer and open source license included in file LICENSE\n"
-"--------------------------------------------------------------------------------\n"
-"\n"
-"\n";
+        "Copyright (c) 2012, UT-Battelle, LLC\n"
+        "All rights reserved\n"
+        "[MPS++, Version 0.1]\n"
+        "\n"
+        "--------------------------------------------------------------------------------\n"
+        "\n"
+        "THE SOFTWARE IS SUPPLIED BY THE COPYRIGHT HOLDERS AND\n"
+        "CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED\n"
+        "WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED\n"
+        "WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A\n"
+        "PARTICULAR PURPOSE ARE DISCLAIMED.\n"
+        "\n"
+        "Please see full disclaimer and open source license included in file LICENSE\n"
+        "--------------------------------------------------------------------------------\n"
+        "\n"
+        "\n";
 
 /** \ingroup MPSPP */
 /*@{*/
@@ -48,13 +48,14 @@ typedef PsimagLite::Concurrency ConcurrencyType;
 typedef PsimagLite::InputNg<Mpspp::InputCheck> InputNgType;
 typedef Mpspp::SymmetryLocal SymmetryLocalType;
 typedef PsimagLite::Geometry<RealType,InputNgType::Readable,Mpspp::ProgramGlobals> GeometryType;
-typedef Mpspp::ParametersMpsSolver<RealType,ComplexOrRealType,InputNgType::Readable> ParametersSolverType;
+typedef Mpspp::ParametersMpsSolver<RealType,ComplexOrRealType,InputNgType::Readable>
+ParametersSolverType;
 typedef PsimagLite::InputNg<Mpspp::InputCheck>::Readable InputValidatorType;
 
 typedef Mpspp::ModelBase<ParametersSolverType,
-						 InputValidatorType,
-						 SymmetryLocalType,
-						 GeometryType> ModelBaseType;
+InputValidatorType,
+SymmetryLocalType,
+GeometryType> ModelBaseType;
 typedef Mpspp::ModelSelector<ModelBaseType> ModelSelectorType;
 typedef ModelBaseType::MpoLocalType MpoLocalType;
 typedef MpoLocalType::MpsLocalType MpsLocalType;
@@ -62,7 +63,7 @@ typedef MpoLocalType::MpsLocalType MpsLocalType;
 // FIXME: make configurable at runtime:
 
 template<typename ModelBaseType,
-template<typename,typename> class InternalProductTemplate>
+         template<typename,typename> class InternalProductTemplate>
 void mainLoop(const typename ModelBaseType::ParametersSolverType& mpsSolverParams,
               const ModelBaseType& model,
               InputValidatorType& io)
@@ -73,11 +74,11 @@ void mainLoop(const typename ModelBaseType::ParametersSolverType& mpsSolverParam
 
 	mpsSolver.computeGroundState();
 
-//	const MpoLocalType& H = model.hamiltonian();
+	//	const MpoLocalType& H = model.hamiltonian();
 
-//	MpsLocalType hpsi = H*psi;
+	//	MpsLocalType hpsi = H*psi;
 
-//	std::cout<<"Energy="<<scalarProduct(psi,hpsi)<<"\n";
+	//	std::cout<<"Energy="<<scalarProduct(psi,hpsi)<<"\n";
 
 	std::cout<<"That's all folks!\n";
 }

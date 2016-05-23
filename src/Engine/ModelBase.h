@@ -97,9 +97,9 @@ public:
 		modelHelper.matrixVectorProduct(x,y);
 	}
 
-	virtual void getOneSite(VectorIntegerType& quantumNumbers,size_t site) const=0;
+	virtual void getOneSite(VectorIntegerType& quantumNumbers,SizeType site) const=0;
 
-	virtual size_t electronsFromQn(size_t qn) const
+	virtual SizeType electronsFromQn(SizeType qn) const
 	{
 		div_t q = div(qn, MAX_SITES);
 		return q.quot + q.rem;

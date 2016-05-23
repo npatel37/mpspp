@@ -44,32 +44,33 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 /*! \file ParametersHeisenbergSpinOneHalf.h
  *
- *  Contains the parameters for the Heisenberg model and function to read them from a JSON file
+ *  Contains the parameters for the Heisenberg model and function to read them from a file
  *
  */
 #ifndef PARAMETERS_HEISENBERG_SPIN_ONE_HALF
 #define PARAMETERS_HEISENBERG_SPIN_ONE_HALF
 
 namespace Mpspp {
-	//! Hubbard Model Parameters
-	template<typename Field>
-	struct ParametersHeisenbergSpinOneHalf {
-		
-		template<typename IoInputType>
-		ParametersHeisenbergSpinOneHalf(IoInputType& io)
-		{	
-		}
+//! Hubbard Model Parameters
+template<typename Field>
+struct ParametersHeisenbergSpinOneHalf {
 
-		// target number of electrons  in the system
-		int nOfElectrons;
-	};
-	
-	//! Function that prints model parameters to stream os
-	template<typename FieldType>
-	std::ostream& operator<<(std::ostream &os,const ParametersHeisenbergSpinOneHalf<FieldType>& parameters)
+	template<typename IoInputType>
+	ParametersHeisenbergSpinOneHalf(IoInputType& io)
 	{
-		return os;
 	}
+
+	// target number of electrons  in the system
+	int nOfElectrons;
+};
+
+//! Function that prints model parameters to stream os
+template<typename FieldType>
+std::ostream& operator<<(std::ostream &os,
+                         const ParametersHeisenbergSpinOneHalf<FieldType>& parameters)
+{
+	return os;
+}
 } // namespace Mpspp
 
 /*@}*/
