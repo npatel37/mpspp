@@ -53,7 +53,6 @@ namespace Mpspp {
 
 class SymmetryComponent {
 
-
 public:
 
 	typedef PsimagLite::IoSimple::In IoInputType;
@@ -64,28 +63,28 @@ public:
 	enum {COMPONENT_LEFT,COMPONENT_RIGHT,COMPONENT_SUPER};
 
 	SymmetryComponent(SizeType type)
-		: type_(type),leftSize_(0)
+	    : type_(type),leftSize_(0)
 	{}
 
 	SymmetryComponent(SizeType type,
 	                  SizeType hilbert,
 	                  SizeType site,
 	                  const VectorIntegerType& quantumNumbers)
-		: type_(type),
-		  leftSize_(hilbert),
-		  block_(1,site),
-		  quantumNumbers_(quantumNumbers)
+	    : type_(type),
+	      leftSize_(hilbert),
+	      block_(1,site),
+	      quantumNumbers_(quantumNumbers)
 	{
 		if (quantumNumbers.size()==1) block_.resize(0);
 
 		findPermutationAndPartition();
 	}
 
-//	SymmetryComponent(IoInputType& io,SizeType divisor)
-//	{
-//		loadInternal(io);
-//		leftSize_ = size()/divisor;
-//	}
+	//	SymmetryComponent(IoInputType& io,SizeType divisor)
+	//	{
+	//		loadInternal(io);
+	//		leftSize_ = size()/divisor;
+	//	}
 
 	void setSite(SizeType site)
 	{
@@ -98,7 +97,10 @@ public:
 		type_=comp;
 	}
 
-	void grow(SizeType site,const VectorIntegerType& quantumNumbers,SizeType nsites,SizeType leftSize)
+	void grow(SizeType site,
+	          const VectorIntegerType& quantumNumbers,
+	          SizeType nsites,
+	          SizeType leftSize)
 	{
 		assert(type_==COMPONENT_RIGHT);
 		SymmetryComponent sc1(type_,0,site,quantumNumbers);
@@ -294,13 +296,12 @@ private:
 	VectorIntegerType partition_;
 	VectorIntegerType permutation_;
 	VectorIntegerType permutationInverse_;
-
-
 }; // SymmetryComponent
 
 std::ostream& operator<<(std::ostream& os,const SymmetryComponent& symm)
 {
-	os<<"type="<<symm.typeToString()<<" leftSize_= "<<symm.leftSize_<<" size= "<<symm.quantumNumbers_.size();
+	os<<"type="<<symm.typeToString()<<" leftSize_= ";
+	os<<symm.leftSize_<<" size= "<<symm.quantumNumbers_.size();
 	os<<" block= ";
 	for (SizeType i=0;i<symm.block_.size();i++)
 		os<<symm.block_[i]<<" ";

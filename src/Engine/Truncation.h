@@ -69,7 +69,7 @@ class Truncation {
 public:
 
 	Truncation(MpsLocalType& mps,ContractedLocalType& contracted,bool enabled)
-		: mps_(mps),contracted_(contracted),enabled_(enabled)
+	    : mps_(mps),contracted_(contracted),enabled_(enabled)
 	{}
 
 	void setSize(SizeType size)
@@ -101,10 +101,10 @@ public:
 
 		if (part==ProgramGlobals::PART_LEFT) {
 			if (leftSize<=cutoff) return;
-//			cutoff = std::min(cutoff,rightSize);
+			//			cutoff = std::min(cutoff,rightSize);
 		} else {
 			if (rightSize<=cutoff) return;
-//			cutoff = std::min(cutoff,leftSize);
+			//			cutoff = std::min(cutoff,leftSize);
 		}
 
 		order();
@@ -185,8 +185,8 @@ private:
 
 	void permute(SparseMatrixType& m,const SparseMatrixType& src,SizeType what) const
 	{
-//		VectorIntegerType permInverse(perm_.size());
-//		getPermInverse(permInverse);
+		//		VectorIntegerType permInverse(perm_.size());
+		//		getPermInverse(permInverse);
 		const VectorIntegerType& perm = perm_;
 		SizeType row = src.row();
 		MatrixType dest(row,src.col());
@@ -213,8 +213,8 @@ private:
 	VectorRealType s_;
 	VectorIntegerType perm_;
 
-//	VectorRealType s_;
-//	VectorIntegerType perm_;
+	//	VectorRealType s_;
+	//	VectorIntegerType perm_;
 
 }; // Truncation
 

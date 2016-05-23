@@ -63,61 +63,67 @@ public:
 	SymmetryLocal()
 	{}
 
-//	SymmetryLocal(IoInputType& io)
-//	{
-//		size_t n = 0;
-//		io.readline(n,"TotalNumberOfSites=");
-//		size_t nk = 0;
-//		io.readline(nk,"HilbertOneSite=");
-//		assert(n>2);
-//		for (size_t i=0;i<n-1;i++) {
-//			SymmetryFactorType f(io,nk);
-//			data_.push_back(f);
-////			if (i==0) data_.push_back(f); // left corner
-////			if (i==n-3) data_.push_back(f); // right corner
-//		}
+	//	SymmetryLocal(IoInputType& io)
+	//	{
+	//		SizeType n = 0;
+	//		io.readline(n,"TotalNumberOfSites=");
+	//		SizeType nk = 0;
+	//		io.readline(nk,"HilbertOneSite=");
+	//		assert(n>2);
+	//		for (SizeType i=0;i<n-1;i++) {
+	//			SymmetryFactorType f(io,nk);
+	//			data_.push_back(f);
+	////			if (i==0) data_.push_back(f); // left corner
+	////			if (i==n-3) data_.push_back(f); // right corner
+	//		}
 
-//		assert(data_.size()==n-1);
-////		data_[0].adjustCorner(SymmetryFactorType::CORNER_LEFT);
-////		data_[n-1].adjustCorner(SymmetryFactorType::CORNER_RIGHT);
-//	}
+	//		assert(data_.size()==n-1);
+	////		data_[0].adjustCorner(SymmetryFactorType::CORNER_LEFT);
+	////		data_[n-1].adjustCorner(SymmetryFactorType::CORNER_RIGHT);
+	//	}
 
-	const SymmetryFactorType& operator()(size_t site) const
+	const SymmetryFactorType& operator()(SizeType site) const
 	{
 		assert(site<data_.size());
 		return data_[site];
 	}
 
-	void moveLeft(size_t site,const VectorIntegerType& quantumNumbers)
+	void moveLeft(SizeType site,const VectorIntegerType& quantumNumbers)
 	{
 		if (site+1==data_.size()) return;
 		assert(site+1<data_.size());
 		SymmetryFactorType symmFactor = data_[site];
-		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_LEFT,0,site,quantumNumbers);
+		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_LEFT,
+		                              0,
+		                              site,
+		                              quantumNumbers);
 		assert(site+1<data_.size());
 		symmFactor.moveLeft(data_[site].left(),onesite, data_[site+1].right());
 		data_[site] = symmFactor;
 		std::cout<<symmFactor;
 	}
 
-	void moveRight(size_t site,const VectorIntegerType& quantumNumbers)
+	void moveRight(SizeType site,const VectorIntegerType& quantumNumbers)
 	{
 		if (site==0) return;
 		assert(site>0);
 		VectorIntegerType qn(1,0);
 
 		if (site==data_.size()) {
-			size_t nsites = data_[site-1].super().block().size();
+			SizeType nsites = data_[site-1].super().block().size();
 			assert(site<=nsites);
 			assert(nsites-site<data_.size());
 			data_.push_back(data_[nsites-site]);
 			SymmetryComponentType onesite2(SymmetryComponentType::COMPONENT_RIGHT,0,site,qn);
 			if (site==nsites)
-				data_[data_.size()-1].set(SymmetryFactorType::SymmetryComponentType::COMPONENT_RIGHT,onesite2);
+				data_[data_.size()-1].set(SymmetryComponentType::COMPONENT_RIGHT,onesite2);
 		}
 		assert(site<data_.size());
 		SymmetryFactorType symmFactor;
-		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_RIGHT,0,site-1,quantumNumbers);
+		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_RIGHT,
+		                              0,
+		                              site-1,
+		                              quantumNumbers);
 		symmFactor.moveRight(data_[site-1].left(),onesite,data_[site].right());
 
 		data_[site] = symmFactor;
@@ -126,7 +132,7 @@ public:
 
 	// left = prev.left + one site
 	// right = prev.right + one site
-	void grow(size_t site,const VectorIntegerType& quantumNumbers,size_t nsites)
+	void grow(SizeType site,const VectorIntegerType& quantumNumbers,SizeType nsites)
 	{
 
 		if (data_.size()==0) {
@@ -141,7 +147,7 @@ public:
 	}
 
 	template<typename SomeTruncationType>
-	void truncate(size_t site,size_t part,size_t cutoff,const SomeTruncationType& trunc)
+	void truncate(SizeType site,SizeType part,SizeType cutoff,const SomeTruncationType& trunc)
 	{
 		assert(site<data_.size());
 		data_[site].truncate(part,cutoff,trunc);
@@ -158,7 +164,7 @@ private:
 std::ostream& operator<<(std::ostream& os,const SymmetryLocal& symm)
 {
 	os<<"symm.data.size= "<<symm.data_.size()<<"\n";
-	for (size_t i=0;i<symm.data_.size();i++)
+	for (SizeType i=0;i<symm.data_.size();i++)
 		os<<symm.data_[i];
 	return os;
 }
