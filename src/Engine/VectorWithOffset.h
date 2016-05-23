@@ -40,7 +40,7 @@ must include the following acknowledgment:
 "This product includes software produced by UT-Battelle,
 LLC under Contract No. DE-AC05-00OR22725  with the
 Department of Energy."
- 
+
 *********************************************************
 DISCLAIMER
 
@@ -86,217 +86,224 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "Vector.h"
 
 namespace Mpspp {
-	template<typename FieldType>
-	struct VectorWithOffset {
-	public:
-		typedef FieldType value_type;
-		typedef std::pair<size_t,size_t> PairType;
-		typedef typename PsimagLite::Vector<FieldType>::Type VectorType;
-		typedef typename PsimagLite::Vector<size_t>::Type VectorIntegerType;
+template<typename FieldType>
+struct VectorWithOffset {
+public:
+	typedef FieldType value_type;
+	typedef std::pair<SizeType,SizeType> PairType;
+	typedef typename PsimagLite::Vector<FieldType>::Type VectorType;
+	typedef typename PsimagLite::Vector<SizeType>::Type VectorIntegerType;
 
-		static const FieldType zero_;
+	static const FieldType zero_;
 
-		VectorWithOffset()  : size_(0),offset_(0),m_(0) { }
+	VectorWithOffset()  : size_(0),offset_(0),m_(0) { }
 
-		template<typename SomeBasisType>
-		VectorWithOffset(const VectorIntegerType& weights,
-		                 const SomeBasisType& someBasis)
-		: size_(someBasis.size())
-		{
-			bool found = false;
-			for (size_t i=0;i<weights.size();i++) {
-				if (weights[i]>0) {
-					if (found)
-						throw std::runtime_error("VectorWithOffset::"
-						  " more than one non-zero sector found. "
-						  " Maybe you should be using VectorWithOffsets instead?\n");
-					data_.resize(weights[i]);
-					offset_ = someBasis.partition(i);
-					m_ = i;
-					found = true;
+	template<typename SomeBasisType>
+	VectorWithOffset(const VectorIntegerType& weights,
+	                 const SomeBasisType& someBasis)
+	    : size_(someBasis.size())
+	{
+		bool found = false;
+		for (SizeType i=0;i<weights.size();i++) {
+			if (weights[i]>0) {
+				if (found) {
+					PsimagLite::String str("VectorWithOffset: ");
+					str += " more than one non-zero sector found. ";
+					str += " Maybe you should be using VectorWithOffsets instead?\n";
+					throw std::runtime_error(str);
 				}
+
+				data_.resize(weights[i]);
+				offset_ = someBasis.partition(i);
+				m_ = i;
+				found = true;
 			}
 		}
+	}
 
-		void resize(size_t x)
-		{
-			size_ = x;
-			data_.clear();
-			offset_=0;
+	void resize(SizeType x)
+	{
+		size_ = x;
+		data_.clear();
+		offset_=0;
+		m_=0;
+	}
+
+	template<typename SomeBasisType>
+	void set(const typename PsimagLite::Vector<VectorType>::Type& v,
+	         const SomeBasisType& someBasis)
+	{
+		bool found = false;
+		size_ = someBasis.size();
+		for (SizeType i=0;i<v.size();i++) {
+			if (v[i].size()>0) {
+				if (found) {
+					PsimagLite::String str("VectorWithOffset: ");
+					str += " more than one non-zero sector found. ";
+					str += " Maybe you should be using VectorWithOffsets instead?\n";
+					throw std::runtime_error(str);
+				}
+
+				data_ = v[i];
+				offset_ = someBasis.partition(i);
+				m_ = i;
+				found = true;
+			}
+		}
+		if (!found) throw std::runtime_error("Set failed\n");
+	}
+
+	template<typename SomeBasisType>
+	void fromFull(const VectorType& v,const SomeBasisType& someBasis)
+	{
+		size_ = someBasis.size();
+		try {
+			m_ = findPartition(v,someBasis);
+			offset_ = someBasis.partition(m_);
+			SizeType total = someBasis.partition(m_+1) - offset_;
+			data_.resize(total);
+			for (SizeType i=0;i<total;i++) data_[i] = v[i+offset_];
+		} catch (std::exception& e) {
+			std::cerr<<e.what();
 			m_=0;
+			offset_=0;
+			data_.resize(0);
 		}
+	}
 
-		template<typename SomeBasisType>
-		void set(const typename PsimagLite::Vector<VectorType>::Type& v,
-		         const SomeBasisType& someBasis)
-		{
-			bool found = false;
-			size_ = someBasis.size();
-			for (size_t i=0;i<v.size();i++) {
-				if (v[i].size()>0) {
-					if (found) throw std::runtime_error("VectorWithOffset::"
-						" more than one non-zero sector found. "
-						" Maybe you should be using VectorWithOffsets instead?\n");
-					data_ = v[i];
-					offset_ = someBasis.partition(i);
-					m_ = i;
-					found = true;
-				}
+	SizeType sectors() const { return 1; }
+
+	SizeType sector(SizeType dummy) const { return m_; }
+
+	SizeType offset(SizeType dummy) const { return offset_; }
+
+	SizeType effectiveSize(SizeType dummy) const { return data_.size(); }
+
+	void setDataInSector(const VectorType& v,SizeType dummy)
+	{
+		data_=v;
+	}
+
+	void extract(VectorType& v, SizeType dummy = 0) const
+	{
+		v=data_;
+	}
+
+	template<typename SparseVectorType>
+	void toSparse(SparseVectorType& sv) const
+	{
+		sv.resize(size_);
+		for (SizeType i=0;i<data_.size();i++)
+			sv[i+offset_] = data_[i];
+	}
+
+	template<typename IoOutputter>
+	void save(IoOutputter& io,const PsimagLite::String& label) const
+	{
+		io.print(label);
+		io.print("#size=",size_);
+		io.print("#offset=",offset_);
+		io.print("#m=",m_);
+		io.printVector(data_,"#data");
+	}
+
+	template<typename IoInputter>
+	void load(IoInputter& io,const PsimagLite::String& label,SizeType counter=0)
+	{
+		io.advance(label,counter);
+		int x = 0;
+		io.readline(x,"#size=");
+		if (x<0) throw std::runtime_error("VectorWithOffset::load(...): size<0\n");
+		size_ = x;
+		io.readline(x,"#offset=");
+		if (x<0) throw std::runtime_error("VectorWithOffset::load(...): offset<0\n");
+		offset_ = x;
+		io.readline(x,"#m=");
+		if (x<0) throw std::runtime_error("VectorWithOffset::load(...): m<0\n");
+		m_ = x;
+		io.read(data_,"#data");
+	}
+
+	SizeType size() const { return size_; }
+
+	SizeType effectiveSize() const { return data_.size(); }
+
+	SizeType offset() const { return offset_; }
+
+	const FieldType& operator[](SizeType i) const
+	{
+		if (i<offset_ || i>= (offset_+data_.size())) return zero_;
+		//assert(i>=offset_ && i<offset_+data_.size());
+		return data_[i-offset_];
+	}
+
+	FieldType& operator[](SizeType i)
+	{
+		// 			if (i<offset_ || i>= (offset_+data_.size()))
+		// 				throw std::runtime_error("VectorWithOffset\n");
+		return data_[i-offset_];
+	}
+
+	const FieldType& fastAccess(SizeType i,SizeType j) const
+	{
+		return data_[j];
+	}
+
+	template<typename FieldType2>
+	friend FieldType2 std::norm(const Mpspp::VectorWithOffset<FieldType2>& v);
+
+	template<typename FieldType2>
+	friend FieldType2 std::norm(const Mpspp::VectorWithOffset<std::complex<FieldType2> >&);
+
+	template<typename FieldType2>
+	friend FieldType2 operator*(const Mpspp::VectorWithOffset<FieldType2>& v1,
+	                            const Mpspp::VectorWithOffset<FieldType2>& v2);
+
+	template<typename FieldType3,typename FieldType2>
+	friend VectorWithOffset<FieldType2> operator*(const FieldType3&,
+	                                              const VectorWithOffset<FieldType2>&);
+
+	template<typename FieldType2>
+	friend FieldType2 multiply(const VectorWithOffset<FieldType2>& v1,
+	                           const VectorWithOffset<FieldType2>& v2);
+
+private:
+	template<typename SomeBasisType>
+	SizeType findPartition(const VectorType& v,const SomeBasisType& someBasis)
+	{
+		bool found = false;
+		SizeType p = 0;
+		for (SizeType i=0;i<someBasis.partition()-1;i++) {
+			if (nonZeroPartition(v,someBasis,i)) {
+				if (found) throw std::runtime_error("VectorWithOFfset::"
+				                                    " More than one partition found\n");
+				found = true;
+				p = i;
 			}
-			if (!found) throw std::runtime_error("Set failed\n");
 		}
-		
-		template<typename SomeBasisType>
-		void fromFull(const VectorType& v,const SomeBasisType& someBasis)
-		{
-			size_ = someBasis.size();
-			try {
-				m_ = findPartition(v,someBasis);
-				offset_ = someBasis.partition(m_);
-				size_t total = someBasis.partition(m_+1) - offset_;
-				data_.resize(total);
-				for (size_t i=0;i<total;i++) data_[i] = v[i+offset_];
-			} catch (std::exception& e) {
-				std::cerr<<e.what();
-				m_=0;
-				offset_=0;
-				data_.resize(0);
-			}
+		if (!found)
+			throw std::runtime_error("VectorWithOFfset: No partition found\n");
+		return p;
+	}
+
+	template<typename SomeBasisType>
+	bool nonZeroPartition(const VectorType& v,const SomeBasisType& someBasis,SizeType i)
+	{
+		typename VectorType::value_type zero = 0;
+		for (SizeType j=someBasis.partition(i);j<someBasis.partition(i+1);j++) {
+			if (v[j]!=zero) return true;
 		}
+		return false;
+	}
 
-		size_t sectors() const { return 1; }
+	SizeType size_;
+	VectorType data_;
+	SizeType offset_;
+	SizeType m_; // partition
+}; // class VectorWithOffset
 
-		size_t sector(size_t dummy) const { return m_; }
-
-		size_t offset(size_t dummy) const { return offset_; }
-
-		size_t effectiveSize(size_t dummy) const { return data_.size(); }
-
-		void setDataInSector(const VectorType& v,size_t dummy)
-		{
-			data_=v;
-		}
-
-		void extract(VectorType& v, size_t dummy = 0) const
-		{
-			v=data_;
-		}
-
-		template<typename SparseVectorType>
-		void toSparse(SparseVectorType& sv) const
-		{
-			sv.resize(size_);
-			for (size_t i=0;i<data_.size();i++)
-				sv[i+offset_] = data_[i];
-		}
-
-		template<typename IoOutputter>
-		void save(IoOutputter& io,const PsimagLite::String& label) const
-		{
-			io.print(label);
-			io.print("#size=",size_);
-			io.print("#offset=",offset_);
-			io.print("#m=",m_);
-			io.printVector(data_,"#data");
-		}
-
-		template<typename IoInputter>
-		void load(IoInputter& io,const PsimagLite::String& label,size_t counter=0)
-		{
-			io.advance(label,counter);
-			int x = 0;
-			io.readline(x,"#size=");
-			if (x<0) throw std::runtime_error("VectorWithOffset::load(...): size<0\n");
-			size_ = x;
-			io.readline(x,"#offset=");
-			if (x<0) throw std::runtime_error("VectorWithOffset::load(...): offset<0\n");
-			offset_ = x;
-			io.readline(x,"#m=");
-			if (x<0) throw std::runtime_error("VectorWithOffset::load(...): m<0\n");
-			m_ = x;
-			io.read(data_,"#data");
-		}
-
-		size_t size() const { return size_; }
-
-		size_t effectiveSize() const { return data_.size(); }
-
-		size_t offset() const { return offset_; }
-
-		 const FieldType& operator[](size_t i) const
-		{
-			if (i<offset_ || i>= (offset_+data_.size())) return zero_;
-			//assert(i>=offset_ && i<offset_+data_.size());
-			return data_[i-offset_];
-		}
-
-		FieldType& operator[](size_t i)
-		{
-// 			if (i<offset_ || i>= (offset_+data_.size()))
-// 				throw std::runtime_error("VectorWithOffset\n");
-			return data_[i-offset_];
-		}
-		
-		const FieldType& fastAccess(size_t i,size_t j) const 
-		{
-			return data_[j];
-		}
-
-		template<typename FieldType2>
-		friend FieldType2 std::norm(const Mpspp::VectorWithOffset<FieldType2>& v);
-
-		template<typename FieldType2>
-		friend FieldType2 std::norm(const Mpspp::VectorWithOffset<std::complex<FieldType2> >& v);
-
-		template<typename FieldType2>
-		friend FieldType2 operator*(const Mpspp::VectorWithOffset<FieldType2>& v1,
-									const Mpspp::VectorWithOffset<FieldType2>& v2);
-
-		template<typename FieldType3,typename FieldType2>
-		friend VectorWithOffset<FieldType2> operator*(const FieldType3& value,const VectorWithOffset<FieldType2>& v);
-		
-		template<typename FieldType2>
-		friend FieldType2 multiply(const VectorWithOffset<FieldType2>& v1,
-		                                         const VectorWithOffset<FieldType2>& v2);
-
-	private:
-		template<typename SomeBasisType>
-		size_t findPartition(const VectorType& v,const SomeBasisType& someBasis)
-		{
-			bool found = false;
-			size_t p = 0;
-			for (size_t i=0;i<someBasis.partition()-1;i++) {
-				if (nonZeroPartition(v,someBasis,i)) {
-					if (found) throw std::runtime_error("VectorWithOFfset::"
-						" More than one partition found\n");
-					found = true;
-					p = i;
-				}
-			}
-			if (!found)
-				throw std::runtime_error("VectorWithOFfset::"
-				                         " No partition found\n");
-			return p;
-		}
-
-		template<typename SomeBasisType>
-		bool nonZeroPartition(const VectorType& v,const SomeBasisType& someBasis,size_t i)
-		{
-			typename VectorType::value_type zero = 0;
-			for (size_t j=someBasis.partition(i);j<someBasis.partition(i+1);j++) {
-				if (v[j]!=zero) return true;
-			}
-			return false;
-		}
-
-		size_t size_;
-		VectorType data_;
-		size_t offset_;
-		size_t m_; // partition 
-	}; // class VectorWithOffset
-
-	template<typename FieldType>
-	const FieldType VectorWithOffset<FieldType>::zero_=0;
+template<typename FieldType>
+const FieldType VectorWithOffset<FieldType>::zero_=0;
 
 //	template<typename FieldType>
 //	std::ostream& operator<<(std::ostream& os,const VectorWithOffset<FieldType>& s)
@@ -304,50 +311,52 @@ namespace Mpspp {
 //		s.print(os,"VectorWithOffset");
 //		return os;
 //	}
-	
-	template<typename FieldType>
-	inline FieldType operator*(const Mpspp::VectorWithOffset<FieldType>& v1,
-							   const Mpspp::VectorWithOffset<FieldType>& v2)
-	{
-		return (v1.data_ * v2.data_);
-	}
 
-	template<typename FieldType,typename FieldType2>
-	inline VectorWithOffset<FieldType2> operator*(const FieldType& value,const VectorWithOffset<FieldType2>& v)
-	{
-		VectorWithOffset<FieldType2> w = v;
-		w.data_ *= value;
-		return w;
-	}
-	
-	template<typename FieldType>
-	inline FieldType multiply(const VectorWithOffset<FieldType>& v1,
-	                                        const VectorWithOffset<FieldType>& v2)
-	{
-		return v1.data_*v2.data_; // call to * will conj()
-	}
+template<typename FieldType>
+inline FieldType operator*(const Mpspp::VectorWithOffset<FieldType>& v1,
+                           const Mpspp::VectorWithOffset<FieldType>& v2)
+{
+	return (v1.data_ * v2.data_);
+}
+
+template<typename FieldType,typename FieldType2>
+inline VectorWithOffset<FieldType2> operator*(const FieldType& value,
+                                              const VectorWithOffset<FieldType2>& v)
+{
+	VectorWithOffset<FieldType2> w = v;
+	w.data_ *= value;
+	return w;
+}
+
+template<typename FieldType>
+inline FieldType multiply(const VectorWithOffset<FieldType>& v1,
+                          const VectorWithOffset<FieldType>& v2)
+{
+	return v1.data_*v2.data_; // call to * will conj()
+}
 
 } // namespace Mpspp
 
 namespace std {
-	template<typename FieldType>
-	inline FieldType norm(const Mpspp::VectorWithOffset<FieldType>& v)
-	{
-		return PsimagLite::norm(v.data_);
-	}
+template<typename FieldType>
+inline FieldType norm(const Mpspp::VectorWithOffset<FieldType>& v)
+{
+	return PsimagLite::norm(v.data_);
+}
 
-	template<typename FieldType>
-	inline FieldType norm(const Mpspp::VectorWithOffset<std::complex<FieldType> >& v)
-	{
-		return PsimagLite::norm(v.data_);
-	}
+template<typename FieldType>
+inline FieldType norm(const Mpspp::VectorWithOffset<std::complex<FieldType> >& v)
+{
+	return PsimagLite::norm(v.data_);
+}
 
-	template<typename FieldType>
-	inline std::complex<FieldType> operator*(const Mpspp::VectorWithOffset<std::complex<FieldType> >& v1,
-											 const Mpspp::VectorWithOffset<std::complex<FieldType> >& v2)
-	{
-		throw std::runtime_error("Unimplemented\n");
-	}
+template<typename FieldType>
+inline std::complex<FieldType>
+operator*(const Mpspp::VectorWithOffset<std::complex<FieldType> >&,
+          const Mpspp::VectorWithOffset<std::complex<FieldType> >&)
+{
+	throw std::runtime_error("Unimplemented\n");
+}
 
 }
 /*@}*/
