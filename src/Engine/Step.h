@@ -81,10 +81,11 @@ class Step {
 	typedef PsimagLite::ParametersForSolver<RealType> ParametersForSolverType;
 	typedef typename ParametersSolverType::InputValidatorType InputValidatorType;
 
-	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
+	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT,
+	      TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 	static int const MAX_ = 100;
-	
+
 public:
 
 	Step(const ParametersSolverType& solverParams,
@@ -92,18 +93,22 @@ public:
 	     ContractedLocalType& contractedLocal,
 	     const ModelType& model,
 	     InputValidatorType& io)
-	: progress_("Step"),
-	  solverParams_(solverParams),
-	  mps_(mps),
-	  contractedLocal_(contractedLocal),
-	  model_(model),
-	  paramsForSolver_(io,"Lanczos"),
-	  statePredictor_(),
-	  truncation_(mps,contractedLocal,solverParams_.options.find("notruncation")==PsimagLite::String::npos)
+	    : progress_("Step"),
+	      solverParams_(solverParams),
+	      mps_(mps),
+	      contractedLocal_(contractedLocal),
+	      model_(model),
+	      paramsForSolver_(io,"Lanczos"),
+	      statePredictor_(),
+	      truncation_(mps,
+	                  contractedLocal,
+	                  solverParams_.options.find("notruncation")==PsimagLite::String::npos)
 	{}
 
 	//! Moves the center of orthogonality by one to the left
-	void moveLeft(SymmetryLocalType& symm,size_t currentSite,const FiniteLoop& finiteLoop)
+	void moveLeft(SymmetryLocalType& symm,
+	              SizeType currentSite,
+	              const FiniteLoop& finiteLoop)
 	{
 		if (currentSite==model_.geometry().numberOfSites()) return;
 		VectorIntegerType quantumNumbers;
@@ -120,7 +125,9 @@ public:
 	}
 
 	//! Moves the center of orthogonality by one to the right
-	void moveRight(SymmetryLocalType& symm,size_t currentSite,const FiniteLoop& finiteLoop)
+	void moveRight(SymmetryLocalType& symm,
+	               SizeType currentSite,
+	               const FiniteLoop& finiteLoop)
 	{
 		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
@@ -131,12 +138,15 @@ public:
 		SymmetryHelperType symmetryHelper(fermionSign,symm);
 		internalmove(TO_THE_RIGHT,symmetryHelper,currentSite+1);
 		contractedLocal_.move(currentSite,TO_THE_RIGHT,symmetryHelper);
-		truncation_(symm,currentSite,ProgramGlobals::PART_LEFT,finiteLoop.keptStates);
+		truncation_(symm,
+		            currentSite,
+		            ProgramGlobals::PART_LEFT,
+		            finiteLoop.keptStates);
 	}
 
-	void grow(SymmetryLocalType& symm,size_t center)
+	void grow(SymmetryLocalType& symm,SizeType center)
 	{
-		size_t nsites = model_.geometry().numberOfSites();
+		SizeType nsites = model_.geometry().numberOfSites();
 		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,center);
 		symm.grow(center,quantumNumbers,nsites);
@@ -153,8 +163,14 @@ public:
 		SymmetryHelperType symmetryHelper2(fermionSign2,symm);
 		internalmove(TO_THE_LEFT,symmetryHelper2,center+1);
 
-		truncation_(symm,center,ProgramGlobals::PART_LEFT,solverParams_.keptStatesInfinite);
-		truncation_(symm,center+1,ProgramGlobals::PART_RIGHT,solverParams_.keptStatesInfinite);
+		truncation_(symm,
+		            center,
+		            ProgramGlobals::PART_LEFT,
+		            solverParams_.keptStatesInfinite);
+		truncation_(symm,
+		            center+1,
+		            ProgramGlobals::PART_RIGHT,
+		            solverParams_.keptStatesInfinite);
 	}
 
 	void printReport(std::ostream& os) const
@@ -164,41 +180,66 @@ public:
 
 private:
 
-	void internalmove(size_t direction,const SymmetryHelperType& symmetryHelper,size_t siteForSymm)
+	void internalmove(SizeType direction,
+	                  const SymmetryHelperType& symmetryHelper,
+	                  SizeType siteForSymm)
 	{
 		const SymmetryFactorType& symm = symmetryHelper.symmLocal()(siteForSymm);
-		size_t currentSite = symmetryHelper.currentSite();
-		size_t symmetrySector = getSymmetrySector(direction,symm.super());
+		SizeType currentSite = symmetryHelper.currentSite();
+		SizeType symmetrySector = getSymmetrySector(direction,symm.super());
 		std::cerr<<"symmetrySector="<<symmetrySector<<"\n";
-//		size_t total = symm.super().size();
-		size_t total = symm.super().partitionSize(symmetrySector);
+		//		SizeType total = symm.super().size();
+		SizeType total = symm.super().partitionSize(symmetrySector);
 		VectorType v(total,0.0);
-		RealType energy = internalmove(v,currentSite,direction,symmetryHelper,symmetrySector,siteForSymm);
+		RealType energy = internalmove(v,
+		                               currentSite,
+		                               direction,
+		                               symmetryHelper,
+		                               symmetrySector,
+		                               siteForSymm);
 		mps_.move(truncation_,currentSite,v,direction,symmetrySector,symm);
 		statePredictor_.push(energy,v,symmetrySector);
 		if (solverParams_.options.find("test")!=PsimagLite::String::npos)
-			throw PsimagLite::LogicError
-					 ("Exiting due to option test in the input file\n");
+			throw PsimagLite::LogicError("Exiting due to option test in the input\n");
 	}
 
-	RealType internalmove(VectorType& tmpVec,size_t currentSite,size_t direction,const SymmetryHelperType& symmetryHelper,size_t symmetrySector,size_t siteForSymm)
+	RealType internalmove(VectorType& tmpVec,
+	                      SizeType currentSite,
+	                      SizeType direction,
+	                      const SymmetryHelperType& symmetryHelper,
+	                      SizeType symmetrySector,
+	                      SizeType siteForSymm)
 	{
 		const ParametersSolverType& solverParams = model_.solverParams();
 
-		typedef InternalProductTemplate<typename VectorType::value_type,ModelType> InternalProductType;
-		typedef PsimagLite::LanczosOrDavidsonBase<ParametersForSolverType,InternalProductType,VectorType> LanczosOrDavidsonBaseType;
+		typedef InternalProductTemplate<typename VectorType::value_type,ModelType>
+		        InternalProductType;
+		typedef PsimagLite::LanczosOrDavidsonBase<ParametersForSolverType,
+		        InternalProductType,
+		        VectorType> LanczosOrDavidsonBaseType;
 
 		ReflectionSymmetryType *rs = 0;
-		ModelHelperType modelHelper(contractedLocal_,symmetrySector,currentSite,direction,model_.hamiltonian()(currentSite),symmetryHelper,siteForSymm);
+		ModelHelperType modelHelper(contractedLocal_,
+		                            symmetrySector,
+		                            currentSite,
+		                            direction,
+		                            model_.hamiltonian()(currentSite),
+		                            symmetryHelper,
+		                            siteForSymm);
 		InternalProductType lanczosHelper(&model_,&modelHelper,rs);
 
 		LanczosOrDavidsonBaseType* lanczosOrDavidson = 0;
 
-		bool useDavidson = (solverParams.options.find("useDavidson")!=PsimagLite::String::npos);
+		bool useDavidson =
+		        (solverParams.options.find("useDavidson")!=PsimagLite::String::npos);
 		if (useDavidson) {
-			lanczosOrDavidson = new PsimagLite::DavidsonSolver<ParametersForSolverType,InternalProductType,VectorType>(lanczosHelper,paramsForSolver_);
+			lanczosOrDavidson = new PsimagLite::DavidsonSolver<ParametersForSolverType,
+			        InternalProductType,
+			        VectorType>(lanczosHelper,paramsForSolver_);
 		} else {
-			lanczosOrDavidson = new PsimagLite::LanczosSolver<ParametersForSolverType,InternalProductType,VectorType>(lanczosHelper,paramsForSolver_);
+			lanczosOrDavidson = new PsimagLite::LanczosSolver<ParametersForSolverType,
+			        InternalProductType,
+			        VectorType>(lanczosHelper,paramsForSolver_);
 		}
 
 		RealType energyTmp = 0;
@@ -208,21 +249,23 @@ private:
 
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
-//		std::cout<<"Eigenstate\n";
-//		std::cout<<tmpVec;
+		//		std::cout<<"Eigenstate\n";
+		//		std::cout<<tmpVec;
 		return energyTmp;
 	}
 
-	size_t getSymmetrySector(size_t direction,const SymmetryComponentType& super) const
+	SizeType getSymmetrySector(SizeType direction,
+	                           const SymmetryComponentType& super) const
 	{
-		size_t sites = super.block().size();
-		size_t targetQuantumNumber = getQuantumSector(sites,direction);
-		size_t imin=0;
-		size_t minDiff=0;
-		for (size_t i=0;i<super.partitions()-1;i++) {
-			size_t state = super.partitionOffset(i);
-			size_t q = super.qn(state);
-			size_t diff = (q<targetQuantumNumber) ? targetQuantumNumber - q : q-targetQuantumNumber;
+		SizeType sites = super.block().size();
+		SizeType targetQuantumNumber = getQuantumSector(sites,direction);
+		SizeType imin=0;
+		SizeType minDiff=0;
+		for (SizeType i=0;i<super.partitions()-1;i++) {
+			SizeType state = super.partitionOffset(i);
+			SizeType q = super.qn(state);
+			SizeType diff = (q<targetQuantumNumber) ?
+			            targetQuantumNumber - q : q-targetQuantumNumber;
 			if (diff<minDiff || i==0) {
 				imin = i;
 				minDiff = diff;
@@ -237,46 +280,49 @@ private:
 		return imin;
 	}
 	
-	size_t getQuantumSector(size_t sites,size_t direction) const
+	SizeType getQuantumSector(SizeType sites,SizeType direction) const
 	{
 		return (solverParams_.targetQuantumNumbers.size()>0) ?
-				getQuantumSectorT(sites,direction) :
-				getQuantumSectorUd(sites,direction);
+		            getQuantumSectorT(sites,direction) :
+		            getQuantumSectorUd(sites,direction);
 	}
 
-	size_t getQuantumSectorT(size_t sites,size_t direction) const
+	SizeType getQuantumSectorT(SizeType sites,SizeType direction) const
 	{
 		VectorIntegerType targetQuantumNumbers(solverParams_.targetQuantumNumbers.size());
-		for (size_t ii=0;ii<targetQuantumNumbers.size();ii++) 
-			targetQuantumNumbers[ii]=size_t(round(solverParams_.targetQuantumNumbers[ii]*sites));
+		for (SizeType ii=0;ii<targetQuantumNumbers.size();ii++)
+			targetQuantumNumbers[ii] =
+			        SizeType(round(solverParams_.targetQuantumNumbers[ii]*sites));
 		return getQuantumSector(targetQuantumNumbers,direction);
 	}
 
-	size_t getQuantumSectorUd(size_t sites,size_t direction) const
+	SizeType getQuantumSectorUd(SizeType sites,SizeType direction) const
 	{
 		VectorIntegerType targetQuantumNumbers(2);
 
-		size_t nsites = model_.geometry().numberOfSites();
-		targetQuantumNumbers[0]=size_t(static_cast<RealType>(solverParams_.electronsUp*sites)/nsites);
-		targetQuantumNumbers[1]=size_t(static_cast<RealType>(solverParams_.electronsDown*sites)/nsites);
+		SizeType nsites = model_.geometry().numberOfSites();
+		targetQuantumNumbers[0] =
+		        SizeType(static_cast<RealType>(solverParams_.electronsUp*sites)/nsites);
+		targetQuantumNumbers[1] =
+		        SizeType(static_cast<RealType>(solverParams_.electronsDown*sites)/nsites);
 
 		return getQuantumSector(targetQuantumNumbers,direction);
 	}
 
-	size_t getQuantumSector(const VectorIntegerType& targetQuantumNumbers,size_t direction) const
+	SizeType getQuantumSector(const VectorIntegerType& targetQuantumNumbers,
+	                          SizeType direction) const
 	{
 		PsimagLite::OstringStream msg;
 		msg<<"Integer target quantum numbers are: ";
-		for (size_t ii=0;ii<targetQuantumNumbers.size();ii++)
+		for (SizeType ii=0;ii<targetQuantumNumbers.size();ii++)
 			msg<<targetQuantumNumbers[ii]<<" ";
 		progress_.printline(msg,std::cout);
-		//if (direction==INFINITE) io_.printVector(targetQuantumNumbers,"TargetedQuantumNumbers");
 		return encodeQuantumNumber(targetQuantumNumbers);
 	}
 	
-	static size_t encodeQuantumNumber(const VectorIntegerType& v)
+	static SizeType encodeQuantumNumber(const VectorIntegerType& v)
 	{
-		size_t x= v[0] + v[1]*MAX_;
+		SizeType x= v[0] + v[1]*MAX_;
 		if (v.size()==3) x += v[2]*MAX_*MAX_;
 		return x;
 	}
