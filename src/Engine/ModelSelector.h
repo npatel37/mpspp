@@ -46,8 +46,8 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define MODEL_SELECTOR_H
 
 #include <stdexcept>
-#include "HubbardOneOrbital.h"
-#include "HeisenbergSpinOneHalf.h"
+#include "../Models/HubbardOneOrbital/HubbardOneOrbital.h"
+#include "../Models/HeisenbergSpinOneHalf/HeisenbergSpinOneHalf.h"
 
 namespace Mpspp {
 

@@ -10,33 +10,25 @@ CPPFLAGS = -Werror -Wall  -IEngine -I../../PsimagLite/src -I../../PsimagLite  \
 CXX = g++ -g3 #ALSO COMMENT OUT strip command below
 all: mpspp 
 
-mpspp:  mpspp.o gitrev Makefile.dep
+mpspp:  mpspp.o Makefile.dep
 	$(CXX) -o mpspp mpspp.o $(LDFLAGS) $(CPPFLAGS) 
 
 mpspp.o: Makefile.dep mpspp.cpp Makefile
 	$(CXX) $(CPPFLAGS) -c mpspp.cpp
 
+Provenance.o
 # dependencies brought about by Makefile.dep
-%.o: %.cpp Makefile gitrev Engine/Version.h
+%.o: %.cpp Makefile
 	$(CXX) $(CPPFLAGS) -c $< 
 
-Makefile.dep: Engine/Version.h mpspp.cpp
+Makefile.dep: mpspp.cpp
 	$(CXX) $(CPPFLAGS) -MM mpspp.cpp  > Makefile.dep
-
-Engine/Version.h: gitrev
-	./gitrev > Engine/Version.h	
-
-gitrev: gitrev.o
-	$(CXX) -o gitrev gitrev.o $(LDFLAGS)
-
-gitrev.o:
-	$(CXX) $(CPPFLAGS) -c gitrev.cpp 
 
 doc:
 	cd ../doc; make
 
 clean:
-	rm -f core* $(EXENAME) *.o *.dep Engine/Version.h gitrev
+	rm -f core* $(EXENAME) *.o *.dep
 
 include Makefile.dep
 ######## End of Makefile ########
