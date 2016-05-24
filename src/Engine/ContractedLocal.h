@@ -66,7 +66,7 @@ public:
 	typedef typename MpsFactorType::VectorIntegerType VectorIntegerType;
 	typedef typename MpsLocalType::SymmetryLocalType SymmetryLocalType;
 	typedef typename MpsLocalType::ComplexOrRealType ComplexOrRealType;
-	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
+	typedef PsimagLite::CrsMatrix<ComplexOrRealType> SparseMatrixType;
 	typedef ContractedFactor<MatrixProductOperatorType> ContractedFactorType;
 	typedef typename MatrixProductOperatorType::SymmetryHelperType SymmetryHelperType;
 

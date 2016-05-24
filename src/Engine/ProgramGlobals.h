@@ -51,7 +51,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef PROGRAM_LIMITS_H
 #define PROGRAM_LIMITS_H
 #include "Matrix.h"
-#include <vector>
+#include "Vector.h"
 #include "CrsMatrix.h"
 
 namespace Mpspp {
@@ -63,47 +63,6 @@ struct ProgramGlobals {
 
 	enum {PART_LEFT,PART_RIGHT};
 
-	template<typename ComplexOrRealType>
-	class Real {
-	public:
-		typedef ComplexOrRealType Type;
-	};
-
-	template<typename RealType>
-	class Real<std::complex<RealType> > {
-	public:
-		typedef RealType Type;
-	};
-
-	template<typename SomeFieldType>
-	class Matrix {
-	public:
-#ifndef USE_MATH_UTILS
-		typedef PsimagLite::Matrix<SomeFieldType> Type;
-#else
-		typedef Utils::Matrix<SomeFieldType> Type;
-#endif
-	};
-
-	template<typename SomeFieldType>
-	class Vector {
-	public:
-#ifndef USE_MATH_UTILS
-		typedef std::vector<SomeFieldType> Type;
-#else
-		typedef Utils::Vector<SomeFieldType> Type;
-#endif
-	};
-
-	template<typename SomeFieldType>
-	class CrsMatrix {
-	public:
-#ifndef USE_MATH_UTILS
-		typedef PsimagLite::CrsMatrix<SomeFieldType> Type;
-#else
-		typedef Utils::CrsMatrix<SomeFieldType> Type;
-#endif
-	};
 }; // ProgramGlobals
 
 }; // namespace Mpspp

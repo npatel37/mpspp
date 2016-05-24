@@ -55,7 +55,7 @@ class MpoFactor {
 
 	typedef Operator<ComplexOrRealType> OperatorType_;
 	typedef typename OperatorType_::SparseMatrixType SparseMatrixType;
-	typedef typename ProgramGlobals::Matrix<OperatorType_>::Type MatrixType;
+	typedef PsimagLite::Matrix<OperatorType_> MatrixType;
 
 	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
 
@@ -84,7 +84,7 @@ public:
 
 private:
 
-	typename ProgramGlobals::Matrix<OperatorType>::Type data_;
+	PsimagLite::Matrix<OperatorType> data_;
 
 }; // MpoFactor
 

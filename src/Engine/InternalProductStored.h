@@ -62,7 +62,7 @@ namespace Mpspp {
 		typedef typename ModelType::ModelHelperType ModelHelperType;
 		typedef typename ModelHelperType::SparseMatrixType SparseMatrixType;
 		typedef typename ModelHelperType::RealType RealType;
-		typedef typename ProgramGlobals::Matrix<RealType>::Type MatrixType;
+		typedef PsimagLite::Matrix<RealType> MatrixType;
 		typedef typename ModelType::ReflectionSymmetryType ReflectionSymmetryType;
 		//typedef typename SparseMatrixType::value_type SparseElementType;
 

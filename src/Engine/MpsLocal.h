@@ -60,7 +60,6 @@ public:
 	typedef SymmetryLocalType_ SymmetryLocalType;
 	typedef typename SymmetryLocalType::IoInputType IoInputType;
 	typedef ComplexOrRealType_ ComplexOrRealType;
-	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::PairType PairType;
 	typedef MpsFactor<ComplexOrRealType,SymmetryFactorType> MpsFactorType;
@@ -69,6 +68,7 @@ public:
 	typedef typename MpsFactorType::MatrixType MatrixType;
 	typedef typename MpsFactorType::VectorRealType VectorRealType;
 	typedef typename MpsFactorType::VectorIntegerType VectorIntegerType;
+	typedef typename PsimagLite::Real<ComplexOrRealType>::Type RealType;
 
 	MpsLocal(size_t nsites)
 	: nsites_(nsites),center_(0)
@@ -195,7 +195,7 @@ public:
 	}
 
 
-	typename ProgramGlobals::Real<ComplexOrRealType>::Type norm(size_t type,const SymmetryLocalType& symm) const
+	RealType norm(size_t type,const SymmetryLocalType& symm) const
 	{
 		if (type==MpsFactorType::TYPE_B) {
 			return normB(symm);
@@ -208,7 +208,7 @@ public:
 
 private:
 
-	typename ProgramGlobals::Real<ComplexOrRealType>::Type normB(const SymmetryLocalType& symm) const
+	RealType normB(const SymmetryLocalType& symm) const
 	{
 		MatrixType tmpOld;
 
@@ -268,7 +268,7 @@ private:
 		} // anm2
 	}
 
-	typename ProgramGlobals::Real<ComplexOrRealType>::Type normA(const SymmetryLocalType& symm) const
+	RealType normA(const SymmetryLocalType& symm) const
 	{
 		MatrixType tmpOld;
 

@@ -61,11 +61,11 @@ public:
 
 	enum {TYPE_A,TYPE_B};
 
-	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
+	typedef typename PsimagLite::Real<ComplexOrRealType>::Type RealType;
 	typedef VectorWithOffset<ComplexOrRealType> VectorWithOffsetType;
 	typedef typename VectorWithOffsetType::VectorType VectorType;
-	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
-	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
+	typedef PsimagLite::CrsMatrix<ComplexOrRealType> SparseMatrixType;
+	typedef PsimagLite::Matrix<ComplexOrRealType> MatrixType;
 	typedef typename SymmetryFactorType::IoInputType IoInputType;
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 	typedef typename SymmetryComponentType::VectorIntegerType VectorIntegerType;

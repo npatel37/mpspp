@@ -83,7 +83,7 @@ class HeisenbergSpinOneHalf : public ModelBase<ParametersSolverType,
 	typedef typename ModelBaseType::VectorType VectorType;
 	typedef typename ModelBaseType::ComplexOrRealType ComplexOrRealType;
 	typedef typename ParametersSolverType::RealType RealType;
-	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
+	typedef PsimagLite::Matrix<ComplexOrRealType> MatrixType;
 	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
 	typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
 

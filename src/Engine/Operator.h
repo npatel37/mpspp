@@ -58,7 +58,7 @@ class Operator {
 
 public:
 
-	typedef typename ProgramGlobals::CrsMatrix<ComplexOrRealType>::Type SparseMatrixType;
+	typedef PsimagLite::CrsMatrix<ComplexOrRealType> SparseMatrixType;
 	typedef std::pair<SparseMatrixType,int> PairType;
 
 	ThisType& operator=(const PairType& pair)

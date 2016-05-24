@@ -56,26 +56,27 @@ class StatePredictor {
 public:
 
 	StatePredictor()
-		: rng_(3433117),energy_(0),symmetrySector_(0)
+	    : rng_(3433117),energy_(0),symmetrySector_(0)
 	{}
 
-	void createRandomVector(VectorType& y,size_t offset,size_t final)
+	void createRandomVector(VectorType& y,SizeType offset,SizeType final)
 	{
 		typedef typename VectorType::value_type ComplexOrRealType;
 		ComplexOrRealType tmp;
-		typename ProgramGlobals::Real<ComplexOrRealType>::Type atmp=0;
+		typename PsimagLite::Real<ComplexOrRealType>::Type atmp=0;
 		y.resize(final-offset);
-		for (size_t i=offset;i<final;i++) {
+		for (SizeType i=offset;i<final;i++) {
 			myRandomT(tmp);
 			y[i]=tmp;
 			atmp += std::real(y[i]*std::conj(y[i]));
 		}
+
 		atmp = 1.0 / sqrt (atmp);
-		for (size_t i=offset;i<final;i++) y[i] *= atmp;
+		for (SizeType i=offset;i<final;i++) y[i] *= atmp;
 		vectorSaved_=y;
 	}
 
-	void push(const RealType& e,const VectorType& v,size_t symmetrySector)
+	void push(const RealType& e,const VectorType& v,SizeType symmetrySector)
 	{
 		energy_ = e;
 		vectorSaved_ = v;
@@ -86,7 +87,7 @@ public:
 
 	const VectorType& vector() const { return vectorSaved_; }
 
-	size_t symmSector() const { return symmetrySector_; }
+	SizeType symmSector() const { return symmetrySector_; }
 
 private:
 
@@ -103,7 +104,7 @@ private:
 	PsimagLite::RandomForTests<RealType> rng_;
 	RealType energy_;
 	VectorType vectorSaved_;
-	size_t symmetrySector_;
+	SizeType symmetrySector_;
 }; // StatePredictor
 
 } // namespace Mpspp

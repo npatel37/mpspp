@@ -58,7 +58,7 @@ public:
 	typedef typename ContractedPartType::ContractedFactorType ContractedFactorType;
 	typedef typename ContractedPartType::MpsLocalType MpsLocalType;
 	typedef typename MpsLocalType::ComplexOrRealType ComplexOrRealType;
-	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
+	typedef typename PsimagLite::Real<ComplexOrRealType>::Type RealType;
 	typedef typename MpsLocalType::SymmetryLocalType SymmetryLocalType;
 	typedef typename SymmetryLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::PairType PairType;

@@ -76,7 +76,7 @@ public:
 	typedef ModelHelper<ContractedLocalType> ModelHelperType;
 	typedef typename ModelHelperType::SparseMatrixType SparseMatrixType;
 	typedef ReflectionSymmetryEmpty<SparseMatrixType> ReflectionSymmetryType;
-	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
+	typedef PsimagLite::Matrix<ComplexOrRealType> MatrixType;
 	typedef typename MpoLocalType::MpoFactorType MpoFactorType;
 
 	virtual ~ModelBase() {}

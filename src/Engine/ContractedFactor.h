@@ -59,12 +59,12 @@ class ContractedFactor {
 	typedef typename MatrixProductOperatorType::MpoFactorType MpoFactorType;
 	typedef typename MatrixProductOperatorType::SymmetryHelperType SymmetryHelperType;
 	typedef typename MpsLocalType::ComplexOrRealType ComplexOrRealType;
-	typedef typename ProgramGlobals::Real<ComplexOrRealType>::Type RealType;
+	typedef typename PsimagLite::Real<ComplexOrRealType>::Type RealType;
 	typedef ContractedFactor<MatrixProductOperatorType> ThisType;
-	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type DenseMatrixType;
+	typedef PsimagLite::Matrix<ComplexOrRealType> DenseMatrixType;
 	typedef typename MpsLocalType::SymmetryFactorType SymmetryFactorType;
 	typedef typename SymmetryFactorType::PairType PairType;
-	typedef typename ProgramGlobals::Matrix<ComplexOrRealType>::Type MatrixType;
+	typedef PsimagLite::Matrix<ComplexOrRealType> MatrixType;
 	typedef typename MpsFactorType::VectorIntegerType VectorIntegerType;
 	typedef typename MpoFactorType::OperatorType OperatorType;
 	typedef typename OperatorType::PairType PairForOperatorType;

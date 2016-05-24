@@ -61,14 +61,21 @@ namespace Mpspp {
  \\subsubsection{Enabling finite loops}
  \\begin{itemize}
  \\item
- {\\bf options line:} \\verb=nofiniteloops=: Don't do finite loops, even if provided under {\\bf FiniteLoops} below.
+ {\\bf options line:} \\verb=nofiniteloops=: Don't do finite loops, even if provided
+under {\\bf FiniteLoops} below.
  \\item {\\bf InfiniteLoopKeptStates} $m$ value for the infinite algorithm.
- \\item {\\bf FiniteLoops} A series of space-separated numbers. More than one space is allowed. The first
- number is the number of finite algorithm ``movements,'' followed by series of three numbers for
- each ``movement''. Of the three numbers, the first is the number of sites to go forward if positive
- or backward if negative. The second number is the $m$ for this movement and the last number
- is either 0 or 1, 0 will not save state data to disk and 1 will save all data to be able to calculate
- observables. The first movement starts from where the infinite loop left off, at the middle of the
+ \\item {\\bf FiniteLoops} A series of space-separated numbers.
+More than one space is allowed. The first
+ number is the number of finite algorithm ``movements,''
+followed by series of three numbers for
+ each ``movement''. Of the three numbers, the first is the number of sites
+to go forward if positive
+ or backward if negative. The second number is the $m$ for this movement and
+the last number
+ is either 0 or 1, 0 will not save state data to disk and 1 will save all data to
+be able to calculate
+ observables. The first movement starts from where the infinite loop left off,
+ at the middle of the
  lattice.
  \\end{itemize}
 
@@ -77,9 +84,11 @@ namespace Mpspp {
  FiniteLoops 4 7 200 0 -7 200 0 7 200 1 7 200 1
  \\end{verbatim}
  The number 4 implies 4 finite loops. The first fine loop is ``7 200 0'', meaning
- go forward 7 steps, use $m=200$ for this finite sweep, and 0: do not store transformation in disk.
+ go forward 7 steps, use $m=200$ for this finite sweep, and 0: do not
+ store transformation in disk.
  The next is ``-7 200 0'', which goes backwards 7 sites, etc.
- Remember that the finite loops start at the middle of the lattice, where the infinite loop left off.
+ Remember that the finite loops start at the middle of the lattice,
+where the infinite loop left off.
  \\todo{ADD FIGURE SHOWING WHAT THIS DOES.}
 
  \\subsubsection{The third number in the triplet}
@@ -115,12 +124,13 @@ struct FiniteLoop {
 	SizeType keptStates; // kept states
 	int saveOption; // to save or not to save
 	FiniteLoop(int sl,int ks,int so)
-		: stepLength(sl),keptStates(ks),saveOption(so)
+	    : stepLength(sl),keptStates(ks),saveOption(so)
 	{}
 };
 
 //!PTEX_LABEL{139}
-inline void checkFiniteLoops(const PsimagLite::Vector<FiniteLoop>::Type& finiteLoop,SizeType totalSites)
+inline void checkFiniteLoops(const PsimagLite::Vector<FiniteLoop>::Type& finiteLoop,
+                             SizeType totalSites)
 {
 	PsimagLite::String s = "checkFiniteLoops: I'm falling out of the lattice ";
 	PsimagLite::String loops = "";
@@ -140,7 +150,7 @@ inline void checkFiniteLoops(const PsimagLite::Vector<FiniteLoop>::Type& finiteL
 			sopt = 1;
 			if (SizeType(x) != 1 && SizeType(x)!=totalSites-2) {
 				s = __FILE__ + PsimagLite::String(": FATAL: for finite loop number ")
-						+ ttos(i) + "\n";
+				        + ttos(i) + "\n";
 				s += "Saving finite loops must start at the left or";
 				s += " right end of the lattice\n";
 				throw std::runtime_error(s.c_str());
@@ -170,7 +180,7 @@ inline void checkFiniteLoops(const PsimagLite::Vector<FiniteLoop>::Type& finiteL
 			// complain and die if we fell out:
 			s = s + "Loops so far: " + loops + "\n";
 			s =s + "x=" + ttos(x) + " last delta=" +
-					ttos(delta);
+			        ttos(delta);
 			s =s + " sites=" + ttos(totalSites);
 			throw std::runtime_error(s.c_str());
 		}
@@ -212,42 +222,58 @@ std::istream &operator>>(std::istream& is,DmrgCheckPoint& c)
  A string indicating the model, be it HubbardOneBand HeisenbergSpinOneHalf, etc.
 
  \\inputItem{Options}
- A comma-separated list of strings. At least one of the following strings must be provided:
- \\inputSubItem{none}  Use this when no options are given, since the list of strings must be non-null.
+ A comma-separated list of strings. At least one of the following strings
+must be provided:
+ \\inputSubItem{none}  Use this when no options are given,
+since the list of strings must be non-null.
  Note that ``none'' does not disable other options.
 
- \\inputSubItem{hasQuantumNumbers} If this option is given, the program will read the line ``QNS''
- described below and act accordingly. It is recommended that you set this option.  \\\\\n
- \\inputSubItem{wft}  Use the Wave Function Transformation speed-up, which is disabled by default.
+ \\inputSubItem{hasQuantumNumbers} If this option is given,
+the program will read the line ``QNS''
+ described below and act accordingly.
+It is recommended that you set this option.  \\\\\n
+ \\inputSubItem{wft}  Use the Wave Function Transformation speed-up,
+ which is disabled by default.
 
- \\inputSubItem{useSu2Symmetry} Use the SU(2) symmetry for the model, and interpret quantum numbers in
- the line ``QNS'' appropriately. The option ``hasQuantumNumbers'' must be set for this to work.
+ \\inputSubItem{useSu2Symmetry} Use the SU(2) symmetry for the model,
+and interpret quantum numbers in
+ the line ``QNS'' appropriately. The option ``hasQuantumNumbers''
+must be set for this to work.
 
- \\inputSubItem{nofiniteloops}  Don't do finite loops, even if provided under ``FiniteLoops'' below.
+ \\inputSubItem{nofiniteloops}  Don't do finite loops, even if
+provided under ``FiniteLoops'' below.
 
- \\inputItem{version}  A mandatory string that is read and ignored. Usually contains the result
+ \\inputItem{version}  A mandatory string that is read and ignored.
+Usually contains the result
  of doing ``git rev-parse HEAD''.
 
- \\inputItem{outputfile}  The output file. This file will be created if non-existent, and if it
+ \\inputItem{outputfile}  The output file. This file will be created
+if non-existent, and if it
  exits it will be truncated.
 
  \\inputItem{InfiniteLoopKeptStates}  ``m'' value for the infinite algorithm.
 
- \\inputItem{FiniteLoops} A series of space-separated numbers. More than one space is allowed.
+ \\inputItem{FiniteLoops} A series of space-separated numbers.
+More than one space is allowed.
  The first number is the number of finite algorithm ``movements'', followed by series
  of three numbers for each ``movement''. Of the three numbers, the first
  is the number of sites to go forward if positive or backward if negative.
  The second number is the ``m'' for this ``movement' and the last number is either 0 or 1,
- 0 will not save state data to disk and 1 will save all data to be able to calculate observables.
- The first ``movement'' starts from where the infinite loop left off, at the middle of the lattice.
+ 0 will not save state data to disk and 1 will save all data to be
+able to calculate observables.
+ The first ``movement'' starts from where the infinite loop left off,
+ at the middle of the lattice.
  \\inputItem{QNS}  A space-separated list of numbers. More than one space is allowed.
- The first number is the number of numbers to follow, these numbers being the density of quantum
+ The first number is the number of numbers to follow,
+these numbers being the density of quantum
  numbers for each conserved quantum number to be used.
  In a simpler way, usually this is 3 followed by $n_\\uparrow n_\\downarrow 0$  if not using
  SU(2) symmetry, where  $n_\\uparrow$, and $n_\\downarrow$ are the densities of up and down
- electrons respectively. If there is SU(2) symmetry then this is 3 followed by $n_\\uparrow n_\\downarrow j$,
+ electrons respectively. If there is SU(2) symmetry then this is 3 followed by
+$n_\\uparrow n_\\downarrow j$,
  where $n_\\uparrow$, and $n_\\downarrow$ are the densities of up and down
- electrons respectively, and $j$ is twice the angular momentum divided by the number of sites.
+ electrons respectively, and $j$ is twice the angular momentum
+divided by the number of sites.
  */
 template<typename RealType_,typename ComplexOrRealType_,typename InputValidatorType_>
 struct ParametersMpsSolver {
@@ -266,12 +292,12 @@ struct ParametersMpsSolver {
 	PsimagLite::String model;
 	VectorRealType targetQuantumNumbers;
 	SizeType electronsUp,electronsDown;
-//	PsimagLite::String initialMps;
-//	RealType tolerance;
-//	DmrgCheckPoint checkpoint;
+	//	PsimagLite::String initialMps;
+	//	RealType tolerance;
+	//	DmrgCheckPoint checkpoint;
 	SizeType nthreads;
-//	int useReflectionSymmetry;
-//	PsimagLite::String fileForDensityMatrixEigs;
+	//	int useReflectionSymmetry;
+	//	PsimagLite::String fileForDensityMatrixEigs;
 
 	//! Read Dmrg parameters from inp file
 	ParametersMpsSolver(InputValidatorType& io)
@@ -308,13 +334,15 @@ struct ParametersMpsSolver {
 
 		if (upToFl>=finiteLoops.size()) {
 			PsimagLite::String s (__FILE__);
-			s += "\nFATAL: RepeatFiniteLoopsTo=" + ttos(upToFl) + " is larger than current finite loops\n";
+			s += "\nFATAL: RepeatFiniteLoopsTo=" + ttos(upToFl);
+			s += " is larger than current finite loops\n";
 			s += "\nMaximum is " + ttos(finiteLoops.size())+ "\n";
 			throw std::runtime_error(s.c_str());
 		}
 		if (fromFl>upToFl) {
 			PsimagLite::String s (__FILE__);
-			s += "\nFATAL: RepeatFiniteLoopsFrom=" + ttos(fromFl) + " is larger than RepeatFiniteLoopsTo\n";
+			s += "\nFATAL: RepeatFiniteLoopsFrom=" + ttos(fromFl);
+			s += " is larger than RepeatFiniteLoopsTo\n";
 			s += "\nMaximum is " + ttos(upToFl)+ "\n";
 			throw std::runtime_error(s.c_str());
 		}
@@ -345,34 +373,37 @@ struct ParametersMpsSolver {
 
 		if (hasElectrons && targetQuantumNumbers.size()>0) {
 			PsimagLite::String s (__FILE__);
-			s += "\nFATAL: Specifying both TargetElectronsUp/Down and TargetQuantumNumbers is an error.";
+			s += "\nFATAL: Specifying both TargetElectronsUp/Down ";
+			s += "and TargetQuantumNumbers is an error.";
 			s += "\nSpecify one or the other only.\n";
 			throw std::runtime_error(s.c_str());
 		}
 
 		if (!hasElectrons && targetQuantumNumbers.size()==0) {
 			PsimagLite::String s (__FILE__);
-			s += "\nFATAL: Either TargetElectronsUp/Down or TargetQuantumNumbers must be specified.\n";
+			s += "\nFATAL: Either TargetElectronsUp/Down or ";
+			s += "TargetQuantumNumbers must be specified.\n";
 			throw std::runtime_error(s.c_str());
 		}
 
 		if (options.find("useSu2Symmetry")!=PsimagLite::String::npos && hasElectrons) {
 			PsimagLite::String s (__FILE__);
-			s += "\nFATAL: TargetElectronsUp/Down cannot be specified while using SU(2) symmetry\n";
+			s += "\nFATAL: TargetElectronsUp/Down cannot be ";
+			s += "specified while using SU(2) symmetry\n";
 			s += "\nTargetQuantumNumbers must be specified instead.\n";
 			throw std::runtime_error(s.c_str());
 		}
 
-//		io.readline(initialMps,"InitialMps=");
-//		tolerance = -1.0;
-//		try {
-//			io.readline(tolerance,"TruncationTolerance=");
-//		} catch (std::exception& e) {}
+		//		io.readline(initialMps,"InitialMps=");
+		//		tolerance = -1.0;
+		//		try {
+		//			io.readline(tolerance,"TruncationTolerance=");
+		//		} catch (std::exception& e) {}
 
-//		if (options.find("checkpoint")!=PsimagLite::String::npos)
-//			io.readline(checkpoint.filename,"CheckpointFilename=");
-//		else if (options.find("restart")!=PsimagLite::String::npos)
-//			io.readline(checkpoint.filename,"RestartFilename=");
+		//		if (options.find("checkpoint")!=PsimagLite::String::npos)
+		//			io.readline(checkpoint.filename,"CheckpointFilename=");
+		//		else if (options.find("restart")!=PsimagLite::String::npos)
+		//			io.readline(checkpoint.filename,"RestartFilename=");
 
 		nthreads=1; // provide a default value
 		try {
@@ -388,39 +419,41 @@ struct ParametersMpsSolver {
 
 };
 
-//! print dmrg parameters
+//! print dmrg p
 template<typename RealType,typename ComplexOrRealType,typename InputValidatorType>
 std::ostream &operator<<(std::ostream &os,
-			 ParametersMpsSolver<RealType,ComplexOrRealType,InputValidatorType> const &parameters)
+                         ParametersMpsSolver<RealType,
+                         ComplexOrRealType,
+                         InputValidatorType> const &p)
 {
 	os<<"#This is MPS++\n";
 	Provenance provenance;
 	os<<provenance;
-	os<<"parameters.version="<<parameters.version<<"\n";
-	os<<"parameters.model="<<parameters.model<<"\n";
-	os<<"parameters.filename="<<parameters.filename<<"\n";
-	os<<"parameters.options="<<parameters.options<<"\n";
-	os<<"parameters.keptStatesInfinite="<<parameters.keptStatesInfinite<<"\n";
+	os<<"p.version="<<p.version<<"\n";
+	os<<"p.model="<<p.model<<"\n";
+	os<<"p.filename="<<p.filename<<"\n";
+	os<<"p.options="<<p.options<<"\n";
+	os<<"p.keptStatesInfinite="<<p.keptStatesInfinite<<"\n";
 	os<<"finiteLoop\n";
-	os<<parameters.finiteLoop;
+	os<<p.finiteLoop;
 
-	if (parameters.targetQuantumNumbers.size()>0) {
-		os<<"parameters.targetQuantumNumbers=";
-		for (SizeType i=0;i<parameters.targetQuantumNumbers.size();i++)
-			os<<parameters.targetQuantumNumbers[i]<<" ";
+	if (p.targetQuantumNumbers.size()>0) {
+		os<<"p.targetQuantumNumbers=";
+		for (SizeType i=0;i<p.targetQuantumNumbers.size();i++)
+			os<<p.targetQuantumNumbers[i]<<" ";
 		os<<"\n";
 	} else {
-		os<<"parameters.electronsUp="<<parameters.electronsUp<<"\n";
-		os<<"parameters.electronsDown="<<parameters.electronsDown<<"\n";
+		os<<"p.electronsUp="<<p.electronsUp<<"\n";
+		os<<"p.electronsDown="<<p.electronsDown<<"\n";
 	}
-	if (parameters.tolerance>0)
-		os<<"parameters.tolerance="<<parameters.tolerance<<"\n";
-	os<<"parameters.nthreads="<<parameters.nthreads<<"\n";
-	os<<"parameters.useReflectionSymmetry="<<parameters.useReflectionSymmetry<<"\n";
-	if (parameters.checkpoint.filename!="")
-		os<<"parameters.restartFilename="<<parameters.checkpoint.filename<<"\n";
-	if (parameters.fileForDensityMatrixEigs!="")
-		os<<"parameters.fileForDensityMatrixEigs="<<parameters.fileForDensityMatrixEigs<<"\n";
+	if (p.tolerance>0)
+		os<<"p.tolerance="<<p.tolerance<<"\n";
+	os<<"p.nthreads="<<p.nthreads<<"\n";
+	os<<"p.useReflectionSymmetry="<<p.useReflectionSymmetry<<"\n";
+	if (p.checkpoint.filename!="")
+		os<<"p.restartFilename="<<p.checkpoint.filename<<"\n";
+	if (p.fileForDensityMatrixEigs!="")
+		os<<"p.fileForDensityMatrixEigs="<<p.fileForDensityMatrixEigs<<"\n";
 	return os;
 }
 } // namespace Dmrg
