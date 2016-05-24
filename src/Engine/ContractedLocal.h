@@ -53,9 +53,11 @@ namespace Mpspp {
 template<typename MatrixProductOperatorType_>
 class ContractedLocal {
 
-	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
+	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT,
+	      TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
-	enum {PART_LEFT = ProgramGlobals::PART_LEFT, PART_RIGHT = ProgramGlobals::PART_RIGHT};
+	enum {PART_LEFT = ProgramGlobals::PART_LEFT,
+		  PART_RIGHT = ProgramGlobals::PART_RIGHT};
 
 public:
 
@@ -71,23 +73,33 @@ public:
 	typedef typename MatrixProductOperatorType::SymmetryHelperType SymmetryHelperType;
 
 	ContractedLocal(const MpsLocalType& abState,const MatrixProductOperatorType& h)
-		: abState_(abState),
-		  h_(h),
-		  R_(abState.sites(),ProgramGlobals::PART_RIGHT),
-		  L_(abState.sites(),ProgramGlobals::PART_LEFT)
+	    : abState_(abState),
+	      h_(h),
+	      R_(abState.sites(),ProgramGlobals::PART_RIGHT),
+	      L_(abState.sites(),ProgramGlobals::PART_LEFT)
 	{}
 
-	void grow(size_t currentSite,const SymmetryHelperType& symmHelper,size_t nsites)
+	void grow(SizeType currentSite,const SymmetryHelperType& symmHelper,SizeType nsites)
 	{
-//		symmHelper.setSiteForSymm(currentSite+1);
+		//		symmHelper.setSiteForSymm(currentSite+1);
 
-		L_[currentSite+1].build(abState_.A(currentSite),h_(currentSite),L_[currentSite],symmHelper,currentSite+1);
+		L_[currentSite+1].build(abState_.A(currentSite),
+		                        h_(currentSite),
+		                        L_[currentSite],
+		                        symmHelper,
+		                        currentSite+1);
 
-		R_[currentSite+1].build(abState_.B(currentSite),h_(nsites-1-currentSite),R_[currentSite],symmHelper,currentSite+1);
+		R_[currentSite+1].build(abState_.B(currentSite),
+		                        h_(nsites-1-currentSite),
+		                        R_[currentSite],
+		                        symmHelper,
+		                        currentSite+1);
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
-	void move(size_t currentSite,size_t direction,const SymmetryHelperType& symmHelper)
+	void move(SizeType currentSite,
+	          SizeType direction,
+	          const SymmetryHelperType& symmHelper)
 	{
 		if (direction==TO_THE_RIGHT) {
 			moveLeft(currentSite,abState_,symmHelper);
@@ -97,18 +109,23 @@ public:
 	}
 
 	template<typename SomeTruncationType>
-	void truncate(size_t site,size_t part,size_t cutoff,size_t nsites,const SomeTruncationType& trunc)
+	void truncate(SizeType site,
+	              SizeType part,
+	              SizeType cutoff,
+	              SizeType nsites,
+	              const SomeTruncationType& trunc)
 	{
 		if (part==ProgramGlobals::PART_LEFT) {
 			if (site+1>=L_.size()) return;
 			L_[site+1].truncate(cutoff,trunc);
 		} else {
-			size_t siteToSet = nsites - site;
+			SizeType siteToSet = nsites - site;
 			R_[siteToSet].truncate(cutoff,trunc);
 		}
 	}
 
-	const ContractedFactorType& operator()(size_t currentSite,size_t leftOrRight) const
+	const ContractedFactorType& operator()(SizeType currentSite,
+	                                       SizeType leftOrRight) const
 	{
 		if (leftOrRight == PART_LEFT) {
 			assert(currentSite<L_.size());
@@ -120,24 +137,37 @@ public:
 	}
 
 	template<typename MatrixProductOperatorType2>
-	friend std::ostream& operator<<(std::ostream& os,const ContractedLocal<MatrixProductOperatorType2>& contractedLocal);
+	friend std::ostream& operator<<(std::ostream&,
+	                                const ContractedLocal<MatrixProductOperatorType2>&);
 
 private:
 
-	void moveLeft(size_t currentSite,const MpsLocalType& abState,const SymmetryHelperType& symm)
+	void moveLeft(SizeType currentSite,
+	              const MpsLocalType& abState,
+	              const SymmetryHelperType& symm)
 	{
 		assert(currentSite+1<L_.size());
-		L_[currentSite+1].move(abState.A(currentSite),h_(currentSite),L_[currentSite],symm,currentSite+1);
+		L_[currentSite+1].move(abState.A(currentSite),
+		                       h_(currentSite),
+		                       L_[currentSite],
+		                       symm,
+		                       currentSite+1);
 		std::cout<<"set L_["<<(currentSite+1)<<"]="<<L_[currentSite+1].row()<<"\n";
 	}
 
-	void moveRight(size_t currentSite,const MpsLocalType& abState,const SymmetryHelperType& symm)
+	void moveRight(SizeType currentSite,
+	               const MpsLocalType& abState,
+	               const SymmetryHelperType& symm)
 	{
-		size_t nsites = symm.symmLocal()(currentSite).super().block().size();
-		size_t siteToSet = nsites - currentSite;
+		SizeType nsites = symm.symmLocal()(currentSite).super().block().size();
+		SizeType siteToSet = nsites - currentSite;
 		if (siteToSet==R_.size()) return;
 		assert(siteToSet<R_.size());
-		R_[siteToSet].move(abState.B(siteToSet-1),h_(currentSite),R_[siteToSet-1],symm,currentSite);
+		R_[siteToSet].move(abState.B(siteToSet-1),
+		                   h_(currentSite),
+		                   R_[siteToSet-1],
+		        symm,
+		        currentSite);
 		std::cout<<"set R_["<<siteToSet<<"]="<<R_[siteToSet].row()<<"\n";
 	}
 
@@ -149,13 +179,14 @@ private:
 }; // ContractedLocal
 
 template<typename MatrixProductOperatorType>
-std::ostream& operator<<(std::ostream& os,const ContractedLocal<MatrixProductOperatorType>& contractedLocal)
+std::ostream& operator<<(std::ostream& os,
+                         const ContractedLocal<MatrixProductOperatorType>& contractedLocal)
 {
 	os<<"ContractedLocal: right size="<<contractedLocal.R_.size()<<"\n";
-	for (size_t i=0;i<contractedLocal.R_.size();i++)
+	for (SizeType i=0;i<contractedLocal.R_.size();i++)
 		os<<contractedLocal.R_[i];
 	os<<"ContractedLocal: left size="<<contractedLocal.L_.size()<<"\n";
-	for (size_t i=0;i<contractedLocal.L_.size();i++)
+	for (SizeType i=0;i<contractedLocal.L_.size();i++)
 		os<<contractedLocal.L_[i];
 	return os;
 }
@@ -164,4 +195,3 @@ std::ostream& operator<<(std::ostream& os,const ContractedLocal<MatrixProductOpe
 
 /*@}*/
 #endif // CONTRACTED_LOCAL_H
-
