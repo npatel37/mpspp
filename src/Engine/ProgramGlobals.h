@@ -63,6 +63,7 @@ struct ProgramGlobals {
 
 	enum {PART_LEFT,PART_RIGHT};
 
+	static const PsimagLite::String license;
 }; // ProgramGlobals
 
 }; // namespace Mpspp

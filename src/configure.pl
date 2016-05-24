@@ -32,7 +32,7 @@ if (defined($arg) and -r "$arg" and $arg ne "Config.make") {
 }
 
 my %provenanceDriver = (name => 'Provenance', aux => 1);
-#my %progGlobalsDriver = (name => 'ProgramGlobals', aux => 1);
+my %progGlobalsDriver = (name => 'ProgramGlobals', aux => 1);
 #my %restartDriver = (name => 'RestartStruct', aux => 1);
 #my %finiteLoopDriver = (name => 'FiniteLoop', aux => 1);
 #my %utilsDriver = (name => 'Utils', aux => 1);
@@ -42,12 +42,12 @@ my %provenanceDriver = (name => 'Provenance', aux => 1);
 my $dotos = "Provenance.o";
 #my %observeDriver = (name => 'observe', dotos => $dotos);
 
-my @drivers = (\%provenanceDriver); #\%su2RelatedDriver,
-#\%progGlobalsDriver,\%restartDriver,\%finiteLoopDriver,\%utilsDriver,
+my @drivers = (\%provenanceDriver,\%progGlobalsDriver);
+#\%restartDriver,\%finiteLoopDriver,\%utilsDriver,
 #\%observeDriver,\%toolboxDriver);
 
 $dotos = "mpspp.o Provenance.o"; # RestartStruct.o FiniteLoop.o Utils.o ";
-#$dotos .= " ProgramGlobals.o Su2Related.o";
+$dotos .= " ProgramGlobals.o";
 
 #my $templates = DmrgDriver::createTemplates();
 

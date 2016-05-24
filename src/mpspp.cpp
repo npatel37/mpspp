@@ -1,22 +1,3 @@
-#include "AllocatorCpu.h"
-const PsimagLite::String license=
-        "Copyright (c) 2012, UT-Battelle, LLC\n"
-        "All rights reserved\n"
-        "[MPS++, Version 0.1]\n"
-        "\n"
-        "--------------------------------------------------------------------------------\n"
-        "\n"
-        "THE SOFTWARE IS SUPPLIED BY THE COPYRIGHT HOLDERS AND\n"
-        "CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED\n"
-        "WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED\n"
-        "WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A\n"
-        "PARTICULAR PURPOSE ARE DISCLAIMED.\n"
-        "\n"
-        "Please see full disclaimer and open source license included in file LICENSE\n"
-        "--------------------------------------------------------------------------------\n"
-        "\n"
-        "\n";
-
 /** \ingroup MPSPP */
 /*@{*/
 
@@ -90,10 +71,21 @@ int main(int argc,char *argv[])
 	int opt = 0;
 	PsimagLite::String strUsage(argv[0]);
 	strUsage += " -f filename";
-	while ((opt = getopt(argc, argv,"f:")) != -1) {
+	int precision = 6;
+	bool versionOnly = false;
+
+	while ((opt = getopt(argc, argv,"f:p:V")) != -1) {
 		switch (opt) {
 		case 'f':
 			filename = optarg;
+			break;
+		case 'p':
+			precision = atoi(optarg);
+			std::cout.precision(precision);
+			std::cerr.precision(precision);
+			break;
+		case 'V':
+			versionOnly = true;
 			break;
 		default:
 			inputCheck.usageMain(strUsage);
@@ -102,7 +94,7 @@ int main(int argc,char *argv[])
 	}
 
 	// sanity checks here
-	if (filename=="") {
+	if (filename=="" && !versionOnly) {
 		inputCheck.usageMain(strUsage);
 		return 1;
 	}
@@ -113,10 +105,12 @@ int main(int argc,char *argv[])
 
 	// print license
 	if (ConcurrencyType::root()) {
-		std::cerr<<license;
+		std::cout<<Mpspp::ProgramGlobals::license;
 		Provenance provenance;
 		std::cout<<provenance;
 	}
+
+	if (versionOnly) return 0;
 
 	InputNgType::Writeable ioWriteable(filename,inputCheck);
 	InputNgType::Readable io(ioWriteable);
@@ -135,7 +129,8 @@ int main(int argc,char *argv[])
 
 	if (mpsSolverParams.options.find("InternalProductStored")!=PsimagLite::String::npos) {
 		mainLoop<ModelBaseType,Mpspp::InternalProductStored>(mpsSolverParams,model,io);
-		//} else if (mpsSolverParams.options.find("InternalProductKron")!=PsimagLite::String::npos) {
+		//} else if (mpsSolverParams.options.find("InternalProductKron") !=
+		// PsimagLite::String::npos) {
 		//	mainLoop<ModelBaseType,Mpspp::InternalProductKron>(psi,mpsSolverParams,model);
 	} else {
 		mainLoop<ModelBaseType,Mpspp::InternalProductOnTheFly>(mpsSolverParams,model,io);
