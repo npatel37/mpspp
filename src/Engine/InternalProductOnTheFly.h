@@ -44,7 +44,8 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 /*! \file InternalProductOnTheFly.h
  *
- *  A class to encapsulate the product x+=Hy, where x and y are vectors and H is the Hamiltonian matrix
+ *  A class to encapsulate the product x+=Hy, where x and y are vectors
+ *  and H is the Hamiltonian matrix
  *
  */
 #ifndef	INTERNALPRODUCT_OTF_H
@@ -53,42 +54,42 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <vector>
 
 namespace Mpspp {
-	template<typename T,typename ModelType>
-	class InternalProductOnTheFly {
+template<typename T,typename ModelType>
+class InternalProductOnTheFly {
 
-	public:
+public:
 
-		typedef T HamiltonianElementType;
-		typedef T value_type;
-		typedef typename ModelType::ModelHelperType ModelHelperType;
-		typedef typename ModelHelperType::RealType RealType;
-		typedef typename ModelType::ReflectionSymmetryType ReflectionSymmetryType;
+	typedef T HamiltonianElementType;
+	typedef T value_type;
+	typedef typename ModelType::ModelHelperType ModelHelperType;
+	typedef typename ModelHelperType::RealType RealType;
+	typedef typename ModelType::ReflectionSymmetryType ReflectionSymmetryType;
 
-		InternalProductOnTheFly(ModelType const *model,
-					ModelHelperType const *modelHelper,
-					ReflectionSymmetryType* rs=0)
-		{
-			model_ = model;
-			modelHelper_=modelHelper;
-		}
+	InternalProductOnTheFly(ModelType const *model,
+	                        ModelHelperType const *modelHelper,
+	                        ReflectionSymmetryType* rs=0)
+	{
+		model_ = model;
+		modelHelper_=modelHelper;
+	}
 
-		size_t rank() const { return modelHelper_->size(); }
+	SizeType rank() const { return modelHelper_->size(); }
 
-		template<typename SomeVectorType>
-		void matrixVectorProduct(SomeVectorType &x,SomeVectorType const &y) const
-		{
-			 model_->matrixVectorProduct(x,y,*modelHelper_);
-		}
+	template<typename SomeVectorType>
+	void matrixVectorProduct(SomeVectorType &x,SomeVectorType const &y) const
+	{
+		model_->matrixVectorProduct(x,y,*modelHelper_);
+	}
 
-		size_t reflectionSector() const { return 0; }
+	SizeType reflectionSector() const { return 0; }
 
-		void reflectionSector(size_t p) {  }
+	void reflectionSector(SizeType p) {  }
 
-	private:
+private:
 
-		ModelType const *model_;
-		ModelHelperType const *modelHelper_;
-	}; // class InternalProductOnTheFly
+	ModelType const *model_;
+	ModelHelperType const *modelHelper_;
+}; // class InternalProductOnTheFly
 } // namespace Mpspp
 
 /*@}*/

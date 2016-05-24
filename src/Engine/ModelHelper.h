@@ -51,7 +51,8 @@ namespace Mpspp {
 template<typename ContractedPartType>
 class ModelHelper {
 
-	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
+	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT,
+	      TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 public:
 
@@ -71,29 +72,29 @@ public:
 	typedef typename MatrixProductOperatorType::SymmetryHelperType SymmetryHelperType;
 
 	ModelHelper(const ContractedPartType& contractedPart,
-				size_t symmetrySector,
-				size_t currentSite,
-				size_t direction,
-				const MpoFactorType& hamiltonian,
-				const SymmetryHelperType& symmetry,
-	            size_t siteForSymm)
-	: contractedPart_(contractedPart),
-	  symmetrySector_(symmetrySector),
-	  currentSite_(currentSite),
-	  direction_(direction),
-	  hamiltonian_(hamiltonian),
-	  symmetry_(symmetry),
-	  siteForSymm_(siteForSymm)
+	            SizeType symmetrySector,
+	            SizeType currentSite,
+	            SizeType direction,
+	            const MpoFactorType& hamiltonian,
+	            const SymmetryHelperType& symmetry,
+	            SizeType siteForSymm)
+	    : contractedPart_(contractedPart),
+	      symmetrySector_(symmetrySector),
+	      currentSite_(currentSite),
+	      direction_(direction),
+	      hamiltonian_(hamiltonian),
+	      symmetry_(symmetry),
+	      siteForSymm_(siteForSymm)
 	{}
 
-	size_t size() const
+	SizeType size() const
 	{
 		return symmetry_.symmLocal()(siteForSymm_).super().partitionSize(symmetrySector_);
 	}
 
-	size_t symmetrySector() const { return symmetrySector_; }
+	SizeType symmetrySector() const { return symmetrySector_; }
 
-	size_t hilbertSize() const { return hamiltonian_(0,0).row(); }
+	SizeType hilbertSize() const { return hamiltonian_(0,0).row(); }
 
 	const MpoFactorType& hamiltonian() const { return hamiltonian_; }
 
@@ -103,35 +104,38 @@ public:
 	void matrixVectorProduct(VectorType& x,const VectorType& y) const
 	{
 		const SymmetryFactorType& symm = symmetry_.symmLocal()(siteForSymm_);
-		size_t offset = symm.super().partitionOffset(symmetrySector_);
-		size_t total = symm.super().partitionSize(symmetrySector_);
+		SizeType offset = symm.super().partitionOffset(symmetrySector_);
+		SizeType total = symm.super().partitionSize(symmetrySector_);
 
-		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
-		size_t rightIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
+		SizeType leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
+		SizeType rightIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
 
-		const ContractedFactorType& cL = contractedPart_(leftIndex,ProgramGlobals::PART_LEFT);
-		const ContractedFactorType& cR = contractedPart_(rightIndex,ProgramGlobals::PART_RIGHT);
-		for (size_t blm1=0;blm1<cL.size();blm1++) {
+		const ContractedFactorType& cL = contractedPart_(leftIndex,
+		                                                 ProgramGlobals::PART_LEFT);
+		const ContractedFactorType& cR = contractedPart_(rightIndex,
+		                                                 ProgramGlobals::PART_RIGHT);
+		for (SizeType blm1=0;blm1<cL.size();blm1++) {
 			const SparseMatrixType& l1 = cL(blm1);
-			for (size_t bl=0;bl<cR.size();bl++) {
+			for (SizeType bl=0;bl<cR.size();bl++) {
 				const OperatorType& wOp =  hamiltonian_(blm1,bl);
 				const SparseMatrixType& w = wOp.matrix();
 				if (w.row()==0) continue;
-//				SparseMatrixType w;
-//				transposeConjugate(w,w1);
+				//				SparseMatrixType w;
+				//				transposeConjugate(w,w1);
 				const SparseMatrixType& r1 = cR(bl);
-				for (size_t i=0;i<total;i++) {
+				for (SizeType i=0;i<total;i++) {
 					PairType ab = symm.super().unpack(i+offset);
-					size_t alm1=0;
-					size_t sigmaL=0;
-					size_t alB=0;
-					size_t electronsLeft = symmetry_.electronsFromQn(symm.left().qn(ab.first));
+					SizeType alm1=0;
+					SizeType sigmaL=0;
+					SizeType alB=0;
+					SizeType electronsLeft = symmetry_.electronsFromQn(symm.left().
+					                                                   qn(ab.first));
 					if (direction_==TO_THE_RIGHT) {
 						PairType tmpPair1 = symm.left().unpack(ab.first);
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
 						alB = ab.second;
-						size_t electronsBlock = symmetry_.electronsFromState(sigmaL);
+						SizeType electronsBlock = symmetry_.electronsFromState(sigmaL);
 						assert(electronsBlock<=electronsLeft);
 						electronsLeft -= electronsBlock;
 					} else {
@@ -140,24 +144,26 @@ public:
 						sigmaL=tmpPair1.first;
 						alm1=ab.first;
 					}
-					RealType fermionSign = (electronsLeft & 1 ) ? wOp.fermionSign() : 1.0;
+
+					RealType fermionSign = (electronsLeft & 1) ? wOp.fermionSign() : 1.0;
 
 					for (int k1=l1.getRowPtr(alm1);k1<l1.getRowPtr(alm1+1);k1++) {
-						size_t alm1p=l1.getCol(k1);
+						SizeType alm1p=l1.getCol(k1);
 						for (int kw=w.getRowPtr(sigmaL);kw<w.getRowPtr(sigmaL+1);kw++) {
-							size_t sigmaLp=w.getCol(kw);
+							SizeType sigmaLp=w.getCol(kw);
 							for (int k2=r1.getRowPtr(alB);k2<r1.getRowPtr(alB+1);k2++) {
-								size_t alBp = r1.getCol(k2);
-								size_t j = 0;
+								SizeType alBp = r1.getCol(k2);
+								SizeType j = 0;
 								if (direction_==TO_THE_RIGHT) {
-									size_t tmp1 = symm.left().pack(alm1p,sigmaLp);
+									SizeType tmp1 = symm.left().pack(alm1p,sigmaLp);
 									j = symm.super().pack(tmp1,alBp);
 								} else {
-									size_t tmp1 = symm.right().pack(sigmaLp,alBp);
+									SizeType tmp1 = symm.right().pack(sigmaLp,alBp);
 									j = symm.super().pack(alm1p,tmp1);
 								}
 								if (j<offset || j>=offset+total) continue;
-								x[i] += y[j-offset]*l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2)*fermionSign;
+								x[i] += y[j-offset]*l1.getValue(k1)*
+								        w.getValue(kw)*r1.getValue(k2)*fermionSign;
 							} // k2 right
 						} // kw Hamiltonian
 					} // k1 left
@@ -170,18 +176,21 @@ public:
 	void fullHamiltonian(SparseMatrixType& matrix) const
 	{
 		const SymmetryFactorType& symm =  symmetry_.symmLocal()(siteForSymm_);
-		size_t offset = symm.super().partitionOffset(symmetrySector_);
-		size_t total = symm.super().partitionSize(symmetrySector_);
-		size_t nsites = symm.super().block().size();
+		SizeType offset = symm.super().partitionOffset(symmetrySector_);
+		SizeType total = symm.super().partitionSize(symmetrySector_);
+		SizeType nsites = symm.super().block().size();
 
-		size_t leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_;
-		size_t rightIndex = (direction_ == TO_THE_RIGHT) ? nsites-currentSite_-1 : nsites-currentSite_-1;
+		SizeType leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_;
+		SizeType rightIndex = (direction_ == TO_THE_RIGHT) ?
+		            nsites-currentSite_-1 : nsites-currentSite_-1;
 
 		matrix.resize(total,total);
-		const ContractedFactorType& cL = contractedPart_(leftIndex,ProgramGlobals::PART_LEFT);
-		const ContractedFactorType& cR = contractedPart_(rightIndex,ProgramGlobals::PART_RIGHT);
+		const ContractedFactorType& cL = contractedPart_(leftIndex,
+		                                                 ProgramGlobals::PART_LEFT);
+		const ContractedFactorType& cR = contractedPart_(rightIndex,
+		                                                 ProgramGlobals::PART_RIGHT);
 		VectorType v(total,0);
-		size_t counter = 0;
+		SizeType counter = 0;
 		assert(hamiltonian_.n_row()>=cL.size());
 		assert(hamiltonian_.n_col()>=cR.size());
 
@@ -189,33 +198,35 @@ public:
 			assert(symm.left().split()==cL(0).row());
 			assert(symm.right().size()==cR(0).row());
 		} else {
-			assert(symm.right().split()==0 || symm.right().size()/symm.right().split()==cR(0).row());
+			assert(symm.right().split()==0 ||
+			       symm.right().size()/symm.right().split()==cR(0).row());
 			assert(symm.left().size()==cL(0).row());
 		}
 
-		for (size_t i=0;i<total;i++) {
+		for (SizeType i=0;i<total;i++) {
 			matrix.setRow(i,counter);
-			for (size_t blm1=0;blm1<cL.size();blm1++) {
-				for (size_t bl=0;bl<cR.size();bl++) {
+			for (SizeType blm1=0;blm1<cL.size();blm1++) {
+				for (SizeType bl=0;bl<cR.size();bl++) {
 					const OperatorType& wOp = hamiltonian_(blm1,bl);
 					const SparseMatrixType& w = wOp.matrix();
 					if (w.row()==0) continue;
-//					SparseMatrixType w;
-//					transposeConjugate(w,w1);
+					//					SparseMatrixType w;
+					//					transposeConjugate(w,w1);
 					const SparseMatrixType& r1 = cR(bl);
 					const SparseMatrixType& l1 = cL(blm1);
 					PairType ab = symm.super().unpack(i+offset);
-					size_t alm1=0;
-					size_t sigmaL=0;
-					size_t alB=0;
+					SizeType alm1=0;
+					SizeType sigmaL=0;
+					SizeType alB=0;
 
-					size_t electronsLeft = symmetry_.electronsFromQn(symm.left().qn(ab.first));
+					SizeType electronsLeft = symmetry_.electronsFromQn(symm.left().
+					                                                   qn(ab.first));
 					if (direction_==TO_THE_RIGHT) {
 						PairType tmpPair1 = symm.left().unpack(ab.first);
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
 						alB = ab.second;
-						size_t electronsBlock = symmetry_.electronsFromState(sigmaL);
+						SizeType electronsBlock = symmetry_.electronsFromState(sigmaL);
 						assert(electronsBlock<=electronsLeft);
 						electronsLeft -= electronsBlock;
 					} else {
@@ -225,31 +236,32 @@ public:
 						alm1=ab.first;
 					}
 
-					RealType fermionSign = (electronsLeft & 1 ) ? wOp.fermionSign() : 1.0;
+					RealType fermionSign = (electronsLeft & 1) ? wOp.fermionSign() : 1.0;
 
 					for (int k1=l1.getRowPtr(alm1);k1<l1.getRowPtr(alm1+1);k1++) {
-						size_t alm1p=l1.getCol(k1);
+						SizeType alm1p=l1.getCol(k1);
 						for (int kw=w.getRowPtr(sigmaL);kw<w.getRowPtr(sigmaL+1);kw++) {
-							size_t sigmaLp=w.getCol(kw);
+							SizeType sigmaLp=w.getCol(kw);
 							for (int k2=r1.getRowPtr(alB);k2<r1.getRowPtr(alB+1);k2++) {
-								size_t alBp = r1.getCol(k2);
-								size_t j = 0;
+								SizeType alBp = r1.getCol(k2);
+								SizeType j = 0;
 								if (direction_==TO_THE_RIGHT) {
-									size_t tmp1 =  symm.left().pack(alm1p,sigmaLp);
+									SizeType tmp1 =  symm.left().pack(alm1p,sigmaLp);
 									j = symm.super().pack(tmp1,alBp);
 								} else {
-									size_t tmp1 = symm.right().pack(sigmaLp,alBp);
+									SizeType tmp1 = symm.right().pack(sigmaLp,alBp);
 									j = symm.super().pack(alm1p,tmp1);
 								}
-//								v[j] += l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2);
+
 								if (j<offset || j>=offset+total) continue;
-								v[j-offset] += l1.getValue(k1)*w.getValue(kw)*r1.getValue(k2)*fermionSign;
+								v[j-offset] += l1.getValue(k1)*w.getValue(kw)*
+								        r1.getValue(k2)*fermionSign;
 							} // k2 right
 						} // kw Hamiltonian
 					} // k1 left
 				} // bl
 			} // blm1
-			for (size_t j=0;j<v.size();j++) {
+			for (SizeType j=0;j<v.size();j++) {
 				if (fabs(v[j])<1e-12) continue;
 				matrix.pushCol(j);
 				matrix.pushValue(v[j]);
@@ -264,13 +276,13 @@ public:
 private:
 
 	const ContractedPartType& contractedPart_;
-	size_t symmetrySector_;
-	size_t currentSite_;
-	size_t direction_;
-	size_t hilbertSize_;
+	SizeType symmetrySector_;
+	SizeType currentSite_;
+	SizeType direction_;
+	SizeType hilbertSize_;
 	const MpoFactorType& hamiltonian_;
 	const SymmetryHelperType& symmetry_;
-	size_t siteForSymm_;
+	SizeType siteForSymm_;
 
 }; // ModelHelper
 
@@ -278,4 +290,3 @@ private:
 
 /*@}*/
 #endif // MODEL_HELPER_H
-

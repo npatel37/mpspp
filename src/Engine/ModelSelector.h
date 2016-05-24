@@ -61,24 +61,24 @@ class ModelSelector {
 	typedef typename ModelType::MpoLocalType MpoLocalType;
 
 	typedef HubbardOneOrbital<ParametersSolverType,
-							  InputValidatorType,
-							  SymmetryLocalType,
-							  GeometryType> HubbardOneOrbitalType;
+	InputValidatorType,
+	SymmetryLocalType,
+	GeometryType> HubbardOneOrbitalType;
 
 	typedef HeisenbergSpinOneHalf<ParametersSolverType,
-							  InputValidatorType,
-							  SymmetryLocalType,
-							  GeometryType> HeisenbergSpinOneHalfType;
+	InputValidatorType,
+	SymmetryLocalType,
+	GeometryType> HeisenbergSpinOneHalfType;
 
 public:
 
 	typedef ModelBase<ParametersSolverType,
-					  InputValidatorType,
-					  SymmetryLocalType,
-					  GeometryType> ModelBaseType;
+	InputValidatorType,
+	SymmetryLocalType,
+	GeometryType> ModelBaseType;
 
 	ModelSelector(const PsimagLite::String& name)
-	: name_(name),model_(0)
+	    : name_(name),model_(0)
 	{}
 
 	~ModelSelector()
@@ -87,8 +87,8 @@ public:
 	}
 
 	const ModelBaseType& operator()(const ParametersSolverType& solverParams,
-						  InputValidatorType& io,
-						  const GeometryType& geometry)
+	                                InputValidatorType& io,
+	                                const GeometryType& geometry)
 	{
 		if (name_ == "HubbardOneBand") {
 			model_ = new HubbardOneOrbitalType(solverParams,io,geometry);

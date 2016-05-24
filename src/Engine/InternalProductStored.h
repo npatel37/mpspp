@@ -54,81 +54,82 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "ProgressIndicator.h"
 
 namespace Mpspp {
-	template<typename T,typename ModelType>
-	class InternalProductStored {
-	public:	
-		typedef T HamiltonianElementType;
-		typedef HamiltonianElementType value_type; 
-		typedef typename ModelType::ModelHelperType ModelHelperType;
-		typedef typename ModelHelperType::SparseMatrixType SparseMatrixType;
-		typedef typename ModelHelperType::RealType RealType;
-		typedef PsimagLite::Matrix<RealType> MatrixType;
-		typedef typename ModelType::ReflectionSymmetryType ReflectionSymmetryType;
-		//typedef typename SparseMatrixType::value_type SparseElementType;
+template<typename T,typename ModelType>
+class InternalProductStored {
+public:
+	typedef T HamiltonianElementType;
+	typedef HamiltonianElementType value_type;
+	typedef typename ModelType::ModelHelperType ModelHelperType;
+	typedef typename ModelHelperType::SparseMatrixType SparseMatrixType;
+	typedef typename ModelHelperType::RealType RealType;
+	typedef PsimagLite::Matrix<RealType> MatrixType;
+	typedef typename ModelType::ReflectionSymmetryType ReflectionSymmetryType;
+	//typedef typename SparseMatrixType::value_type SparseElementType;
 
-		InternalProductStored(ModelType const *model,
-					  ModelHelperType const *modelHelper,
-					  const ReflectionSymmetryType* rs=0)
-		: matrixStored_(2),pointer_(0),progress_("InternalProductStored")
-		{
-			model_ = model;
-			modelHelper_=modelHelper;
+	InternalProductStored(ModelType const *model,
+	                      ModelHelperType const *modelHelper,
+	                      const ReflectionSymmetryType* rs=0)
+	    : matrixStored_(2),pointer_(0),progress_("InternalProductStored")
+	{
+		model_ = model;
+		modelHelper_=modelHelper;
 
-
-			if (!rs) {
-				matrixStored_[0].clear();
-				model->fullHamiltonian(matrixStored_[0],*modelHelper);
-				if (model_->solverParams().options.find("debugmatrix")!=PsimagLite::String::npos) {
-					MatrixType fullm;
-					crsMatrixToFullMatrix(fullm,matrixStored_[0]);
-					if (PsimagLite::isZero(fullm)) std::cerr<<"Matrix is zero\n";
-					if (fullm.n_row()>40) {
-						printNonZero(fullm,std::cerr);
-					} else {
-						std::cout<<fullm;
-	//					printFullMatrix(fullm,"matrix",1);
-					}
-
+		if (!rs) {
+			matrixStored_[0].clear();
+			model->fullHamiltonian(matrixStored_[0],*modelHelper);
+			if (model_->solverParams().options.find("debugmatrix") !=
+			        PsimagLite::String::npos) {
+				MatrixType fullm;
+				crsMatrixToFullMatrix(fullm,matrixStored_[0]);
+				if (PsimagLite::isZero(fullm)) std::cerr<<"Matrix is zero\n";
+				if (fullm.n_row()>40) {
+					printNonZero(fullm,std::cerr);
+				} else {
+					std::cout<<fullm;
+					//					printFullMatrix(fullm,"matrix",1);
 				}
 
-				assert(isHermitian(matrixStored_[0],true));
-				PsimagLite::OstringStream msg;
-				msg<<"fullHamiltonian has rank="<<matrixStored_[0].row()<<" nonzeros="<<matrixStored_[0].nonZero();
-				progress_.printline(msg,std::cout);
-				return;
 			}
-			SparseMatrixType matrix2;
-			model->fullHamiltonian(matrix2,*modelHelper);
-			rs->transform(matrixStored_[0],matrixStored_[1],matrix2);
+
+			assert(isHermitian(matrixStored_[0],true));
 			PsimagLite::OstringStream msg;
-			msg<<" sector="<<matrixStored_[0].row()<<" and sector="<<matrixStored_[1].row();
+			msg<<"fullHamiltonian has rank="<<matrixStored_[0].row();
+			msg<<" nonzeros="<<matrixStored_[0].nonZero();
 			progress_.printline(msg,std::cout);
+			return;
 		}
+		SparseMatrixType matrix2;
+		model->fullHamiltonian(matrix2,*modelHelper);
+		rs->transform(matrixStored_[0],matrixStored_[1],matrix2);
+		PsimagLite::OstringStream msg;
+		msg<<" sector="<<matrixStored_[0].row()<<" and sector="<<matrixStored_[1].row();
+		progress_.printline(msg,std::cout);
+	}
 
-		size_t rank() const { return matrixStored_[pointer_].row(); }
+	SizeType rank() const { return matrixStored_[pointer_].row(); }
 
-		template<typename SomeVectorType>
-		void matrixVectorProduct(SomeVectorType &x, SomeVectorType const &y) const
-		{
-			 matrixStored_[pointer_].matrixVectorProduct(x,y);
-		}
+	template<typename SomeVectorType>
+	void matrixVectorProduct(SomeVectorType &x, SomeVectorType const &y) const
+	{
+		matrixStored_[pointer_].matrixVectorProduct(x,y);
+	}
 
-		HamiltonianElementType operator()(size_t i,size_t j) const
-		{
-			return matrixStored_[pointer_](i,j);
-		}
+	HamiltonianElementType operator()(SizeType i,SizeType j) const
+	{
+		return matrixStored_[pointer_](i,j);
+	}
 
-		size_t reflectionSector() const { return pointer_; }
+	SizeType reflectionSector() const { return pointer_; }
 
-		void reflectionSector(size_t p) { pointer_=p; }
+	void reflectionSector(SizeType p) { pointer_=p; }
 
-	private:
-		ModelType const *model_;
-		ModelHelperType const *modelHelper_;
-		typename PsimagLite::Vector<SparseMatrixType>::Type matrixStored_;
-		size_t pointer_;
-		PsimagLite::ProgressIndicator progress_;
-	}; // class InternalProductStored
+private:
+	ModelType const *model_;
+	ModelHelperType const *modelHelper_;
+	typename PsimagLite::Vector<SparseMatrixType>::Type matrixStored_;
+	SizeType pointer_;
+	PsimagLite::ProgressIndicator progress_;
+}; // class InternalProductStored
 } // namespace Mpspp
 
 /*@}*/
