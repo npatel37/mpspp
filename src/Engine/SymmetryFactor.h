@@ -99,9 +99,10 @@ public:
 		super_.combine(left_,right_);
 	}
 
+
 	void grow(SizeType site,
 	          const VectorIntegerType& quantumNumbers,
-	          const SymmetryFactor& previous,
+              const SymmetryFactor* previous,
 	          SizeType nsites)
 	{
 		assert(site+1<nsites);
@@ -109,21 +110,57 @@ public:
 		                                   0,
 		                                   site,
 		                                   quantumNumbers);
-		left_.combine(previous.left(),onesiteRight);
+        const SymmetryComponentType* pleft = (previous) ? &previous->left() : 0;
+
+        if (pleft){
+            left_.combine(*pleft,onesiteRight);
+        } else{
+            left_ = onesiteRight;
+        }
 
 		SizeType siteRight = nsites - 1 -site;
 		SymmetryComponentType onesiteRight3(SymmetryComponentType::COMPONENT_LEFT,
 		                                    0,
 		                                    siteRight,
 		                                    quantumNumbers);
-		if (site==0) {
-			right_=previous.right();
-		} else {
-			right_.combine(onesiteRight3,previous.right());
-		}
+
+        const SymmetryComponentType* pright = (previous) ? &previous->right() : 0;
+
+        if (pright){
+            right_.combine(onesiteRight3,*pright);
+        } else{
+            right_ = onesiteRight3;
+        }
 
 		super_.combine(left_,right_);
 	}
+
+    void growRight(SizeType site,
+              const VectorIntegerType& quantumNumbers,
+              const SymmetryFactor* previous,
+              SizeType nsites)
+    {
+        SizeType siteRight = site;
+        SymmetryComponentType onesiteRight3(SymmetryComponentType::COMPONENT_LEFT,
+                                            0,
+                                            siteRight,
+                                            quantumNumbers);
+
+        const SymmetryComponentType* pright = (previous) ? &previous->right() : 0;
+
+        if (pright){
+            right_.combine(*pright,onesiteRight3);
+        } else{
+            right_ = onesiteRight3;
+        }
+        if (left_.block().size() == 0) {
+            super_ = right_;
+        } else if (right_.block().size() == 0){
+            super_ = left_;
+        } else {
+            super_.combine(left_,right_);
+        }
+    }
 
 	void moveRight(const SymmetryComponentType& oldLeft,
 	               const SymmetryComponentType& onesite,

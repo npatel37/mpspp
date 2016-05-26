@@ -96,6 +96,16 @@ public:
 			if (B_[i]) delete B_[i];
 	}
 
+    void initialGuess(size_t currentSite,const SymmetryLocalType& symm,size_t nk)
+    {
+        center_ = currentSite;
+            size_t n = symm(currentSite).right().size();
+            MpsFactorType* mpsFactor = new MpsFactorType(MpsFactorType::TYPE_B);
+            std::cout << "currentSite=" << currentSite << ", n=" << n << "\n";
+            mpsFactor->setRandom(currentSite,n);
+            B_.push_back(mpsFactor);
+    }
+
 	void grow(size_t currentSite,const SymmetryLocalType& symm,size_t nk)
 	{
 		center_ = currentSite;

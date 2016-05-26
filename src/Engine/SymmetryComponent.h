@@ -115,9 +115,9 @@ public:
 		this->leftSize_ = leftSize;
 	}
 
-	void combine(const SymmetryComponent& left,const SymmetryComponent& right)
+    void combine(const SymmetryComponent& left,const SymmetryComponent& right)
 	{
-		block_.clear();
+        //block_.clear();
 		blockUnion(block_,left.block_,right.block_); //! B= pS.block Union X
 		assert(isValidBlock());
 

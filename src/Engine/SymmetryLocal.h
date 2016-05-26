@@ -130,6 +130,15 @@ public:
 		std::cout<<symmFactor;
 	}
 
+    void initialGuess(SizeType site,const VectorIntegerType& quantumNumbers,SizeType nsites)
+    {
+            SymmetryFactorType symmFactor;
+            SymmetryFactorType* ptr = (data_.size() == 0) ? 0 : &data_[data_.size()-1];
+            symmFactor.growRight(site,quantumNumbers,ptr,nsites);
+            data_.push_back(symmFactor);
+            std::cout<<symmFactor;
+    }
+
 	// left = prev.left + one site
 	// right = prev.right + one site
 	void grow(SizeType site,const VectorIntegerType& quantumNumbers,SizeType nsites)
@@ -141,7 +150,7 @@ public:
 			data_.push_back(symmFactor0);
 		}
 		SymmetryFactorType symmFactor;
-		symmFactor.grow(site,quantumNumbers,data_[data_.size()-1],nsites);
+        symmFactor.grow(site,quantumNumbers,&data_[data_.size()-1],nsites);
 		data_.push_back(symmFactor);
 		std::cout<<symmFactor;
 	}

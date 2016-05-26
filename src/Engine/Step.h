@@ -144,6 +144,18 @@ public:
 		            finiteLoop.keptStates);
 	}
 
+    void initialGuess(SymmetryLocalType& symm,SizeType center)
+    {
+
+        SizeType nsites = model_.geometry().numberOfSites();
+        VectorIntegerType quantumNumbers;
+        model_.getOneSite(quantumNumbers,center);
+        for (SizeType i = 0; i< nsites; ++i){
+            symm.initialGuess(i,quantumNumbers,nsites);
+            mps_.initialGuess(i,symm,nsites);
+        }
+    }
+
 	void grow(SymmetryLocalType& symm,SizeType center)
 	{
 		SizeType nsites = model_.geometry().numberOfSites();

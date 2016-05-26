@@ -94,9 +94,10 @@ public:
 
 		size_t center = 0;
 
-		growLattice(psi,contracted,center,symm);
+    //	growLattice(psi,contracted,center,symm);
+        initialGuess(psi,contracted,center,symm);
 
-		if (solverParams_.options.find("nofiniteloops")!=PsimagLite::String::npos)
+        if (solverParams_.options.find("nofiniteloops")!=PsimagLite::String::npos)
 			return;
 
 		StepType step(solverParams_,psi,contracted,model_,io_);
@@ -105,6 +106,16 @@ public:
 
 private:
 
+    void initialGuess(MpsLocalType& psi,
+                      ContractedLocalType& contracted,
+                      size_t& center,
+                      SymmetryLocalType& symm)
+    {
+
+        StepType step(solverParams_,psi,contracted,model_,io_);
+        step.initialGuess(symm,center);
+
+    }
 	void growLattice(MpsLocalType& psi,ContractedLocalType& contracted,size_t& center,SymmetryLocalType& symm)
 	{
 		size_t nsites = model_.geometry().numberOfSites();
