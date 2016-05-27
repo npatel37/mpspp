@@ -300,7 +300,7 @@ private:
 
 std::ostream& operator<<(std::ostream& os,const SymmetryComponent& symm)
 {
-	os<<"type="<<symm.typeToString()<<" leftSize_= ";
+    os<<"type="<<symm.typeToString()<<" leftSize_= ";
 	os<<symm.leftSize_<<" size= "<<symm.quantumNumbers_.size();
 	os<<" block= ";
 	for (SizeType i=0;i<symm.block_.size();i++)

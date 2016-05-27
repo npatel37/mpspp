@@ -148,9 +148,10 @@ public:
     {
 
         SizeType nsites = model_.geometry().numberOfSites();
+        SizeType nsitesOverTwo = static_cast<SizeType>(nsites/2);
         VectorIntegerType quantumNumbers;
         model_.getOneSite(quantumNumbers,center);
-        for (SizeType i = 0; i< nsites; ++i){
+        for (SizeType i = 0; i< nsitesOverTwo; ++i){
             symm.initialGuess(i,quantumNumbers,nsites);
             mps_.initialGuess(i,symm,nsites);
         }

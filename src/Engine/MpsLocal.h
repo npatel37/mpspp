@@ -99,11 +99,15 @@ public:
     void initialGuess(size_t currentSite,const SymmetryLocalType& symm,size_t nk)
     {
         center_ = currentSite;
-            size_t n = symm(currentSite).right().size();
-            MpsFactorType* mpsFactor = new MpsFactorType(MpsFactorType::TYPE_B);
-            std::cout << "currentSite=" << currentSite << ", n=" << n << "\n";
-            mpsFactor->setRandom(currentSite,n);
-            B_.push_back(mpsFactor);
+        SizeType d = 2;
+        SizeType middle = static_cast<SizeType>(nsites_/2);
+        SizeType x = nsites_ - currentSite;
+        SizeType n = (currentSite<middle) ? pow(d,currentSite+1) : pow(d,x);
+
+        MpsFactorType* mpsFactor = new MpsFactorType(MpsFactorType::TYPE_B);
+        std::cout << "currentSite=" << currentSite << ", n=" << n << "\n";
+        mpsFactor->setRandom(currentSite,n);
+        B_.push_back(mpsFactor);
     }
 
 	void grow(size_t currentSite,const SymmetryLocalType& symm,size_t nk)

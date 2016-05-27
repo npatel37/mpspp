@@ -134,7 +134,7 @@ public:
     {
             SymmetryFactorType symmFactor;
             SymmetryFactorType* ptr = (data_.size() == 0) ? 0 : &data_[data_.size()-1];
-            symmFactor.growRight(site,quantumNumbers,ptr,nsites);
+            symmFactor.grow(site,quantumNumbers,ptr,nsites);
             data_.push_back(symmFactor);
             std::cout<<symmFactor;
     }
