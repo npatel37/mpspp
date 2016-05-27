@@ -81,7 +81,6 @@ public:
 
 	void grow(SizeType currentSite,const SymmetryHelperType& symmHelper,SizeType nsites)
 	{
-		//		symmHelper.setSiteForSymm(currentSite+1);
 
 		L_[currentSite+1].build(abState_.A(currentSite),
 		                        h_(currentSite),
@@ -95,6 +94,16 @@ public:
 		                        symmHelper,
 		                        currentSite+1);
 	}
+
+    void initialGuess(SizeType currentSite,const SymmetryHelperType& symmHelper,SizeType nsites)
+    {
+        ContractedFactorType* ptr = (currentSite == 0) ? 0 : &R_[currentSite-1];
+        R_[currentSite].build(abState_.B(currentSite),
+                                h_(nsites-1-currentSite),
+                                ptr,
+                                symmHelper,
+                                currentSite);
+    }
 
 	//! From As (or Bs) and Ws reconstruct *this
 	void move(SizeType currentSite,

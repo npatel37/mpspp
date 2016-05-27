@@ -155,6 +155,14 @@ public:
             symm.initialGuess(i,quantumNumbers,nsites);
             mps_.initialGuess(i,symm,nsites);
         }
+
+        for (SizeType i = 0; i<nsites-1;++i){
+
+            FermionSign<ModelType> fermionSign(model_,i);
+            SymmetryHelperType symmetryHelper(fermionSign,symm);
+            contractedLocal_.initialGuess(i,symmetryHelper,nsites);
+        }
+
     }
 
 	void grow(SymmetryLocalType& symm,SizeType center)

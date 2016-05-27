@@ -87,20 +87,22 @@ public:
 
 	void build(const MpsFactorType& AorB,
 	           const MpoFactorType& h,
-	           const ThisType& prev,
+               const ThisType* prev,
 	           const SymmetryHelperType& symmHelper,
 	           SizeType siteForSymm)
 	{
+        const DataType* ptr = (prev) ? &prev->data_: 0;
 		if (leftOrRight_==PART_RIGHT) {
 			assert(AorB.type()==MpsFactorType::TYPE_B);
 
 			data_.resize(h.n_row());
-			moveRight(AorB,h,prev.data_,symmHelper,siteForSymm);
+
+            moveRight(AorB,h,ptr,symmHelper,siteForSymm);
 		} else {
 			assert(AorB.type()==MpsFactorType::TYPE_A);
 
 			data_.resize(h.n_col());
-			moveLeft(AorB,h,prev.data_,symmHelper,siteForSymm);
+            moveLeft(AorB,h,ptr,symmHelper,siteForSymm);
 		}
 	}
 
@@ -113,10 +115,10 @@ public:
 	{
 		if (leftOrRight_ == PART_RIGHT) {
 			assert(AorB.type()==MpsFactorType::TYPE_B);
-			moveRight(AorB,h,dataPrev.data_,symm,siteForSymm);
+            moveRight(AorB,h,&dataPrev.data_,symm,siteForSymm);
 		} else {
 			assert(AorB.type()==MpsFactorType::TYPE_A);
-			moveLeft(AorB,h,dataPrev.data_,symm,siteForSymm);
+            moveLeft(AorB,h,&dataPrev.data_,symm,siteForSymm);
 		}
 	}
 
@@ -147,17 +149,18 @@ public:
 
 private:
 
-	void moveLeft(SparseMatrixType& m,
+    void moveLeft(SparseMatrixType& m,
 	              const MpsFactorType& AorB,
 	              const SparseMatrixType& Atranspose,
 	              SizeType b,
 	              const MpoFactorType& h,
-	              const DataType& dataPrev,
+                  const DataType* dataPrev,
 	              const SymmetryHelperType& symmHelper,
 	              SizeType siteForSymm)
 	{
 		const SymmetryFactorType& symm = symmHelper.symmLocal()(siteForSymm);
 		const SparseMatrixType& A = AorB();
+        SparseMatrixType empty(1,1);
 
 		m.resize(A.col(),A.col());
 		SizeType counter=0;
@@ -210,7 +213,7 @@ private:
 
 	void moveLeft(const MpsFactorType& A,
 	              const MpoFactorType& h,
-	              const DataType& dataPrev,
+                  const DataType* dataPrev,
 	              const SymmetryHelperType& symm,
 	              SizeType siteForSymm)
 	{
@@ -227,7 +230,7 @@ private:
 
 	void moveRight(const MpsFactorType& B,
 	               const MpoFactorType& h,
-	               const DataType& dataPrev,
+                   const DataType* dataPrev,
 	               const SymmetryHelperType& symm,
 	               SizeType siteForSymm)
 	{
@@ -247,7 +250,7 @@ private:
 	               const MpsFactorType& B,
 	               const SparseMatrixType& Btranspose,
 	               const MpoFactorType& h,
-	               const DataType& dataPrev,
+                   const DataType* dataPrev,
 	               const SymmetryHelperType& symm,
 	               SizeType siteForSymm)
 	{
@@ -281,7 +284,7 @@ private:
 	               const MpsFactorType& B,
 	               const SparseMatrixType& Btranspose,
 	               const MpoFactorType& h,
-	               const DataType& dataPrev,
+                   const DataType* dataPrev,
 	               const SymmetryHelperType& symmHelper,
 	               SizeType siteForSymm)
 	{
