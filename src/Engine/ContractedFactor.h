@@ -154,13 +154,13 @@ private:
 	              const SparseMatrixType& Atranspose,
 	              SizeType b,
 	              const MpoFactorType& h,
-                  const DataType* dataPrev,
+                  const DataType* dataPrevPtr,
 	              const SymmetryHelperType& symmHelper,
 	              SizeType siteForSymm)
 	{
 		const SymmetryFactorType& symm = symmHelper.symmLocal()(siteForSymm);
 		const SparseMatrixType& A = AorB();
-        SparseMatrixType empty(1,1);
+        const DataType& dataPrev = *dataPrevPtr;
 
 		m.resize(A.col(),A.col());
 		SizeType counter=0;
@@ -284,16 +284,19 @@ private:
 	               const MpsFactorType& B,
 	               const SparseMatrixType& Btranspose,
 	               const MpoFactorType& h,
-                   const DataType* dataPrev,
+                   const DataType* dataPrevPtr,
 	               const SymmetryHelperType& symmHelper,
 	               SizeType siteForSymm)
 	{
 		const SymmetryFactorType& symm = symmHelper.symmLocal()(siteForSymm);
 		const SparseMatrixType& Bmatrix = B();
+		const DataType& dataPrev = *dataPrevPtr;
+
 		assert(symm.right().split()==0 ||
 		       symm.right().size()/symm.right().split()==dataPrev[0].row());
 		assert(Btranspose.row()==symm.right().size());
 		assert(dataPrev.size()<=h.n_col());
+
 		for (int kb=Bmatrix.getRowPtr(alm2);kb<Bmatrix.getRowPtr(alm2+1);kb++) {
 			PairType sigmalm1alm1 = symm.right().unpack(Bmatrix.getCol(kb));
 			SizeType sigmalm1 = sigmalm1alm1.first;
