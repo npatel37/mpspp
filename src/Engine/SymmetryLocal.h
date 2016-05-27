@@ -88,6 +88,11 @@ public:
 		return data_[site];
 	}
 
+    const SizeType size() const
+    {
+        return data_.size();
+    }
+
 	void moveLeft(SizeType site,const VectorIntegerType& quantumNumbers)
 	{
 		if (site+1==data_.size()) return;

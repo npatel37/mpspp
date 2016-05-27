@@ -153,6 +153,8 @@ public:
         model_.getOneSite(quantumNumbers,center);
         for (SizeType i = 0; i< nsitesOverTwo; ++i){
             symm.initialGuess(i,quantumNumbers,nsites);
+        }
+        for (SizeType i = 0; i< nsites; ++i){
             mps_.initialGuess(i,symm,nsites);
         }
 

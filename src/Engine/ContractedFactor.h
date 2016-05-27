@@ -68,6 +68,7 @@ class ContractedFactor {
 	typedef typename MpsFactorType::VectorIntegerType VectorIntegerType;
 	typedef typename MpoFactorType::OperatorType OperatorType;
 	typedef typename OperatorType::PairType PairForOperatorType;
+    typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT,
 	      TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
@@ -286,19 +287,28 @@ private:
 	               const MpoFactorType& h,
                    const DataType* dataPrevPtr,
 	               const SymmetryHelperType& symmHelper,
-	               SizeType siteForSymm)
+                   SizeType currentSite)
 	{
+        SizeType nsites = 2*symmHelper.symmLocal().size();
+        SizeType middle = static_cast<SizeType>(nsites/2);
+        SizeType siteForSymm = (currentSite<middle) ? currentSite : nsites-currentSite-1;
 		const SymmetryFactorType& symm = symmHelper.symmLocal()(siteForSymm);
+        //const SymmetryComponentType& symmC = (currentSite<middle) ? symm.right(): symm.left();
+        const SymmetryComponentType& symmC = symm.right();
 		const SparseMatrixType& Bmatrix = B();
+
+        if (!dataPrevPtr)
+            return moveRightFirst(values,cols,alm2,blm2,B,Btranspose,h,symmHelper,siteForSymm);
+
 		const DataType& dataPrev = *dataPrevPtr;
 
-		assert(symm.right().split()==0 ||
-		       symm.right().size()/symm.right().split()==dataPrev[0].row());
-		assert(Btranspose.row()==symm.right().size());
+        assert(symmC.split()==0 ||
+               symmC.size()/symmC.split()==dataPrev[0].row());
+        assert(Btranspose.row()==symmC.size());
 		assert(dataPrev.size()<=h.n_col());
 
 		for (int kb=Bmatrix.getRowPtr(alm2);kb<Bmatrix.getRowPtr(alm2+1);kb++) {
-			PairType sigmalm1alm1 = symm.right().unpack(Bmatrix.getCol(kb));
+            PairType sigmalm1alm1 = symmC.unpack(Bmatrix.getCol(kb));
 			SizeType sigmalm1 = sigmalm1alm1.first;
 			SizeType alm1 = sigmalm1alm1.second;
 
@@ -314,7 +324,7 @@ private:
 					     kprev<dataPrev[blm1].getRowPtr(alm1+1);
 					     kprev++) {
 						SizeType aplm1 = dataPrev[blm1].getCol(kprev);
-						SizeType i = symm.right().pack(sigmaplm1,aplm1);
+                        SizeType i = symmC.pack(sigmaplm1,aplm1);
 						for (int kb2=Btranspose.getRowPtr(i);
 						     kb2<Btranspose.getRowPtr(i+1);
 						     kb2++) {
@@ -328,6 +338,49 @@ private:
 			} // blm1
 		} // kb
 	}
+
+    void moveRightFirst(VectorType& values,
+                   VectorIntegerType& cols,
+                   SizeType alm2,
+                   SizeType blm2,
+                   const MpsFactorType& B,
+                   const SparseMatrixType& Btranspose,
+                   const MpoFactorType& h,
+                   const SymmetryHelperType& symmHelper,
+                   SizeType currentSite)
+    {
+        SizeType nsites = 2*symmHelper.symmLocal().size();
+        SizeType middle = static_cast<SizeType>(nsites/2);
+        SizeType siteForSymm = (currentSite<middle) ? currentSite : nsites-currentSite-1;
+        const SymmetryFactorType& symm = symmHelper.symmLocal()(siteForSymm);
+        const SymmetryComponentType& symmC = (currentSite<middle) ? symm.right(): symm.left();
+
+        const SparseMatrixType& Bmatrix = B();
+
+        assert(Btranspose.row()==symmC.size());
+
+        for (int kb=Bmatrix.getRowPtr(alm2);kb<Bmatrix.getRowPtr(alm2+1);kb++) {
+            PairType sigmalm1alm1 = symmC.unpack(Bmatrix.getCol(kb));
+            SizeType sigmalm1 = sigmalm1alm1.second;
+            assert(sigmalm1alm1.first == 0);
+            const OperatorType& wOp = h(blm2,0);
+            const SparseMatrixType& w = wOp.matrix();
+            if (w.row()==0) continue;
+            RealType fermionSign = 1.0;
+            for (int k=w.getRowPtr(sigmalm1);k<w.getRowPtr(sigmalm1+1);k++) {
+                SizeType sigmaplm1 = w.getCol(k);
+                ComplexOrRealType tmp = std::conj(Bmatrix.getValue(kb))*w.getValue(k);
+
+                for (int kb2=Bmatrix.getRowPtr(sigmaplm1);
+                     kb2<Bmatrix.getRowPtr(sigmaplm1+1);
+                     kb2++) {
+                    SizeType aplm2 = Bmatrix.getCol(kb2);
+                    values[aplm2] += tmp*Bmatrix.getValue(kb2)*fermionSign;
+                    cols[aplm2]=1;
+                } // kb2
+            } // k
+        } // kb
+    }
 
 	PsimagLite::String partToString() const
 	{
