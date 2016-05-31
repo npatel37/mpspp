@@ -98,7 +98,7 @@ public:
     void initialGuess(SizeType currentSite,const SymmetryHelperType& symmHelper,SizeType nsites)
     {
         ContractedFactorType* ptr = (currentSite == 0) ? 0 : &R_[currentSite-1];
-        R_[currentSite].build(abState_.B(currentSite),
+        R_[currentSite].build(abState_.B(nsites-1-currentSite),
                                 h_(nsites-1-currentSite),
                                 ptr,
                                 symmHelper,
