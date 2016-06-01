@@ -72,6 +72,10 @@ public:
 		return data_(i,j);
 	}
 
+    void setTo(const OperatorType& op){
+        data_.setTo(op);
+    }
+
 	OperatorType& operator()(size_t i,size_t j)
 	{
 		assert(i<n_row() && j<n_col());

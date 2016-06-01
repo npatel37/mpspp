@@ -77,7 +77,7 @@ class HeisenbergSpinOneHalf : public ModelBase<ParametersSolverType,
 	GeometryType> ModelBaseType;
 
 	typedef typename ModelBaseType::MpoLocalType MpoLocalType;
-	typedef typename MpoLocalType::MpoFactorType MpoFactorType;
+    typedef typename MpoLocalType::MpoFactorType MpoFactorType;
 	typedef typename ModelBaseType::SparseMatrixType SparseMatrixType;
 	typedef typename ModelBaseType::ModelHelperType ModelHelperType;
 	typedef typename ModelBaseType::VectorType VectorType;
@@ -88,6 +88,7 @@ class HeisenbergSpinOneHalf : public ModelBase<ParametersSolverType,
 	typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
 
 	typedef ParametersHeisenbergSpinOneHalf<RealType> ParametersModelType;
+    typedef typename MpoFactorType::OperatorType OperatorType;
 
 	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
 
@@ -112,6 +113,11 @@ public:
 
 		SparseMatrixType identity(hilbert_,hilbert_);
 		identity.makeDiagonal(hilbert_,1.0);
+        SparseMatrixType zero(hilbert_,hilbert_);
+        zero.makeDiagonal(hilbert_,0.0);
+
+        OperatorType zeroop(zero,1);
+
 		SparseMatrixType splus(hilbert_,hilbert_);
 		fillSplusMatrix(splus);
 		SparseMatrixType sminus(hilbert_,hilbert_);
@@ -120,7 +126,9 @@ public:
 		SparseMatrixType sz(hilbert_,hilbert_);
 		fillSzMatrix(sz);
 
+
 		MpoFactorType mleft(1,wdim);
+        mleft(0,0) = zero;
 		mleft(0,1) = Jover2*sminus;
 		mleft(0,2) = Jover2*splus;
 		mleft(0,3) = Jz*sz;
@@ -128,7 +136,8 @@ public:
 		hamiltonian_(0)=mleft;
 
 		for (SizeType i=1;i<n-1;i++) {
-			MpoFactorType m(wdim,wdim);
+            MpoFactorType m(wdim,wdim);
+            m.setTo(zeroop);
 			m(0,0) = identity;
 			m(1,0) = splus;
 			m(2,0) = sminus;
@@ -142,6 +151,7 @@ public:
 		}
 
 		MpoFactorType mright(wdim,1);
+        mright(4,0) = zero;
 		mright(3,0) = sz;
 		mright(2,0) = sminus;
 		mright(1,0) = splus;
