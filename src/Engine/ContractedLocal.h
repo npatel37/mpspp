@@ -155,12 +155,13 @@ private:
 	              const MpsLocalType& abState,
 	              const SymmetryHelperType& symm)
 	{
-		assert(currentSite+1<L_.size());
-		L_[currentSite+1].move(abState.A(currentSite),
+        assert(currentSite+1<L_.size());
+        L_[currentSite+1].move(abState.A(currentSite),
 		                       h_(currentSite),
 		                       L_[currentSite],
 		                       symm,
-		                       currentSite+1);
+                               currentSite);
+
 		std::cout<<"set L_["<<(currentSite+1)<<"]="<<L_[currentSite+1].row()<<"\n";
 	}
 
