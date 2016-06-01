@@ -131,12 +131,12 @@ public:
 	{
 		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
-		symm.moveRight(currentSite+1,quantumNumbers);
+        symm.moveRight(currentSite,quantumNumbers);
 		if (currentSite+1==model_.geometry().numberOfSites()) return;
 
 		FermionSign<ModelType> fermionSign(model_,currentSite);
 		SymmetryHelperType symmetryHelper(fermionSign,symm);
-		internalmove(TO_THE_RIGHT,symmetryHelper,currentSite+1);
+        internalmove(TO_THE_RIGHT,symmetryHelper,currentSite);
 		contractedLocal_.move(currentSite,TO_THE_RIGHT,symmetryHelper);
 		truncation_(symm,
 		            currentSite,

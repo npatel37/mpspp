@@ -139,11 +139,7 @@ private:
 		for (size_t finiteLoop=0;finiteLoop<solverParams_.finiteLoops.size();finiteLoop++) {
 			FiniteLoop fl = solverParams_.finiteLoops[finiteLoop];
 			size_t counter = abs(fl.stepLength);
-			if (finiteLoop==0) {
-				if (fl.stepLength>0) {
-					center++;
-				}
-			}
+
 			while(true) {
 				if (fl.stepLength<0) {
 					step.moveLeft(symm,center,fl);

@@ -178,11 +178,9 @@ public:
 		const SymmetryFactorType& symm =  symmetry_.symmLocal()(siteForSymm_);
 		SizeType offset = symm.super().partitionOffset(symmetrySector_);
 		SizeType total = symm.super().partitionSize(symmetrySector_);
-		SizeType nsites = symm.super().block().size();
 
-		SizeType leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_;
-		SizeType rightIndex = (direction_ == TO_THE_RIGHT) ?
-		            nsites-currentSite_-1 : nsites-currentSite_-1;
+        SizeType leftIndex = currentSite_;
+        SizeType rightIndex = currentSite_;
 
 		matrix.resize(total,total);
 		const ContractedFactorType& cL = contractedPart_(leftIndex,
@@ -196,7 +194,7 @@ public:
 
 		if (direction_==TO_THE_RIGHT) {
 			assert(symm.left().split()==cL(0).row());
-			assert(symm.right().size()==cR(0).row());
+            //assert(symm.right().size()==cR(0).row());
 		} else {
 			assert(symm.right().split()==0 ||
 			       symm.right().size()/symm.right().split()==cR(0).row());
@@ -209,10 +207,7 @@ public:
 				for (SizeType bl=0;bl<cR.size();bl++) {
 					const OperatorType& wOp = hamiltonian_(blm1,bl);
 					const SparseMatrixType& w = wOp.matrix();
-					if (w.row()==0) continue;
-					//					SparseMatrixType w;
-					//					transposeConjugate(w,w1);
-					const SparseMatrixType& r1 = cR(bl);
+                    const SparseMatrixType& r1 = cR(bl);
 					const SparseMatrixType& l1 = cL(blm1);
 					PairType ab = symm.super().unpack(i+offset);
 					SizeType alm1=0;
