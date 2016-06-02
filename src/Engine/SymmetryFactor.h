@@ -212,6 +212,14 @@ public:
 
 	const SymmetryComponentType& right() const { return right_; }
 
+	const bool operator==(const SymmetryFactor& other) const
+	{
+		bool b1 = (left_ == other.left_);
+		bool b2 = (right_ == other.right_);
+		bool b3 = (super_ == other.super_);
+		return (b1 && b2 && b3);
+	}
+
 	friend std::ostream& operator<<(std::ostream& os,const SymmetryFactor& symm);
 
 private:

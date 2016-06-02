@@ -213,6 +213,18 @@ public:
 
 	const VectorIntegerType& block() const { return block_; }
 
+	const bool operator==(const SymmetryComponent& other) const
+	{
+		bool b1 = (type_ == other.type_);
+		bool b2 = (leftSize_ == other.leftSize_);
+		bool b3 = (block_ == other.block_);
+		bool b4 = (quantumNumbers_ == other.quantumNumbers_);
+		bool b5 = (partition_ == other.partition_);
+		bool b6 = (permutation_ == other.permutation_);
+		bool b7 = (permutationInverse_ == other.permutationInverse_);
+		return (b1 && b2 && b3 && b4 && b5 && b6 && b7);
+	}
+
 	friend std::ostream& operator<<(std::ostream& os,const SymmetryComponent& symm);
 
 private:

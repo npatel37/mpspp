@@ -127,7 +127,8 @@ public:
 
         symmFactor.moveRight(nothing,onesite,right);
         assert(site<data_.size());
-		data_[site] = symmFactor;
+		assert(data_[site] == symmFactor);
+//		data_[site] = symmFactor;
 		std::cout<<symmFactor;
 	}
 
