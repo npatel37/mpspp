@@ -108,7 +108,7 @@ public:
 		std::cout<<symmFactor;
 	}
 
-	void moveRight(SizeType site,const VectorIntegerType& quantumNumbers)
+	void moveRight(SizeType site,const VectorIntegerType& quantumNumbers, SizeType nsites)
 	{
         VectorIntegerType qn(1,0);
 		SymmetryFactorType symmFactor;
@@ -122,7 +122,7 @@ public:
                                       qn);
         SymmetryComponentType right(SymmetryComponentType::COMPONENT_RIGHT,
                                       quantumNumbers.size(),
-                                      site+1,
+                                      nsites - 1 -site,
                                       quantumNumbers);
 
         symmFactor.moveRight(nothing,onesite,right);

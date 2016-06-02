@@ -131,7 +131,8 @@ public:
 	{
 		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
-        symm.moveRight(currentSite,quantumNumbers);
+		SizeType nsites = model_.geometry().numberOfSites();
+        symm.moveRight(currentSite,quantumNumbers,nsites);
 		if (currentSite+1==model_.geometry().numberOfSites()) return;
 
 		FermionSign<ModelType> fermionSign(model_,currentSite);
