@@ -54,7 +54,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 namespace Mpspp {
 
 template<typename ModelBaseType,
-template<typename,typename> class InternalProductTemplate>
+         template<typename,typename> class InternalProductTemplate>
 class MpsSolver {
 
 	typedef typename ModelBaseType::ParametersSolverType ParametersSolverType;
@@ -69,21 +69,22 @@ class MpsSolver {
 	typedef typename ModelBaseType::SymmetryLocalType SymmetryLocalType;
 	typedef Step<ModelBaseType,InternalProductTemplate> StepType;
 
-	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT, TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
+	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT,
+	      TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 public:
 
 	MpsSolver(const ParametersSolverType& solverParams,
-			  const ModelBaseType& model,
+	          const ModelBaseType& model,
 	          InputValidatorType& io)
-		: solverParams_(solverParams),
-		  model_(model),
+	    : solverParams_(solverParams),
+	      model_(model),
 	      io_(io),
-		  progress_("MpsSolver"),
-		  stepCurrent_(0),
-		  sitesIndices_(model.geometry().numberOfSites())
+	      progress_("MpsSolver"),
+	      stepCurrent_(0),
+	      sitesIndices_(model.geometry().numberOfSites())
 	{
-		for (size_t i=0;i<sitesIndices_.size();i++) sitesIndices_[i] = i;
+		for (SizeType i=0;i<sitesIndices_.size();i++) sitesIndices_[i] = i;
 	}
 
 	void computeGroundState()
@@ -92,12 +93,12 @@ public:
 		MpsLocalType psi(model_.geometry().numberOfSites());
 		ContractedLocalType contracted(psi,model_.hamiltonian());
 
-		size_t center = 0;
+		SizeType center = 0;
 
-    //	growLattice(psi,contracted,center,symm);
-        initialGuess(psi,contracted,center,symm);
+		//	growLattice(psi,contracted,center,symm);
+		initialGuess(psi,contracted,center,symm);
 
-        if (solverParams_.options.find("nofiniteloops")!=PsimagLite::String::npos)
+		if (solverParams_.options.find("nofiniteloops")!=PsimagLite::String::npos)
 			return;
 
 		StepType step(solverParams_,psi,contracted,model_,io_);
@@ -106,41 +107,46 @@ public:
 
 private:
 
-    void initialGuess(MpsLocalType& psi,
-                      ContractedLocalType& contracted,
-                      size_t& center,
-                      SymmetryLocalType& symm)
-    {
-
-        StepType step(solverParams_,psi,contracted,model_,io_);
-        step.initialGuess(symm,center);
-
-    }
-	void growLattice(MpsLocalType& psi,ContractedLocalType& contracted,size_t& center,SymmetryLocalType& symm)
+	void initialGuess(MpsLocalType& psi,
+	                  ContractedLocalType& contracted,
+	                  SizeType& center,
+	                  SymmetryLocalType& symm)
 	{
-		size_t nsites = model_.geometry().numberOfSites();
+
+		StepType step(solverParams_,psi,contracted,model_,io_);
+		step.initialGuess(symm,center);
+
+	}
+
+	void growLattice(MpsLocalType& psi,
+	                 ContractedLocalType& contracted,
+	                 SizeType& center,
+	                 SymmetryLocalType& symm)
+	{
+		SizeType nsites = model_.geometry().numberOfSites();
 
 		StepType step(solverParams_,psi,contracted,model_,io_);
 
 		if (nsites&1) {
 			throw std::runtime_error("growLattice: nsites must be even\n");
 		}
-		size_t total = size_t(nsites/2);
-		for (size_t i=0;i<total;i++) {
+		SizeType total = SizeType(nsites/2);
+		for (SizeType i=0;i<total;i++) {
 			center=i;
 			step.grow(symm,center);
 		}
 	}
 
-	void finiteLoops(StepType& step,size_t& center,SymmetryLocalType& symm)
+	void finiteLoops(StepType& step,SizeType& center,SymmetryLocalType& symm)
 	{
-		size_t nsites = model_.geometry().numberOfSites();
+		SizeType nsites = model_.geometry().numberOfSites();
+		SizeType loops = solverParams_.finiteLoops.size();
 
-		for (size_t finiteLoop=0;finiteLoop<solverParams_.finiteLoops.size();finiteLoop++) {
+		for (SizeType finiteLoop=0;finiteLoop<loops;finiteLoop++) {
 			FiniteLoop fl = solverParams_.finiteLoops[finiteLoop];
-			size_t counter = abs(fl.stepLength);
+			SizeType counter = abs(fl.stepLength);
 
-			while(true) {
+			while (true) {
 				if (fl.stepLength<0) {
 					step.moveLeft(symm,center,fl);
 					printProgress(symm,center,"to the left");
@@ -162,7 +168,9 @@ private:
 		}
 	}
 
-	void printProgress(const SymmetryLocalType& symm,size_t center,const PsimagLite::String& direction) const
+	void printProgress(const SymmetryLocalType& symm,
+	                   SizeType center,
+	                   const PsimagLite::String& direction) const
 	{
 		PsimagLite::OstringStream msg;
 		msg<<"center="<<center<<" direction="<<direction;
@@ -180,7 +188,8 @@ private:
 		msg<<"Current virtual memory is "<<vmSize<<" maximum was "<<vmPeak;
 		progress_.printline(msg,std::cout);
 		PsimagLite::OstringStream msg2;
-		msg2<<"Amount of time scheduled (user plus system): "<<musage.time()<<" clock ticks";
+		msg2<<"Amount of time scheduled (user plus system): ";
+		msg2<<musage.time()<<" clock ticks";
 		progress_.printline(msg2,std::cout);
 	}
 

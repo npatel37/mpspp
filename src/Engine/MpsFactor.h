@@ -73,38 +73,11 @@ public:
 	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
 
 	MpsFactor(SizeType aOrB)
-		: rng_(0),aOrB_(aOrB)
+	    : rng_(0),aOrB_(aOrB)
 	{}
-
-//	MpsFactor(IoInputType& io,const SymmetryFactorType& symm,SizeType site)
-//	: symm_(symm),rng_(0)
-//	{
-////		if (site==0 || site+1 ==symm_.super().block().size()) {
-////			PsimagLite::String str(__FILE__);
-////			str += " " + ttos(__LINE__) + "\n";
-////			str += "Needs corner cases. I cannot go further until this is implemented\n";
-////			std::cerr<<str;
-////			return;
-////		}
-//		VectorWithOffsetType mpsFactorM;
-//		mpsFactorM.load(io,"MpsFactorM");
-
-//		MatrixType mpsFactor;
-//		findMpsFactor1(mpsFactor,mpsFactorM);
-
-//		VectorRealType s;
-//		svd(mpsFactor,s);
-
-//		fullMatrixToCrsMatrix(data_,mpsFactor);
-//	}
 
 	void setRandom(SizeType site,SizeType n)
 	{
-//		MatrixType m(n,n);
-//		for (SizeType i=0;i<n;i++)
-//			m(i,i) = (rng_()<0.5) ? -1 : 1;
-
-//		fullMatrixToCrsMatrix(data_,m);
 		data_.resize(n,n);
 		data_.makeDiagonal(n,1.0);
 
@@ -112,7 +85,10 @@ public:
 	}
 
 	template<typename SomeTruncationType>
-	void move(SomeTruncationType& truncation,const VectorType& v,SizeType symmetrySector,const SymmetryFactorType& symm)
+	void move(SomeTruncationType& truncation,
+	          const VectorType& v,
+	          SizeType symmetrySector,
+	          const SymmetryFactorType& symm)
 	{
 
 		SizeType row = symm.left().size();
@@ -121,7 +97,6 @@ public:
 
 		MatrixType m(row,col);
 
-//		SizeType total = symm.super().size();
 		SizeType offset = symm.super().partitionOffset(symmetrySector);
 		SizeType total = symm.super().partitionSize(symmetrySector);
 		for (SizeType i=0;i<total;i++) {
@@ -132,8 +107,6 @@ public:
 				m(ab.second,ab.first) = v[i];
 			}
 		}
-//		std::cout<<"full matrix prior to svd is\n";
-//		std::cout<<m;
 
 		moveFromVector(m,truncation,symm,symmetrySector);
 	}
@@ -143,13 +116,6 @@ public:
 	{
 		trunc.matrixRow(data_,cutoff);
 	}
-
-//	template<typename SomeNumericType>
-//	void divideBy(const SomeNumericType& value)
-//	{
-//		assert(value!=0);
-//		data_ *= (1.0/value);
-//	}
 
 	PsimagLite::String typeToString() const
 	{
@@ -161,17 +127,20 @@ public:
 	const SizeType type() const { return aOrB_; }
 
 	template<typename ComplexOrRealType2,typename SymmetryLocalType2>
-	friend std::ostream& operator<<(std::ostream& os,const MpsFactor<ComplexOrRealType2,SymmetryLocalType2>& mps);
+	friend std::ostream& operator<<(std::ostream&,
+	                                const MpsFactor<ComplexOrRealType2,SymmetryLocalType2>&);
 
 private:
 
 	template<typename SomeTruncationType>
-	void moveFromVector(const MatrixType& m,SomeTruncationType& truncation,const SymmetryFactorType& symm,SizeType symmetrySector)
+	void moveFromVector(const MatrixType& m,
+	                    SomeTruncationType& truncation,
+	                    const SymmetryFactorType& symm,
+	                    SizeType)
 	{
 		const SymmetryComponentType& summed = (aOrB_==TYPE_A) ? symm.left() : symm.right();
 		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
 
-//		SizeType max = std::max(summed.size(),nonSummed.size());
 		MatrixType finalU(summed.size(),summed.size());
 
 		truncation.setSize(summed.size());
@@ -194,31 +163,31 @@ private:
 			}
 		}
 
-//		VectorRealType finalS(m.n_col());
-//		svd('A',finalU,finalS,finalVt);
-//		truncation.set(finalS);
+		//		VectorRealType finalS(m.n_col());
+		//		svd('A',finalU,finalS,finalVt);
+		//		truncation.set(finalS);
 
 		MatrixType mtranspose;
 		if (aOrB_==TYPE_B)
 			transposeConjugate(mtranspose,finalU);
 
-//		std::cout<<"new AorB=\n";
-//		std::cout<<finalU;
-//		truncation.print(std::cout);
-//		std::cout<<"final vt\n";
-//		std::cout<<finalVt;
+		//		std::cout<<"new AorB=\n";
+		//		std::cout<<finalU;
+		//		truncation.print(std::cout);
+		//		std::cout<<"final vt\n";
+		//		std::cout<<finalVt;
 		assert(isNormalized(finalU));
 		assert(respectsSymmetry(finalU,summed));
-//		assert(isCorrectSvd(m,finalU,truncation,finalVt));
+		//		assert(isCorrectSvd(m,finalU,truncation,finalVt));
 		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? finalU : mtranspose);
 	}
 
 	void setThisSector(MatrixType& u,
-					   SizeType istart,
-					   SizeType itotal,
-					   SizeType jstart,
-					   SizeType jtotal,
-					   const MatrixType& m) const
+	                   SizeType istart,
+	                   SizeType itotal,
+	                   SizeType jstart,
+	                   SizeType jtotal,
+	                   const MatrixType& m) const
 	{
 		for (SizeType i=0;i<itotal;i++) {
 			for (SizeType j=0;j<jtotal;j++) {
@@ -228,13 +197,13 @@ private:
 	}
 
 	void setFinalU(MatrixType& finalU,
-				   SizeType istart,
-				   SizeType itotal,
-				   SizeType jstart,
-				   SizeType jtotal,
-				   const MatrixType& u) const
+	               SizeType istart,
+	               SizeType itotal,
+	               SizeType jstart,
+	               SizeType jtotal,
+	               const MatrixType& u) const
 	{
-//		std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
+		// std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
 		SizeType n = std::min(itotal,u.n_col());
 		for (SizeType i=0;i<itotal;i++) {
 			for (SizeType j=0;j<n;j++) {
@@ -246,28 +215,28 @@ private:
 
 	template<typename SomeTruncationType>
 	void setFinalS(SomeTruncationType& truncation,
-				   SizeType jstart,
-				   SizeType jtotal,
-				   const VectorRealType& s) const
+	               SizeType jstart,
+	               SizeType jtotal,
+	               const VectorRealType& s) const
 	{
-//		std::cout<<"setFinalS from "<<jstart<<" to "<<(jstart+jtotal-1)<<"\n";
+		//	std::cout<<"setFinalS from "<<jstart<<" to "<<(jstart+jtotal-1)<<"\n";
 		SizeType n = std::min(jtotal,static_cast<SizeType>(s.size()));
 		for (SizeType j=0;j<n;j++) {
-//			assert(j+jstart<finalS.size());
-//			if (fabs(s[j])<1e-6) continue;
+			//			assert(j+jstart<finalS.size());
+			//			if (fabs(s[j])<1e-6) continue;
 			if (j+jstart>=truncation.size()) continue;
 			truncation(j+jstart) = s[j];
-//			std::cout<<"s["<<j<<"]="<<s[j]<<" ";
+			//			std::cout<<"s["<<j<<"]="<<s[j]<<" ";
 		}
-//		std::cout<<"\n";
+		//		std::cout<<"\n";
 	}
 
 	void setFinalVt(MatrixType& finalVt,
-				   SizeType istart,
-				   SizeType itotal,
-				   SizeType jstart,
-				   SizeType jtotal,
-				   const MatrixType& vt) const
+	                SizeType istart,
+	                SizeType itotal,
+	                SizeType jstart,
+	                SizeType jtotal,
+	                const MatrixType& vt) const
 	{
 		std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
 		for (SizeType i=0;i<jtotal;i++) {
@@ -278,7 +247,10 @@ private:
 	}
 
 	template<typename SomeTruncationType>
-	bool isCorrectSvd(const MatrixType& mat,const MatrixType& u,SomeTruncationType& truncation,const MatrixType& vt) const
+	bool isCorrectSvd(const MatrixType& mat,
+	                  const MatrixType& u,
+	                  SomeTruncationType& truncation,
+	                  const MatrixType& vt) const
 	{
 		MatrixType m(u.n_row(),vt.n_col());
 		truncation.recoverSvd(m,u,vt);
@@ -291,7 +263,8 @@ private:
 		return true;
 	}
 
-	bool respectsSymmetry(const MatrixType& m,const SymmetryComponentType& summed) const
+	bool respectsSymmetry(const MatrixType& m,
+	                      const SymmetryComponentType& summed) const
 	{
 		assert(m.n_row()<=summed.size());
 		assert(m.n_col()<=summed.size());
@@ -308,7 +281,7 @@ private:
 
 	bool isNormalized(const MatrixType& m) const
 	{
-//		assert(m.n_row()==m.n_col());
+		//		assert(m.n_row()==m.n_col());
 		for (SizeType i=0;i<m.n_col();i++) {
 			for (SizeType j=0;j<m.n_col();j++) {
 				ComplexOrRealType sum = 0;
@@ -330,7 +303,8 @@ private:
 }; // MpsFactor
 
 template<typename ComplexOrRealType,typename SymmetryLocalType>
-std::ostream& operator<<(std::ostream& os,const MpsFactor<ComplexOrRealType,SymmetryLocalType>& mps)
+std::ostream& operator<<(std::ostream& os,
+                         const MpsFactor<ComplexOrRealType,SymmetryLocalType>& mps)
 {
 	os<<"type= "<<mps.typeToString();
 	os<<" rows= "<<mps.data_.row()<<" cols="<<mps.data_.col()<<"\n";
