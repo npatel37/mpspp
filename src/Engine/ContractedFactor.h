@@ -456,8 +456,8 @@ private:
 
         for (int kb=Bmatrix.getRowPtr(alm2);kb<Bmatrix.getRowPtr(alm2+1);kb++) {
             PairType sigmalm1alm1 = symmC.unpack(Bmatrix.getCol(kb));
-            SizeType sigmalm1 = sigmalm1alm1.first;
-            assert(sigmalm1alm1.second == 0);
+            SizeType sigmalm1 = sigmalm1alm1.second;
+            assert(sigmalm1alm1.first == 0);
             const OperatorType& wOp = h(blm2,0);
             const SparseMatrixType& w = wOp.matrix();
             if (w.row()==0) continue;

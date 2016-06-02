@@ -193,7 +193,7 @@ public:
 		assert(hamiltonian_.n_col()>=cR.size());
 
 		if (direction_==TO_THE_RIGHT) {
-            //assert(symm.left().split()==0 || symm.left().split()==cL(0).row());
+			assert(symm.left().split()==cL(0).row());
             //assert(symm.right().size()==cR(0).row());
 		} else {
 			assert(symm.right().split()==0 ||
@@ -220,7 +220,6 @@ public:
 						PairType tmpPair1 = symm.left().unpack(ab.first);
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
-                        assert(sigmaL<2);
 						alB = ab.second;
 						SizeType electronsBlock = symmetry_.electronsFromState(sigmaL);
 						assert(electronsBlock<=electronsLeft);
@@ -238,13 +237,11 @@ public:
 						SizeType alm1p=l1.getCol(k1);
 						for (int kw=w.getRowPtr(sigmaL);kw<w.getRowPtr(sigmaL+1);kw++) {
 							SizeType sigmaLp=w.getCol(kw);
-                            assert(sigmaLp<2);
 							for (int k2=r1.getRowPtr(alB);k2<r1.getRowPtr(alB+1);k2++) {
 								SizeType alBp = r1.getCol(k2);
 								SizeType j = 0;
 								if (direction_==TO_THE_RIGHT) {
-                                    SizeType tmp1 =  (symm.left().split()==0) ?
-                                              sigmaLp : symm.left().pack(alm1p,sigmaLp);
+									SizeType tmp1 =  symm.left().pack(alm1p,sigmaLp);
 									j = symm.super().pack(tmp1,alBp);
 								} else {
 									SizeType tmp1 = symm.right().pack(sigmaLp,alBp);

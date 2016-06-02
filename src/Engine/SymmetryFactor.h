@@ -106,8 +106,8 @@ public:
 	          SizeType nsites)
 	{
 		assert(site+1<nsites);
-        SymmetryComponentType onesiteRight(SymmetryComponentType::COMPONENT_LEFT,
-                                           0,
+		SymmetryComponentType onesiteRight(SymmetryComponentType::COMPONENT_RIGHT,
+		                                   0,
 		                                   site,
 		                                   quantumNumbers);
         const SymmetryComponentType* pleft = (previous) ? &previous->left() : 0;
@@ -119,8 +119,8 @@ public:
         }
 
 		SizeType siteRight = nsites - 1 -site;
-        SymmetryComponentType onesiteRight3(SymmetryComponentType::COMPONENT_RIGHT,
-                                            0,
+		SymmetryComponentType onesiteRight3(SymmetryComponentType::COMPONENT_LEFT,
+		                                    0,
 		                                    siteRight,
 		                                    quantumNumbers);
 

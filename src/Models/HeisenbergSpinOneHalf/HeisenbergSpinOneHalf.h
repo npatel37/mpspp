@@ -171,12 +171,8 @@ public:
 	virtual void getOneSite(VectorIntegerType& quantumNumbers,SizeType site) const
 	{
 		quantumNumbers.push_back(1);
-        quantumNumbers.push_back(0);
+		quantumNumbers.push_back(MAX_SITES);
 	}
-    virtual SizeType electronsFromQn(SizeType qn) const
-    {
-        return 0;
-    }
 
 private:
 
