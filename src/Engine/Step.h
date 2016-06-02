@@ -208,6 +208,10 @@ private:
 	                  const SymmetryHelperType& symmetryHelper,
 	                  SizeType siteForSymm)
 	{
+        SizeType nsites = model_.geometry().numberOfSites();
+        SizeType middle = static_cast<SizeType>(nsites/2);
+        SizeType part = (siteForSymm < middle) ? ProgramGlobals::PART_RIGHT:ProgramGlobals::PART_LEFT;
+        if (siteForSymm >= middle) siteForSymm = nsites - 1 - siteForSymm;
 		const SymmetryFactorType& symm = symmetryHelper.symmLocal()(siteForSymm);
 		SizeType currentSite = symmetryHelper.currentSite();
 		SizeType symmetrySector = getSymmetrySector(direction,symm.super());
@@ -217,7 +221,7 @@ private:
 		VectorType v(total,0.0);
 		RealType energy = internalmove(v,
 		                               currentSite,
-		                               direction,
+                                       part,
 		                               symmetryHelper,
 		                               symmetrySector,
 		                               siteForSymm);
@@ -229,7 +233,7 @@ private:
 
 	RealType internalmove(VectorType& tmpVec,
 	                      SizeType currentSite,
-	                      SizeType direction,
+                          SizeType part,
 	                      const SymmetryHelperType& symmetryHelper,
 	                      SizeType symmetrySector,
 	                      SizeType siteForSymm)
@@ -246,7 +250,7 @@ private:
 		ModelHelperType modelHelper(contractedLocal_,
 		                            symmetrySector,
 		                            currentSite,
-		                            direction,
+                                    part,
 		                            model_.hamiltonian()(currentSite),
 		                            symmetryHelper,
 		                            siteForSymm);

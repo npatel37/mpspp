@@ -51,8 +51,8 @@ namespace Mpspp {
 template<typename ContractedPartType>
 class ModelHelper {
 
-	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT,
-	      TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
+    enum {PART_RIGHT = ProgramGlobals::PART_RIGHT,
+          PART_LEFT = ProgramGlobals::PART_LEFT};
 
 public:
 
@@ -81,7 +81,7 @@ public:
 	    : contractedPart_(contractedPart),
 	      symmetrySector_(symmetrySector),
 	      currentSite_(currentSite),
-	      direction_(direction),
+          part_(direction),
 	      hamiltonian_(hamiltonian),
 	      symmetry_(symmetry),
 	      siteForSymm_(siteForSymm)
@@ -107,8 +107,8 @@ public:
 		SizeType offset = symm.super().partitionOffset(symmetrySector_);
 		SizeType total = symm.super().partitionSize(symmetrySector_);
 
-		SizeType leftIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
-		SizeType rightIndex = (direction_ == TO_THE_RIGHT) ? currentSite_ : currentSite_+1;
+        SizeType leftIndex = (part_ == PART_RIGHT) ? currentSite_ : currentSite_+1;
+        SizeType rightIndex = (part_ == PART_RIGHT) ? currentSite_ : currentSite_+1;
 
 		const ContractedFactorType& cL = contractedPart_(leftIndex,
 		                                                 ProgramGlobals::PART_LEFT);
@@ -130,7 +130,7 @@ public:
 					SizeType alB=0;
 					SizeType electronsLeft = symmetry_.electronsFromQn(symm.left().
 					                                                   qn(ab.first));
-					if (direction_==TO_THE_RIGHT) {
+                    if (part_==PART_RIGHT) {
 						PairType tmpPair1 = symm.left().unpack(ab.first);
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
@@ -154,7 +154,7 @@ public:
 							for (int k2=r1.getRowPtr(alB);k2<r1.getRowPtr(alB+1);k2++) {
 								SizeType alBp = r1.getCol(k2);
 								SizeType j = 0;
-								if (direction_==TO_THE_RIGHT) {
+                                if (part_==PART_RIGHT) {
 									SizeType tmp1 = symm.left().pack(alm1p,sigmaLp);
 									j = symm.super().pack(tmp1,alBp);
 								} else {
@@ -192,13 +192,13 @@ public:
 		assert(hamiltonian_.n_row()>=cL.size());
 		assert(hamiltonian_.n_col()>=cR.size());
 
-		if (direction_==TO_THE_RIGHT) {
-			assert(symm.left().split()==cL(0).row());
+        if (part_==PART_RIGHT) {
+            //assert(symm.left().split()==cL(0).row());
 			//assert(symm.right().size()==cR(0).row());
 		} else {
-			assert(symm.right().split()==0 ||
-			       symm.right().size()/symm.right().split()==cR(0).row());
-			assert(symm.left().size()==cL(0).row());
+//			assert(symm.right().split()==0 ||
+//			       symm.right().size()/symm.right().split()==cR(0).row());
+//			assert(symm.left().size()==cL(0).row());
 		}
 
 		for (SizeType i=0;i<total;i++) {
@@ -216,7 +216,7 @@ public:
 
 					SizeType electronsLeft = symmetry_.electronsFromQn(symm.left().
 					                                                   qn(ab.first));
-					if (direction_==TO_THE_RIGHT) {
+                    if (part_==PART_RIGHT) {
 						PairType tmpPair1 = symm.left().unpack(ab.first);
 						alm1=tmpPair1.first;
 						sigmaL=tmpPair1.second;
@@ -240,11 +240,11 @@ public:
 							for (int k2=r1.getRowPtr(alB);k2<r1.getRowPtr(alB+1);k2++) {
 								SizeType alBp = r1.getCol(k2);
 								SizeType j = 0;
-								if (direction_==TO_THE_RIGHT) {
+                                if (part_==PART_RIGHT) {
 									SizeType tmp1 =  symm.left().pack(alm1p,sigmaLp);
 									j = symm.super().pack(tmp1,alBp);
 								} else {
-									SizeType tmp1 = symm.right().pack(sigmaLp,alBp);
+                                    SizeType tmp1 = symm.right().pack(sigmaLp,alBp);
 									j = symm.super().pack(alm1p,tmp1);
 								}
 
@@ -273,7 +273,7 @@ private:
 	const ContractedPartType& contractedPart_;
 	SizeType symmetrySector_;
 	SizeType currentSite_;
-	SizeType direction_;
+    SizeType part_;
 	SizeType hilbertSize_;
 	const MpoFactorType& hamiltonian_;
 	const SymmetryHelperType& symmetry_;
