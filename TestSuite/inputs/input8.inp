@@ -8,7 +8,7 @@ Connectors
         1.0
 
 Model=HeisenbergSpinOneHalf
-SolverOptions=InternalProductStored,notrucation
+SolverOptions=InternalProductStored,notruncation
 Version=0.02
 OutputFile=data.txt
 InfiniteLoopKeptStates=64

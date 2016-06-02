@@ -89,30 +89,6 @@ public:
 		std::cout<<symmFactor;
 	}
 
-	void moveRight(SizeType site,const VectorIntegerType& quantumNumbers, SizeType nsites)
-	{
-		VectorIntegerType qn(1,0);
-		SymmetryFactorType symmFactor;
-		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_LEFT,
-		                              quantumNumbers.size(),
-		                              site,
-		                              quantumNumbers);
-		SymmetryComponentType nothing(SymmetryComponentType::COMPONENT_LEFT,
-		                              0,
-		                              site,
-		                              qn);
-		SymmetryComponentType right(SymmetryComponentType::COMPONENT_RIGHT,
-		                            quantumNumbers.size(),
-		                            nsites - 1 -site,
-		                            quantumNumbers);
-
-		symmFactor.moveRight(nothing,onesite,right);
-		assert(site<data_.size());
-		//assert(data_[site] == symmFactor);
-		//		data_[site] = symmFactor;
-		std::cout<<symmFactor;
-	}
-
 	void initialGuess(SizeType site,
 	                  const VectorIntegerType& quantumNumbers,
 	                  SizeType nsites)
