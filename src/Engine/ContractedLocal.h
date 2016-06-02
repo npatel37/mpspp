@@ -162,7 +162,7 @@ private:
 		                       h_(currentSite),
 		                       L_[currentSite],
 		                       symm,
-		                       currentSite+1);
+		                       currentSite);
 		std::cout<<"set L_["<<(currentSite+1)<<"]="<<L_[currentSite+1].row()<<"\n";
 	}
 
