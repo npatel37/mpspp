@@ -179,8 +179,8 @@ public:
 		SizeType offset = symm.super().partitionOffset(symmetrySector_);
 		SizeType total = symm.super().partitionSize(symmetrySector_);
 
-        SizeType leftIndex = currentSite_;
-        SizeType rightIndex = currentSite_;
+		SizeType leftIndex = currentSite_;
+		SizeType rightIndex = currentSite_;
 
 		matrix.resize(total,total);
 		const ContractedFactorType& cL = contractedPart_(leftIndex,
@@ -194,7 +194,7 @@ public:
 
 		if (direction_==TO_THE_RIGHT) {
 			assert(symm.left().split()==cL(0).row());
-            //assert(symm.right().size()==cR(0).row());
+			//assert(symm.right().size()==cR(0).row());
 		} else {
 			assert(symm.right().split()==0 ||
 			       symm.right().size()/symm.right().split()==cR(0).row());
@@ -207,7 +207,7 @@ public:
 				for (SizeType bl=0;bl<cR.size();bl++) {
 					const OperatorType& wOp = hamiltonian_(blm1,bl);
 					const SparseMatrixType& w = wOp.matrix();
-                    const SparseMatrixType& r1 = cR(bl);
+					const SparseMatrixType& r1 = cR(bl);
 					const SparseMatrixType& l1 = cL(blm1);
 					PairType ab = symm.super().unpack(i+offset);
 					SizeType alm1=0;

@@ -57,7 +57,7 @@ class ContractedLocal {
 	      TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 	enum {PART_LEFT = ProgramGlobals::PART_LEFT,
-		  PART_RIGHT = ProgramGlobals::PART_RIGHT};
+	      PART_RIGHT = ProgramGlobals::PART_RIGHT};
 
 public:
 
@@ -95,15 +95,17 @@ public:
 		                        currentSite+1);
 	}
 
-    void initialGuess(SizeType currentSite,const SymmetryHelperType& symmHelper,SizeType nsites)
-    {
-        ContractedFactorType* ptr = (currentSite == 0) ? 0 : &R_[currentSite-1];
-        R_[currentSite].build(abState_.B(nsites-1-currentSite),
-                                h_(nsites-1-currentSite),
-                                ptr,
-                                symmHelper,
-                                currentSite);
-    }
+	void initialGuess(SizeType currentSite,
+	                  const SymmetryHelperType& symmHelper,
+	                  SizeType nsites)
+	{
+		ContractedFactorType* ptr = (currentSite == 0) ? 0 : &R_[currentSite-1];
+		R_[currentSite].build(abState_.B(nsites-1-currentSite),
+		                      h_(nsites-1-currentSite),
+		                      ptr,
+		                      symmHelper,
+		                      currentSite);
+	}
 
 	//! From As (or Bs) and Ws reconstruct *this
 	void move(SizeType currentSite,
