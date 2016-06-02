@@ -63,35 +63,16 @@ public:
 	SymmetryLocal()
 	{}
 
-	//	SymmetryLocal(IoInputType& io)
-	//	{
-	//		SizeType n = 0;
-	//		io.readline(n,"TotalNumberOfSites=");
-	//		SizeType nk = 0;
-	//		io.readline(nk,"HilbertOneSite=");
-	//		assert(n>2);
-	//		for (SizeType i=0;i<n-1;i++) {
-	//			SymmetryFactorType f(io,nk);
-	//			data_.push_back(f);
-	////			if (i==0) data_.push_back(f); // left corner
-	////			if (i==n-3) data_.push_back(f); // right corner
-	//		}
-
-	//		assert(data_.size()==n-1);
-	////		data_[0].adjustCorner(SymmetryFactorType::CORNER_LEFT);
-	////		data_[n-1].adjustCorner(SymmetryFactorType::CORNER_RIGHT);
-	//	}
-
 	const SymmetryFactorType& operator()(SizeType site) const
 	{
 		assert(site<data_.size());
 		return data_[site];
 	}
 
-    const SizeType size() const
-    {
-        return data_.size();
-    }
+	const SizeType size() const
+	{
+		return data_.size();
+	}
 
 	void moveLeft(SizeType site,const VectorIntegerType& quantumNumbers)
 	{
@@ -110,36 +91,38 @@ public:
 
 	void moveRight(SizeType site,const VectorIntegerType& quantumNumbers, SizeType nsites)
 	{
-        VectorIntegerType qn(1,0);
+		VectorIntegerType qn(1,0);
 		SymmetryFactorType symmFactor;
-        SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_LEFT,
-                                      quantumNumbers.size(),
-                                      site,
+		SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_LEFT,
+		                              quantumNumbers.size(),
+		                              site,
 		                              quantumNumbers);
-        SymmetryComponentType nothing(SymmetryComponentType::COMPONENT_LEFT,
-                                      0,
-                                      site,
-                                      qn);
-        SymmetryComponentType right(SymmetryComponentType::COMPONENT_RIGHT,
-                                      quantumNumbers.size(),
-                                      nsites - 1 -site,
-                                      quantumNumbers);
+		SymmetryComponentType nothing(SymmetryComponentType::COMPONENT_LEFT,
+		                              0,
+		                              site,
+		                              qn);
+		SymmetryComponentType right(SymmetryComponentType::COMPONENT_RIGHT,
+		                            quantumNumbers.size(),
+		                            nsites - 1 -site,
+		                            quantumNumbers);
 
-        symmFactor.moveRight(nothing,onesite,right);
-        assert(site<data_.size());
+		symmFactor.moveRight(nothing,onesite,right);
+		assert(site<data_.size());
 		assert(data_[site] == symmFactor);
-//		data_[site] = symmFactor;
+		//		data_[site] = symmFactor;
 		std::cout<<symmFactor;
 	}
 
-    void initialGuess(SizeType site,const VectorIntegerType& quantumNumbers,SizeType nsites)
-    {
-            SymmetryFactorType symmFactor;
-            SymmetryFactorType* ptr = (data_.size() == 0) ? 0 : &data_[data_.size()-1];
-            symmFactor.grow(site,quantumNumbers,ptr,nsites);
-            data_.push_back(symmFactor);
-            std::cout<<symmFactor;
-    }
+	void initialGuess(SizeType site,
+	                  const VectorIntegerType& quantumNumbers,
+	                  SizeType nsites)
+	{
+		SymmetryFactorType symmFactor;
+		SymmetryFactorType* ptr = (data_.size() == 0) ? 0 : &data_[data_.size()-1];
+		symmFactor.grow(site,quantumNumbers,ptr,nsites);
+		data_.push_back(symmFactor);
+		std::cout<<symmFactor;
+	}
 
 	// left = prev.left + one site
 	// right = prev.right + one site
@@ -152,13 +135,16 @@ public:
 			data_.push_back(symmFactor0);
 		}
 		SymmetryFactorType symmFactor;
-        symmFactor.grow(site,quantumNumbers,&data_[data_.size()-1],nsites);
+		symmFactor.grow(site,quantumNumbers,&data_[data_.size()-1],nsites);
 		data_.push_back(symmFactor);
 		std::cout<<symmFactor;
 	}
 
 	template<typename SomeTruncationType>
-	void truncate(SizeType site,SizeType part,SizeType cutoff,const SomeTruncationType& trunc)
+	void truncate(SizeType site,
+	              SizeType part,
+	              SizeType cutoff,
+	              const SomeTruncationType& trunc)
 	{
 		assert(site<data_.size());
 		data_[site].truncate(part,cutoff,trunc);

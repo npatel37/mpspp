@@ -80,12 +80,6 @@ public:
 		findPermutationAndPartition();
 	}
 
-	//	SymmetryComponent(IoInputType& io,SizeType divisor)
-	//	{
-	//		loadInternal(io);
-	//		leftSize_ = size()/divisor;
-	//	}
-
 	void setSite(SizeType site)
 	{
 		assert(block_.size()==1);
@@ -115,9 +109,9 @@ public:
 		this->leftSize_ = leftSize;
 	}
 
-    void combine(const SymmetryComponent& left,const SymmetryComponent& right)
+	void combine(const SymmetryComponent& left,const SymmetryComponent& right)
 	{
-        //block_.clear();
+		//block_.clear();
 		blockUnion(block_,left.block_,right.block_); //! B= pS.block Union X
 		assert(isValidBlock());
 
@@ -225,7 +219,8 @@ public:
 		return (b1 && b2 && b3 && b4 && b5 && b6 && b7);
 	}
 
-	friend std::ostream& operator<<(std::ostream& os,const SymmetryComponent& symm);
+	friend std::ostream& operator<<(std::ostream& os,
+	                                const SymmetryComponent& symm);
 
 private:
 
@@ -244,7 +239,8 @@ private:
 		io.read(partition_,"#PARTITION");
 		io.read(permutationInverse_,"#PERMUTATIONINVERSE");
 		permutation_.resize(permutationInverse_.size());
-		for (SizeType i=0;i<permutation_.size();i++) permutation_[permutationInverse_[i]]=i;
+		for (SizeType i=0;i<permutation_.size();i++)
+			permutation_[permutationInverse_[i]]=i;
 		/*dmrgTransformed_=false;
 		if (useSu2Symmetry_)
 			symmSu2_.load(io);
@@ -312,7 +308,7 @@ private:
 
 std::ostream& operator<<(std::ostream& os,const SymmetryComponent& symm)
 {
-    os<<"type="<<symm.typeToString()<<" leftSize_= ";
+	os<<"type="<<symm.typeToString()<<" leftSize_= ";
 	os<<symm.leftSize_<<" size= "<<symm.quantumNumbers_.size();
 	os<<" block= ";
 	for (SizeType i=0;i<symm.block_.size();i++)

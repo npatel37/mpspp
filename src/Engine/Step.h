@@ -132,12 +132,12 @@ public:
 		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,currentSite);
 		SizeType nsites = model_.geometry().numberOfSites();
-        symm.moveRight(currentSite,quantumNumbers,nsites);
+		symm.moveRight(currentSite,quantumNumbers,nsites);
 		if (currentSite+1==model_.geometry().numberOfSites()) return;
 
 		FermionSign<ModelType> fermionSign(model_,currentSite);
 		SymmetryHelperType symmetryHelper(fermionSign,symm);
-        internalmove(TO_THE_RIGHT,symmetryHelper,currentSite);
+		internalmove(TO_THE_RIGHT,symmetryHelper,currentSite);
 		contractedLocal_.move(currentSite,TO_THE_RIGHT,symmetryHelper);
 		truncation_(symm,
 		            currentSite,
@@ -145,28 +145,28 @@ public:
 		            finiteLoop.keptStates);
 	}
 
-    void initialGuess(SymmetryLocalType& symm,SizeType center)
-    {
+	void initialGuess(SymmetryLocalType& symm,SizeType center)
+	{
 
-        SizeType nsites = model_.geometry().numberOfSites();
-        SizeType nsitesOverTwo = static_cast<SizeType>(nsites/2);
-        VectorIntegerType quantumNumbers;
-        model_.getOneSite(quantumNumbers,center);
-        for (SizeType i = 0; i< nsitesOverTwo; ++i){
-            symm.initialGuess(i,quantumNumbers,nsites);
-        }
-        for (SizeType i = 0; i< nsites; ++i){
-            mps_.initialGuess(i,symm,nsites);
-        }
+		SizeType nsites = model_.geometry().numberOfSites();
+		SizeType nsitesOverTwo = static_cast<SizeType>(nsites/2);
+		VectorIntegerType quantumNumbers;
+		model_.getOneSite(quantumNumbers,center);
+		for (SizeType i = 0; i< nsitesOverTwo; ++i){
+			symm.initialGuess(i,quantumNumbers,nsites);
+		}
+		for (SizeType i = 0; i< nsites; ++i){
+			mps_.initialGuess(i,symm,nsites);
+		}
 
-        for (SizeType i = 0; i<nsites-1;++i){
+		for (SizeType i = 0; i<nsites-1;++i){
 
-            FermionSign<ModelType> fermionSign(model_,i);
-            SymmetryHelperType symmetryHelper(fermionSign,symm);
-            contractedLocal_.initialGuess(i,symmetryHelper,nsites);
-        }
+			FermionSign<ModelType> fermionSign(model_,i);
+			SymmetryHelperType symmetryHelper(fermionSign,symm);
+			contractedLocal_.initialGuess(i,symmetryHelper,nsites);
+		}
 
-    }
+	}
 
 	void grow(SymmetryLocalType& symm,SizeType center)
 	{
@@ -273,8 +273,6 @@ private:
 
 		lanczosOrDavidson->computeGroundState(energyTmp,tmpVec,initialVector);
 		if (lanczosOrDavidson) delete lanczosOrDavidson;
-		//		std::cout<<"Eigenstate\n";
-		//		std::cout<<tmpVec;
 		return energyTmp;
 	}
 
@@ -303,7 +301,7 @@ private:
 		}
 		return imin;
 	}
-	
+
 	SizeType getQuantumSector(SizeType sites,SizeType direction) const
 	{
 		return (solverParams_.targetQuantumNumbers.size()>0) ?
@@ -343,7 +341,7 @@ private:
 		progress_.printline(msg,std::cout);
 		return encodeQuantumNumber(targetQuantumNumbers);
 	}
-	
+
 	static SizeType encodeQuantumNumber(const VectorIntegerType& v)
 	{
 		SizeType x= v[0] + v[1]*MAX_;
