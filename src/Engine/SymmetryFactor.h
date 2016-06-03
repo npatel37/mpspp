@@ -137,7 +137,7 @@ public:
 		const SymmetryComponentType* pright = (previous) ? &previous->right() : 0;
 
 		if (pright)
-			right_.combine(*pright,onesiteRight3);
+			right_.combine(onesiteRight3,*pright);
 		else
 			right_ = onesiteRight3;
 

@@ -53,18 +53,19 @@ namespace Mpspp {
 template<typename RealType,typename ComplexOrRealType>
 class MpoFactor {
 
-	typedef Operator<ComplexOrRealType> OperatorType_;
-	typedef typename OperatorType_::SparseMatrixType SparseMatrixType;
-	typedef PsimagLite::Matrix<OperatorType_> MatrixType;
+    typedef MpoFactor<RealType,ComplexOrRealType> ThisType;
+    typedef Operator<ComplexOrRealType> OperatorType_;
+    typedef typename OperatorType_::SparseMatrixType SparseMatrixType;
+    typedef PsimagLite::Matrix<OperatorType_> MatrixType;
 
-	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
+    static const int MAX_SITES = ProgramGlobals::MAX_SITES;
 
 public:
 
 	typedef OperatorType_ OperatorType;
 
 	MpoFactor(size_t wdim1,size_t wdim2)
-		: data_(wdim1,wdim2) {}
+	    : data_(wdim1,wdim2) {}
 
 	const OperatorType& operator()(size_t i,size_t j) const
 	{
@@ -72,9 +73,10 @@ public:
 		return data_(i,j);
 	}
 
-    void setTo(const OperatorType& op){
-        data_.setTo(op);
-    }
+	void setTo(const OperatorType& op)
+	{
+		data_.setTo(op);
+	}
 
 	OperatorType& operator()(size_t i,size_t j)
 	{
@@ -85,6 +87,11 @@ public:
 	size_t n_row() const { return data_.n_row(); }
 
 	size_t n_col() const { return data_.n_col(); }
+
+	bool operator==(const ThisType& other) const
+	{
+		return (data_ == other.data_);
+	}
 
 private:
 

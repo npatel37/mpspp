@@ -158,11 +158,15 @@ private:
 	              const SymmetryHelperType& symm)
 	{
 		assert(currentSite+1<L_.size());
+		SizeType nsites = h_.size();
+		SizeType middle = static_cast<SizeType>(nsites/2);
+		SizeType siteForSymm = (currentSite < middle) ? currentSite : nsites - 1 - currentSite;
+
 		L_[currentSite+1].move(abState.A(currentSite),
 		                       h_(currentSite),
 		                       L_[currentSite],
 		                       symm,
-		                       currentSite);
+		                       siteForSymm);
 		std::cout<<"set L_["<<(currentSite+1)<<"]="<<L_[currentSite+1].row()<<"\n";
 	}
 

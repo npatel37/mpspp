@@ -48,6 +48,7 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "ModelBase.h"
 #include "ParametersHeisenbergSpinOneHalf.h"
 #include "ProgramGlobals.h"
+#include "MpoLocal.h"
 
 /** Hamiltonian of the Heisenberg Model:
 
@@ -71,26 +72,26 @@ class HeisenbergSpinOneHalf : public ModelBase<ParametersSolverType,
         SymmetryLocalType,
         GeometryType> {
 
-	typedef ModelBase<ParametersSolverType,
-	InputValidatorType,
-	SymmetryLocalType,
-	GeometryType> ModelBaseType;
+    typedef ModelBase<ParametersSolverType,
+    InputValidatorType,
+    SymmetryLocalType,
+    GeometryType> ModelBaseType;
 
-	typedef typename ModelBaseType::MpoLocalType MpoLocalType;
+    typedef typename ModelBaseType::MpoLocalType MpoLocalType;
     typedef typename MpoLocalType::MpoFactorType MpoFactorType;
-	typedef typename ModelBaseType::SparseMatrixType SparseMatrixType;
-	typedef typename ModelBaseType::ModelHelperType ModelHelperType;
-	typedef typename ModelBaseType::VectorType VectorType;
-	typedef typename ModelBaseType::ComplexOrRealType ComplexOrRealType;
-	typedef typename ParametersSolverType::RealType RealType;
-	typedef PsimagLite::Matrix<ComplexOrRealType> MatrixType;
-	typedef typename MpoLocalType::MpsLocalType MpsLocalType;
-	typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
+    typedef typename ModelBaseType::SparseMatrixType SparseMatrixType;
+    typedef typename ModelBaseType::ModelHelperType ModelHelperType;
+    typedef typename ModelBaseType::VectorType VectorType;
+    typedef typename ModelBaseType::ComplexOrRealType ComplexOrRealType;
+    typedef typename ParametersSolverType::RealType RealType;
+    typedef PsimagLite::Matrix<ComplexOrRealType> MatrixType;
+    typedef typename MpoLocalType::MpsLocalType MpsLocalType;
+    typedef typename MpsLocalType::VectorIntegerType VectorIntegerType;
 
-	typedef ParametersHeisenbergSpinOneHalf<RealType> ParametersModelType;
+    typedef ParametersHeisenbergSpinOneHalf<RealType> ParametersModelType;
     typedef typename MpoFactorType::OperatorType OperatorType;
 
-	static const int MAX_SITES = ProgramGlobals::MAX_SITES;
+    static const int MAX_SITES = ProgramGlobals::MAX_SITES;
 
 public:
 
@@ -105,18 +106,18 @@ public:
 	      hamiltonian_(geometry_.numberOfSites())
 	{
 		// FIXME: CONNECT WITH THE GEOMETRY HERE!!
-		RealType J = 1.0;
-		RealType Jz=1.0;
+		RealType J = 0.0;
+		RealType Jz = 1.0;
 		RealType Jover2 = 0.5*J;
 		SizeType n = hamiltonian_.size();
 		SizeType wdim = 5;
 
 		SparseMatrixType identity(hilbert_,hilbert_);
 		identity.makeDiagonal(hilbert_,1.0);
-        SparseMatrixType zero(hilbert_,hilbert_);
-        zero.makeDiagonal(hilbert_,0.0);
+		SparseMatrixType zero(hilbert_,hilbert_);
+		zero.makeDiagonal(hilbert_,0.0);
 
-        OperatorType zeroop(zero,1);
+		OperatorType zeroop(zero,1);
 
 		SparseMatrixType splus(hilbert_,hilbert_);
 		fillSplusMatrix(splus);
@@ -128,7 +129,7 @@ public:
 
 
 		MpoFactorType mleft(1,wdim);
-        mleft(0,0) = zero;
+		mleft(0,0) = zero;
 		mleft(0,1) = Jover2*sminus;
 		mleft(0,2) = Jover2*splus;
 		mleft(0,3) = Jz*sz;
@@ -136,8 +137,8 @@ public:
 		hamiltonian_(0)=mleft;
 
 		for (SizeType i=1;i<n-1;i++) {
-            MpoFactorType m(wdim,wdim);
-            m.setTo(zeroop);
+			MpoFactorType m(wdim,wdim);
+			m.setTo(zeroop);
 			m(0,0) = identity;
 			m(1,0) = splus;
 			m(2,0) = sminus;
@@ -148,10 +149,12 @@ public:
 			m(4,3) = Jz*sz;
 			m(4,4) = identity;
 			hamiltonian_(i)=m;
+			if (i > 1)
+				assert(hamiltonian_(i) == hamiltonian_(1));
 		}
 
 		MpoFactorType mright(wdim,1);
-        mright(4,0) = zero;
+		mright(4,0) = zero;
 		mright(3,0) = sz;
 		mright(2,0) = sminus;
 		mright(1,0) = splus;
