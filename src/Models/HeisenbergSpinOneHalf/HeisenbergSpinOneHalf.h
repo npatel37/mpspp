@@ -106,7 +106,7 @@ public:
 	      hamiltonian_(geometry_.numberOfSites())
 	{
 		// FIXME: CONNECT WITH THE GEOMETRY HERE!!
-		RealType J = 0.0;
+		RealType J = 1.0;
 		RealType Jz = 1.0;
 		RealType Jover2 = 0.5*J;
 		SizeType n = hamiltonian_.size();

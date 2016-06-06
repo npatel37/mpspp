@@ -103,12 +103,13 @@ public:
 	//! Eq. (201) but very modified
 	void matrixVectorProduct(VectorType& x,const VectorType& y) const
 	{
+		SizeType nsites = 2*symmetry_.symmLocal().size();
 		const SymmetryFactorType& symm = symmetry_.symmLocal()(siteForSymm_);
 		SizeType offset = symm.super().partitionOffset(symmetrySector_);
 		SizeType total = symm.super().partitionSize(symmetrySector_);
 
 		SizeType leftIndex = (part_ == PART_RIGHT) ? currentSite_ : currentSite_+1;
-		SizeType rightIndex = (part_ == PART_RIGHT) ? currentSite_ : currentSite_+1;
+		SizeType rightIndex = (part_ == PART_RIGHT) ? currentSite_ : nsites - currentSite_ -1;
 
 		const ContractedFactorType& cL = contractedPart_(leftIndex,
 		                                                 ProgramGlobals::PART_LEFT);
@@ -175,12 +176,13 @@ public:
 	//! Used only for stored option
 	void fullHamiltonian(SparseMatrixType& matrix) const
 	{
+		SizeType nsites = 2*symmetry_.symmLocal().size();
 		const SymmetryFactorType& symm =  symmetry_.symmLocal()(siteForSymm_);
 		SizeType offset = symm.super().partitionOffset(symmetrySector_);
 		SizeType total = symm.super().partitionSize(symmetrySector_);
 
 		SizeType leftIndex = currentSite_;
-		SizeType rightIndex = currentSite_;
+		SizeType rightIndex = (part_==PART_RIGHT) ? currentSite_ + 1: nsites - currentSite_ - 1;
 
 		matrix.resize(total,total);
 		const ContractedFactorType& cL = contractedPart_(leftIndex,

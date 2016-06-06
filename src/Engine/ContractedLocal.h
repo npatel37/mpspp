@@ -99,8 +99,8 @@ public:
 	                  const SymmetryHelperType& symmHelper,
 	                  SizeType nsites)
 	{
-		ContractedFactorType* ptr = (currentSite == 0) ? 0 : &R_[currentSite-1];
-		R_[currentSite].build(abState_.B(nsites-1-currentSite),
+		ContractedFactorType* ptr = (currentSite == 0) ? 0 : &R_[currentSite];
+		R_[currentSite+1].build(abState_.B(nsites-1-currentSite),
 		                      h_(nsites-1-currentSite),
 		                      ptr,
 		                      symmHelper,
@@ -161,6 +161,10 @@ private:
 		SizeType nsites = h_.size();
 		SizeType middle = static_cast<SizeType>(nsites/2);
 		SizeType siteForSymm = (currentSite < middle) ? currentSite : nsites - 1 - currentSite;
+		if (currentSite >= middle) {
+			if (siteForSymm > 0) siteForSymm--;
+			else return;
+		}
 
 		L_[currentSite+1].move(abState.A(currentSite),
 		                       h_(currentSite),
