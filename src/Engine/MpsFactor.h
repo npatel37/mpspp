@@ -182,8 +182,8 @@ private:
 		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? finalU : mtranspose);
 		// debuggin only
 		assert(aOrB_ == TYPE_A);
-		SizeType n = data_.row();
-		data_.makeDiagonal(n,1.0);
+		//SizeType n = data_.row();
+		//data_.makeDiagonal(n,1.0);
 	}
 
 	void setThisSector(MatrixType& u,

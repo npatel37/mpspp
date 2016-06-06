@@ -240,38 +240,38 @@ private:
 		for (SizeType a2=0;a2<mrow;++a2) {
 			m.setRow(a2,counter);
 			for (SizeType sigma2 = 0; sigma2 < hilbertSize; ++sigma2) {
-					SizeType r = symm.right().pack(sigma2,a2);
-					for (int k3=Atranspose.getRowPtr(r);
-					     k3<Atranspose.getRowPtr(r+1);
-					     ++k3) {
-						SizeType a1 = Atranspose.getCol(k3);
-						for (SizeType b1=0;b1<h.n_row();++b1) {
-							const OperatorType& wOp = h(b1,b);
-							const SparseMatrixType& w = wOp.matrix();
-							if (w.row()==0) continue;
-							const SparseMatrixType& l1 = dataPrev[b1];
-							for (int k=l1.getRowPtr(a1);k<l1.getRowPtr(a1+1);++k) {
-								SizeType a1p = l1.getCol(k);
-								ComplexOrRealType tmp= l1.getValue(k)*
-								        std::conj(A.getValue(k3));
-								for (int kp=w.getRowPtr(sigma2);
-								     kp<w.getRowPtr(sigma2+1);
-								     ++kp) {
-									SizeType sigma2p = w.getCol(kp);
-									for (int k2=A.getRowPtr(a1p);
-									     k2<A.getRowPtr(a1p+1);
-									     k2++) {
-										SizeType j = A.getCol(k2);
-										PairType sigma2pa2p = symm.right().unpack(j);
-										if (sigma2p != sigma2pa2p.first) continue;
-										SizeType a2p = sigma2pa2p.second;
-										values[a2p] += tmp*w.getValue(kp)*A.getValue(k2);
-										cols[a2p]=1;
-									} // k2
-								} // kp
-							} // k
-						} //b1
-					} // k3
+				SizeType r = symm.right().pack(sigma2,a2);
+				for (int k3=Atranspose.getRowPtr(r);
+				     k3<Atranspose.getRowPtr(r+1);
+				     ++k3) {
+					SizeType a1 = Atranspose.getCol(k3);
+					for (SizeType b1=0;b1<h.n_row();++b1) {
+						const OperatorType& wOp = h(b1,b);
+						const SparseMatrixType& w = wOp.matrix();
+						if (w.row()==0) continue;
+						const SparseMatrixType& l1 = dataPrev[b1];
+						for (int k=l1.getRowPtr(a1);k<l1.getRowPtr(a1+1);++k) {
+							SizeType a1p = l1.getCol(k);
+							ComplexOrRealType tmp= l1.getValue(k)*
+							        std::conj(Atranspose.getValue(k3));
+							for (int kp=w.getRowPtr(sigma2);
+							     kp<w.getRowPtr(sigma2+1);
+							     ++kp) {
+								SizeType sigma2p = w.getCol(kp);
+								for (int k2=A.getRowPtr(a1p);
+								     k2<A.getRowPtr(a1p+1);
+								     k2++) {
+									SizeType j = A.getCol(k2);
+									PairType sigma2pa2p = symm.right().unpack(j);
+									if (sigma2p != sigma2pa2p.first) continue;
+									SizeType a2p = sigma2pa2p.second;
+									values[a2p] += tmp*w.getValue(kp)*A.getValue(k2);
+									cols[a2p]=1;
+								} // k2
+							} // kp
+						} // k
+					} //b1
+				} // k3
 			} //sigma2
 
 			for (SizeType i=0;i<cols.size();i++) {

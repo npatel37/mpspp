@@ -173,6 +173,11 @@ public:
 
 	virtual void getOneSite(VectorIntegerType& quantumNumbers,SizeType site) const
 	{
+		if (solverParams_.options.find("nolocalsymm")) {
+			quantumNumbers.resize(2,0);
+			return;
+		}
+
 		quantumNumbers.push_back(1);
 		quantumNumbers.push_back(MAX_SITES);
 	}
