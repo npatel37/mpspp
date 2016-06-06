@@ -174,8 +174,11 @@ private:
 	{
 		PsimagLite::OstringStream msg;
 		msg<<"center="<<center<<" direction="<<direction;
-		msg<<" left space= "<<symm(center).left().size();
-		msg<<" right space="<<symm(center).right().size()<<"\n";
+		SizeType nsites = model_.geometry().numberOfSites();
+		SizeType middle = static_cast<SizeType>(nsites/2);
+		SizeType siteForSymm = (center < middle) ? center : nsites - 1 - center;
+		msg<<" left space= "<<symm(siteForSymm).left().size();
+		msg<<" right space="<<symm(siteForSymm).right().size()<<"\n";
 		progress_.printline(msg,std::cout);
 	}
 

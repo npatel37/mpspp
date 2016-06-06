@@ -11,7 +11,7 @@ Model=HeisenbergSpinOneHalf
 SolverOptions=InternalProductStored,notruncation
 Version=0.02
 OutputFile=data.txt
-InfiniteLoopKeptStates=64
+InfiniteLoopKeptStates=1024
 FiniteLoops 1  7 1024 0  
 
 TargetElectronsUp=4
