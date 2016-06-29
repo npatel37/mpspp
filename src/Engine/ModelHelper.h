@@ -177,12 +177,13 @@ public:
 	void fullHamiltonian(SparseMatrixType& matrix) const
 	{
 		SizeType nsites = symmetry_.symmLocal().size();
+		SizeType middle = nsites/2;
 		const SymmetryFactorType& symm =  symmetry_.symmLocal()(siteForSymm_);
 		SizeType offset = symm.super().partitionOffset(symmetrySector_);
 		SizeType total = symm.super().partitionSize(symmetrySector_);
 
 		SizeType leftIndex = currentSite_;
-		SizeType rightIndex = (part_==PART_RIGHT) ? currentSite_ + 1: nsites - currentSite_ - 1;
+		SizeType rightIndex = (currentSite_ < middle) ? currentSite_ + 1: nsites - currentSite_ - 1;
 
 		matrix.resize(total,total);
 		const ContractedFactorType& cL = contractedPart_(leftIndex,
@@ -235,7 +236,7 @@ public:
 						alm1=ab.first;
 					}
 
-					RealType fermionSign = 1.0; //(electronsLeft & 1) ? wOp.fermionSign() : 1.0;
+					RealType fermionSign = (electronsLeft & 1) ? wOp.fermionSign() : 1.0;
 
 					for (int k1=l1.getRowPtr(alm1);k1<l1.getRowPtr(alm1+1);k1++) {
 						SizeType alm1p=l1.getCol(k1);

@@ -100,8 +100,19 @@ public:
             symmFactor.grow(site,quantumNumbers,ptr,nsites);
         } else {
             SizeType ref = nsites - site -1;
-			if (site == middle) symmFactor = data_[data_.size()-1];
-            else symmFactor.set(data_[ref+1].left(),data_[(ref==0) ? 0 : ref-1].right());
+			if (ref+1 < data_.size()) {
+				symmFactor.set(data_[ref+1].left(),data_[(ref==0) ? 0 : ref-1].right());
+			} else {
+				assert(data_.size() > 0);
+				SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_RIGHT,
+				                              0,
+				                              site,
+				                              quantumNumbers);
+				SizeType max = data_.size() - 1;
+				SymmetryComponentType l(SymmetryComponentType::COMPONENT_LEFT);
+				l.combine(data_[max].left(),onesite);
+				symmFactor.set(l,data_[ref-1].right());
+			}
         }
 
 		data_.push_back(symmFactor);

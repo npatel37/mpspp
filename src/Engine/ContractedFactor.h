@@ -230,7 +230,7 @@ private:
 		const DataType& dataPrev = *dataPrevPtr;
 
 		assert(symm.left().split()==0 || symm.right().size()==dataPrev[0].row());
-		assert(symm.left().size()==A.row());
+//		assert(symm.left().size()==A.row());
 		SizeType hilbertSize = symm.right().split();
 		SizeType mrow = A.row()/hilbertSize;
 		m.resize(mrow,mrow);
@@ -294,8 +294,8 @@ private:
 	              const SymmetryHelperType& symm,
 	              SizeType currentSite)
 	{
-		SizeType nsites = symm.symmLocal().size();
-		SizeType middle = static_cast<SizeType>(nsites/2);
+		//SizeType nsites = symm.symmLocal().size();
+		//SizeType middle = static_cast<SizeType>(nsites/2);
 		assert(leftOrRight_ == PART_LEFT);
 		assert(A.type()==MpsFactorType::TYPE_A);
 		SparseMatrixType Atranspose;
@@ -303,12 +303,8 @@ private:
 		if (data_.size()!=h.n_col())
 			data_.resize(h.n_col());
 		assert(data_.size()==h.n_col());
-		for (SizeType b1=0;b1<data_.size();b1++) {
-			if (currentSite < middle)
+		for (SizeType b1=0;b1<data_.size();b1++)
 				moveLeft(data_[b1],A,Atranspose,b1,h,dataPrev,symm,currentSite);
-			else
-				moveLeftPastMiddle(data_[b1],A,Atranspose,b1,h,dataPrev,symm,currentSite);
-		}
 	}
 
 	void moveRight(const MpsFactorType& B,
