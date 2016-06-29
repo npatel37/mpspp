@@ -88,11 +88,10 @@ public:
 	void move(SomeTruncationType& truncation,
 	          const VectorType& v,
 	          SizeType symmetrySector,
-	          const SymmetryFactorType& symm)
+              const SymmetryFactorType& symm)
 	{
-
-		SizeType row = symm.left().size();
-		SizeType col = symm.right().size();
+        SizeType row = symm.left().size();
+        SizeType col = symm.right().size();
 		if (aOrB_==TYPE_B) std::swap(row,col);
 
 		MatrixType m(row,col);
@@ -102,7 +101,7 @@ public:
 		for (SizeType i=0;i<total;i++) {
 			PairType ab = symm.super().unpack(i+offset);
 			if (aOrB_==TYPE_A) {
-				m(ab.first,ab.second) = v[i];
+                m(ab.first,ab.second) = v[i];
 			} else {
 				m(ab.second,ab.first) = v[i];
 			}
@@ -132,40 +131,48 @@ public:
 
 private:
 
+    void addNewSymmetryIfNeeded(SymmetryFactorType& newsymm,
+                                SizeType currentSite,
+                                SizeType totalSites) const
+    {
+
+
+    }
+
 	template<typename SomeTruncationType>
 	void moveFromVector(const MatrixType& m,
 	                    SomeTruncationType& truncation,
 	                    const SymmetryFactorType& symm,
 	                    SizeType)
-	{
-		const SymmetryComponentType& summed = (aOrB_==TYPE_A) ? symm.left() : symm.right();
+	{        
+        const SymmetryComponentType& summed = (aOrB_==TYPE_A) ? symm.left() : symm.right();
 		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
 
-		MatrixType finalU(summed.size(),summed.size());
+        MatrixType finalU(summed.size(),nonSummed.size());
 
-		truncation.setSize(summed.size());
-		for (SizeType i=0;i<summed.partitions()-1;i++) {
-			SizeType istart = summed.partitionOffset(i);
-			SizeType itotal = summed.partitionSize(i);
-			for (SizeType j=0;j<nonSummed.partitions()-1;j++) {
-				SizeType jstart = nonSummed.partitionOffset(j);
-				SizeType jtotal = nonSummed.partitionSize(j);
+        truncation.setSize(summed.size());
+        for (SizeType i=0;i<summed.partitions()-1;i++) {
+            SizeType istart = summed.partitionOffset(i);
+            SizeType itotal = summed.partitionSize(i);
+            for (SizeType j=0;j<nonSummed.partitions()-1;j++) {
+                SizeType jstart = nonSummed.partitionOffset(j);
+                SizeType jtotal = nonSummed.partitionSize(j);
 
-				MatrixType u(itotal,jtotal);
-				setThisSector(u,istart,itotal,jstart,jtotal,m);
+                MatrixType u(itotal,jtotal);
+                setThisSector(u,istart,itotal,jstart,jtotal,m);
 
-				VectorRealType s;
-				MatrixType vt;
-				svd('A',u,s,vt);
+                VectorRealType s;
+                MatrixType vt;
+                svd('A',u,s,vt);
 
-				setFinalU(finalU,istart,itotal,jstart,jtotal,u);
-				setFinalS(truncation,istart,itotal,s);
-			}
-		}
+                setFinalU(finalU,istart,itotal,jstart,jtotal,u);
+                setFinalS(truncation,istart,itotal,s);
+            }
+        }
 
-		//		VectorRealType finalS(m.n_col());
-		//		svd('A',finalU,finalS,finalVt);
-		//		truncation.set(finalS);
+//		VectorRealType finalS(m.n_col());
+//		svd('A',finalU,finalS,finalVt);
+//		truncation.set(finalS);
 
 		MatrixType mtranspose;
 		if (aOrB_==TYPE_B)

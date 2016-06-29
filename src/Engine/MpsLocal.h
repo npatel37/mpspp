@@ -135,7 +135,7 @@ public:
 				A_.push_back(mpsFactor);
 			}
 			assert(currentSite<A_.size());
-			A_[currentSite]->move(truncation,v,symmetrySector,symm);
+            A_[currentSite]->move(truncation,v,symmetrySector,symm);
 			std::cout<<"moved A["<<currentSite<<"].row= ";
 			std::cout<<A_[currentSite]->operator()().row()<<"\n";
 		} else {
@@ -149,7 +149,7 @@ public:
 				mpsFactor->setRandom(currentSite,n);
 				B_.push_back(mpsFactor);
 			}
-			B_[siteToSet]->move(truncation,v,symmetrySector,symm);
+            B_[siteToSet]->move(truncation,v,symmetrySector,symm);
 			std::cout<<"moved B["<<(siteToSet)<<"].row= ";
 			std::cout<<B_[siteToSet]->operator()().row()<<"\n";
 		}
