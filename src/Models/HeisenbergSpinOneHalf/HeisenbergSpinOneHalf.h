@@ -173,7 +173,7 @@ public:
 
 	virtual void getOneSite(VectorIntegerType& quantumNumbers,SizeType site) const
 	{
-		if (solverParams_.options.find("nolocalsymm")) {
+        if (solverParams_.options.find("nolocalsymm") != PsimagLite::String::npos) {
 			quantumNumbers.resize(2,0);
 			return;
 		}
