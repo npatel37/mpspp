@@ -223,7 +223,7 @@ private:
 	                        const SymmetryHelperType& symmHelper,
 	                        SizeType currentSite)
 	{
-		SizeType nsites = 2*symmHelper.symmLocal().size();
+		SizeType nsites = symmHelper.symmLocal().size();
 		SizeType siteForSymm =  nsites - 1 - currentSite;
 		const SymmetryFactorType& symm = symmHelper.symmLocal()(siteForSymm);
 		const SparseMatrixType& A = AorB();
@@ -294,7 +294,7 @@ private:
 	              const SymmetryHelperType& symm,
 	              SizeType currentSite)
 	{
-		SizeType nsites = 2*symm.symmLocal().size();
+		SizeType nsites = symm.symmLocal().size();
 		SizeType middle = static_cast<SizeType>(nsites/2);
 		assert(leftOrRight_ == PART_LEFT);
 		assert(A.type()==MpsFactorType::TYPE_A);
@@ -337,7 +337,7 @@ private:
 	               const SymmetryHelperType& symm,
 	               SizeType currentSite)
 	{
-		SizeType nsites = 2*symm.symmLocal().size();
+		SizeType nsites = symm.symmLocal().size();
 		SizeType middle = static_cast<SizeType>(nsites/2);
 		if (currentSite >= middle) {
 			const SymmetryComponentType& symmC =
@@ -416,10 +416,8 @@ private:
 	               const SymmetryHelperType& symmHelper,
 	               SizeType currentSite)
 	{
+		SizeType siteForSymm = currentSite;
 
-		SizeType nsites = 2*symmHelper.symmLocal().size();
-		SizeType middle = static_cast<SizeType>(nsites/2);
-		SizeType siteForSymm = (currentSite<middle) ? currentSite : nsites-currentSite-1;
 		if (!dataPrevPtr)
 			return moveRightFirst(values,cols,alm2,blm2,B,Btranspose,h,symmHelper,siteForSymm);
 
@@ -428,8 +426,7 @@ private:
 		const SparseMatrixType& Bmatrix = B();
 		const DataType& dataPrev = *dataPrevPtr;
 
-//		assert(symmC.split()==0 ||
-//		       symmC.size()/symmC.split()==dataPrev[0].row());
+		assert(symmC.split()==0 || symmC.size()/symmC.split()==dataPrev[0].row());
 		assert(Btranspose.row()==symmC.size());
 		assert(dataPrev.size()<=h.n_col());
 
@@ -477,7 +474,7 @@ private:
 	                    SizeType currentSite)
 	{
 
-		SizeType nsites = 2*symmHelper.symmLocal().size();
+		SizeType nsites = symmHelper.symmLocal().size();
 		SizeType middle = static_cast<SizeType>(nsites/2);
 		SizeType siteForSymm = (currentSite<middle) ? currentSite : nsites-currentSite-1;
 		assert(currentSite >= middle);
@@ -535,7 +532,7 @@ private:
 	                    const SymmetryHelperType& symmHelper,
 	                    SizeType currentSite)
 	{
-		SizeType nsites = 2*symmHelper.symmLocal().size();
+		SizeType nsites = symmHelper.symmLocal().size();
 		SizeType middle = static_cast<SizeType>(nsites/2);
 		SizeType siteForSymm = (currentSite<middle) ? currentSite : nsites-currentSite-1;
 		const SymmetryFactorType& symm = symmHelper.symmLocal()(siteForSymm);

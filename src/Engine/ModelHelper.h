@@ -103,7 +103,7 @@ public:
 	//! Eq. (201) but very modified
 	void matrixVectorProduct(VectorType& x,const VectorType& y) const
 	{
-		SizeType nsites = 2*symmetry_.symmLocal().size();
+		SizeType nsites = symmetry_.symmLocal().size();
 		const SymmetryFactorType& symm = symmetry_.symmLocal()(siteForSymm_);
 		SizeType offset = symm.super().partitionOffset(symmetrySector_);
 		SizeType total = symm.super().partitionSize(symmetrySector_);
@@ -176,7 +176,7 @@ public:
 	//! Used only for stored option
 	void fullHamiltonian(SparseMatrixType& matrix) const
 	{
-		SizeType nsites = 2*symmetry_.symmLocal().size();
+		SizeType nsites = symmetry_.symmLocal().size();
 		const SymmetryFactorType& symm =  symmetry_.symmLocal()(siteForSymm_);
 		SizeType offset = symm.super().partitionOffset(symmetrySector_);
 		SizeType total = symm.super().partitionSize(symmetrySector_);
