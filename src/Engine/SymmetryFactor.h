@@ -194,6 +194,13 @@ public:
 		super_.combine(left_,right_);
 	}
 
+    void set(const SymmetryComponentType& l,const SymmetryComponentType& r)
+    {
+        left_=l;
+        right_=r;
+        super_.combine(left_,right_);
+    }
+
 	const SymmetryComponentType& super() const { return super_; }
 
 	const SymmetryComponentType& left() const { return left_; }

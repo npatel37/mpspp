@@ -428,8 +428,8 @@ private:
 		const SparseMatrixType& Bmatrix = B();
 		const DataType& dataPrev = *dataPrevPtr;
 
-		assert(symmC.split()==0 ||
-		       symmC.size()/symmC.split()==dataPrev[0].row());
+//		assert(symmC.split()==0 ||
+//		       symmC.size()/symmC.split()==dataPrev[0].row());
 		assert(Btranspose.row()==symmC.size());
 		assert(dataPrev.size()<=h.n_col());
 

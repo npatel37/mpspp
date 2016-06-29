@@ -149,10 +149,9 @@ public:
 	{
 
 		SizeType nsites = model_.geometry().numberOfSites();
-		SizeType nsitesOverTwo = static_cast<SizeType>(nsites/2);
 		VectorIntegerType quantumNumbers;
 		model_.getOneSite(quantumNumbers,center);
-		for (SizeType i = 0; i< nsitesOverTwo; ++i){
+        for (SizeType i = 0; i< nsites; ++i){
 			symm.initialGuess(i,quantumNumbers,nsites);
 		}
 		for (SizeType i = 0; i< nsites; ++i){
@@ -211,7 +210,7 @@ private:
         SizeType nsites = model_.geometry().numberOfSites();
         SizeType middle = static_cast<SizeType>(nsites/2);
         SizeType part = (siteForSymm < middle) ? ProgramGlobals::PART_RIGHT:ProgramGlobals::PART_LEFT;
-        if (siteForSymm >= middle) siteForSymm = nsites - 1 - siteForSymm;
+//        if (siteForSymm >= middle) siteForSymm = nsites - 1 - siteForSymm;
 		const SymmetryFactorType& symm = symmetryHelper.symmLocal()(siteForSymm);
 		SizeType currentSite = symmetryHelper.currentSite();
 		SizeType symmetrySector = getSymmetrySector(direction,symm.super());

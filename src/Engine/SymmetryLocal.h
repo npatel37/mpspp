@@ -93,9 +93,17 @@ public:
 	                  const VectorIntegerType& quantumNumbers,
 	                  SizeType nsites)
 	{
+        SizeType middle = nsites/2;
 		SymmetryFactorType symmFactor;
 		SymmetryFactorType* ptr = (data_.size() == 0) ? 0 : &data_[data_.size()-1];
-		symmFactor.grow(site,quantumNumbers,ptr,nsites);
+        if (site < middle) {
+            symmFactor.grow(site,quantumNumbers,ptr,nsites);
+        } else {
+            SizeType ref = nsites - site -1;
+            if (site == middle) symmFactor = data_[data_.size()-1];
+            else symmFactor.set(data_[ref+1].left(),data_[(ref==0) ? 0 : ref-1].right());
+        }
+        //symmFactor.grow(site,quantumNumbers,ptr,nsites);
 		data_.push_back(symmFactor);
 		std::cout<<symmFactor;
 	}
