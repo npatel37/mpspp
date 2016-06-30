@@ -126,6 +126,9 @@ public:
 			}
 		}
 
+		if (ne==0) quantumNumbers_= left.quantumNumbers_;
+		if (ns==0) quantumNumbers_= right.quantumNumbers_;
+
 		// order quantum numbers of combined basis:
 		findPermutationAndPartition();
 		leftSize_ = left.size();
@@ -268,6 +271,7 @@ private:
 	void findPartition()
 	{
 		assert(quantumNumbers_.size()>0);
+
 		SizeType qtmp = quantumNumbers_[0]+1;
 		partition_.clear();
 		for (SizeType i=0;i<size();i++) {
@@ -276,6 +280,7 @@ private:
 				qtmp = quantumNumbers_[i];
 			}
 		}
+
 		partition_.push_back(size());
 	}
 

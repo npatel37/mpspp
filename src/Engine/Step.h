@@ -133,7 +133,7 @@ public:
 //		model_.getOneSite(quantumNumbers,currentSite);
 //		SizeType nsites = model_.geometry().numberOfSites();
 //		symm.moveRight(currentSite,quantumNumbers,nsites);
-		if (currentSite+1==model_.geometry().numberOfSites()) return;
+//		if (currentSite+1==model_.geometry().numberOfSites()) return;
 
 		FermionSign<ModelType> fermionSign(model_,currentSite);
 		SymmetryHelperType symmetryHelper(fermionSign,symm);

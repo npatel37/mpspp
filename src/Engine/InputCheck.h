@@ -99,6 +99,7 @@ public:
 		VectorStringType registerOpts;
 
 		//			registerOpts.push_back("restart");
+		registerOpts.push_back("nolocalsymm");
 		registerOpts.push_back("debugmatrix");
 		registerOpts.push_back("test");
 		registerOpts.push_back("notruncation");

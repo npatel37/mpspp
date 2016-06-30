@@ -101,7 +101,9 @@ public:
         } else {
             SizeType ref = nsites - site -1;
 			if (ref+1 < data_.size()) {
-				symmFactor.set(data_[ref+1].left(),data_[(ref==0) ? 0 : ref-1].right());
+				SymmetryComponentType tmp(SymmetryComponentType::COMPONENT_RIGHT);
+				if (ref>0) tmp = data_[ref-1].right();
+				symmFactor.set(data_[ref+1].left(),tmp);
 			} else {
 				assert(data_.size() > 0);
 				SymmetryComponentType onesite(SymmetryComponentType::COMPONENT_RIGHT,
