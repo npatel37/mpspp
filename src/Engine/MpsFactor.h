@@ -101,7 +101,7 @@ public:
 		for (SizeType i=0;i<total;i++) {
 			PairType ab = symm.super().unpack(i+offset);
 			if (aOrB_==TYPE_A) {
-                m(ab.first,ab.second) = v[i];
+                		m(ab.first,ab.second) = v[i];
 			} else {
 				m(ab.second,ab.first) = v[i];
 			}
@@ -131,14 +131,6 @@ public:
 
 private:
 
-    void addNewSymmetryIfNeeded(SymmetryFactorType& newsymm,
-                                SizeType currentSite,
-                                SizeType totalSites) const
-    {
-
-
-    }
-
 	template<typename SomeTruncationType>
 	void moveFromVector(const MatrixType& m,
 	                    SomeTruncationType& truncation,
@@ -146,7 +138,7 @@ private:
 	                    SizeType)
 	{        
         const SymmetryComponentType& summed = (aOrB_==TYPE_A) ? symm.left() : symm.right();
-		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
+	const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
 
         MatrixType finalU(summed.size(),nonSummed.size());
 
@@ -170,8 +162,10 @@ private:
             }
         }
 
-//		VectorRealType finalS(m.n_col());
-//		svd('A',finalU,finalS,finalVt);
+	/*finalU = m;
+	VectorRealType finalS(m.n_col());
+	MatrixType finalVt(nonSummed.size(),nonSummed.size());
+	svd('A',finalU,finalS,finalVt);*/
 //		truncation.set(finalS);
 
 		MatrixType mtranspose;
@@ -184,7 +178,7 @@ private:
 		//		std::cout<<"final vt\n";
 		//		std::cout<<finalVt;
 		assert(isNormalized(finalU));
-		assert(respectsSymmetry(finalU,summed));
+		assert(respectsSymmetry(finalU,summed,nonSummed));
 		//		assert(isCorrectSvd(m,finalU,truncation,finalVt));
 		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? finalU : mtranspose);
 		// debuggin only
@@ -275,14 +269,15 @@ private:
 	}
 
 	bool respectsSymmetry(const MatrixType& m,
-	                      const SymmetryComponentType& summed) const
+	                      const SymmetryComponentType& summed,
+	                      const SymmetryComponentType& nonSummed) const
 	{
-		assert(m.n_row()<=summed.size());
-		assert(m.n_col()<=summed.size());
+		assert(m.n_row()==summed.size());
+		assert(m.n_col()==nonSummed.size());
 		for (SizeType i=0;i<m.n_row();i++) {
 			SizeType qi = summed.qn(i);
 			for (SizeType j=0;j<m.n_col();j++) {
-				SizeType qj = summed.qn(j);
+				SizeType qj = nonSummed.qn(j);
 				if (qi==qj) continue;
 				if (fabs(m(i,j))>1e-6) return false;
 			}
