@@ -170,7 +170,7 @@ private:
 		VectorRealType finalS(m.n_col());
 		MatrixType finalVt(nonSummed.size(),nonSummed.size());
 		svd('A',finalU,finalS,finalVt);
-		resizeU(finalU,nonSummed.size());
+		resizeUAndNormalize(finalU,nonSummed.size());
 		truncation.set(finalS);
 #endif
 
@@ -185,7 +185,7 @@ private:
 		//		std::cout<<finalVt;
 		assert(isNormalized(finalU));
 		assert(respectsSymmetry(finalU,summed,nonSummed));
-		//		assert(isCorrectSvd(m,finalU,truncation,finalVt));
+//		assert(isCorrectSvd(m,finalU,truncation,finalVt));
 		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? finalU : mtranspose);
 		// debuggin only
 		assert(aOrB_ == TYPE_A);
@@ -322,7 +322,7 @@ private:
 		return true;
 	}
 
-	void resizeU(MatrixType& finalU, SizeType smallSize) const
+	void resizeUAndNormalize(MatrixType& finalU, SizeType smallSize, bool flag=false) const
 	{
 		SizeType m = finalU.n_row();
 		SizeType n = finalU.n_col();
@@ -333,10 +333,14 @@ private:
 
 		for (SizeType i = 0; i < m; i++) {
 			for (SizeType j = 0; j < smallSize; j++) {
-				tmp(i,j) = finalU(i,j);
+				RealType sum=0.0;
+				for (SizeType k = 0; k < smallSize; k++)
+					sum+=finalU(i,k)*std::conj(finalU(j,k));
+				if (!flag) sum=1.0;
+				assert(sum>=1e-6);
+				tmp(i,j) = finalU(i,j)/sqrt(sum);
 			}
 		}
-
 		finalU = tmp;
 	}
 
