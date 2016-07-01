@@ -141,6 +141,10 @@ private:
 		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
 
 		MatrixType finalU(summed.size(),nonSummed.size());
+		assert(m.n_col() == nonSummed.size());
+		assert(m.n_row() == summed.size());
+
+#if 0
 
 		truncation.setSize(summed.size());
 		for (SizeType i=0;i<summed.partitions()-1;i++) {
@@ -161,12 +165,14 @@ private:
 				setFinalS(truncation,istart,itotal,s);
 			}
 		}
-
-		//		finalU = m;
-		//		VectorRealType finalS(m.n_col());
-		//		MatrixType finalVt(nonSummed.size(),nonSummed.size());
-		//		svd('A',finalU,finalS,finalVt);
-		//		truncation.set(finalS);
+#else
+		finalU = m;
+		VectorRealType finalS(m.n_col());
+		MatrixType finalVt(nonSummed.size(),nonSummed.size());
+		svd('A',finalU,finalS,finalVt);
+		resizeU(finalU,nonSummed.size());
+		truncation.set(finalS);
+#endif
 
 		MatrixType mtranspose;
 		if (aOrB_==TYPE_B)
@@ -314,6 +320,24 @@ private:
 			}
 		}
 		return true;
+	}
+
+	void resizeU(MatrixType& finalU, SizeType smallSize) const
+	{
+		SizeType m = finalU.n_row();
+		SizeType n = finalU.n_col();
+
+		assert(m==n);
+		if (n == smallSize) return;
+		MatrixType tmp(m,smallSize);
+
+		for (SizeType i = 0; i < m; i++) {
+			for (SizeType j = 0; j < smallSize; j++) {
+				tmp(i,j) = finalU(i,j);
+			}
+		}
+
+		finalU = tmp;
 	}
 
 	RandomNumberGeneratorType rng_;
