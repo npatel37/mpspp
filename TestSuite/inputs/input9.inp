@@ -1,0 +1,19 @@
+TotalNumberOfSites=8
+NumberOfTerms=1
+DegreesOfFreedom=1
+GeometryKind=chain
+GeometryOptions=ConstantValues
+Connectors
+        1
+        1.0
+
+Model=HeisenbergSpinOneHalf
+SolverOptions=InternalProductStored,notruncation,nolocalsymm
+Version=0.02
+OutputFile=data.txt
+InfiniteLoopKeptStates=1024
+FiniteLoops 1  8 1024 0  
+
+TargetElectronsUp=0
+TargetElectronsDown=0
+
