@@ -286,7 +286,7 @@ private:
 			for (SizeType j=0;j<m.n_col();j++) {
 				SizeType qk = nonSummed.qn(j);
 				if(flag) {
-					SizeType k = summed.pack(asigma.second,j);
+					SizeType k = summed.pack(j, asigma.second);
 					qk = summed.qn(k);
 				}
 
