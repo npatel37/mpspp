@@ -98,8 +98,13 @@ public:
 
 		SizeType offset = symm.super().partitionOffset(symmetrySector);
 		SizeType total = symm.super().partitionSize(symmetrySector);
+		SizeType qt = symm.super().qn(offset);
 		for (SizeType i=0;i<total;i++) {
 			PairType ab = symm.super().unpack(i+offset);
+			SizeType qab = 0;
+			if (symm.left().size() > 0) qab = symm.left().qn(ab.first);
+			if (symm.right().size() > 0) qab += symm.right().qn(ab.second);
+			assert(qab == qt);
 			if (aOrB_==TYPE_A) {
 				m(ab.first,ab.second) = v[i];
 			} else {
@@ -107,7 +112,7 @@ public:
 			}
 		}
 
-		moveFromVector(m,truncation,symm,symmetrySector);
+		moveFromVector(m,truncation,symm,qt);
 	}
 
 	template<typename SomeTruncationType>
@@ -133,9 +138,9 @@ private:
 
 	template<typename SomeTruncationType>
 	void moveFromVector(const MatrixType& m,
-						SomeTruncationType& truncation,
-						const SymmetryFactorType& symm,
-						SizeType)
+	                    SomeTruncationType& truncation,
+	                    const SymmetryFactorType& symm,
+	                    SizeType qt)
 	{
 		const SymmetryComponentType& summed = (aOrB_==TYPE_A) ? symm.left() : symm.right();
 		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
@@ -144,15 +149,18 @@ private:
 		assert(m.n_col() == nonSummed.size());
 		assert(m.n_row() == summed.size());
 
-#if 1
+#if 1 
 
 		truncation.setSize(summed.size());
 		for (SizeType i=0;i<summed.partitions()-1;i++) {
 			SizeType istart = summed.partitionOffset(i);
 			SizeType itotal = summed.partitionSize(i);
+			SizeType qni = summed.qn(istart);
 			for (SizeType j=0;j<nonSummed.partitions()-1;j++) {
 				SizeType jstart = nonSummed.partitionOffset(j);
 				SizeType jtotal = nonSummed.partitionSize(j);
+				SizeType qnj = nonSummed.qn(jstart);
+				if (qni + qnj != qt) continue;
 
 				MatrixType u(itotal,jtotal);
 				setThisSector(u,istart,itotal,jstart,jtotal,m);
@@ -183,7 +191,7 @@ private:
 		//		truncation.print(std::cout);
 		//		std::cout<<"final vt\n";
 		//		std::cout<<finalVt;
-		assert(isNormalized(finalU));
+		//assert(isNormalized(finalU));
 		assert(respectsSymmetry(finalU,summed));
 //		assert(isCorrectSvd(m,finalU,truncation,finalVt));
 		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? finalU : mtranspose);
