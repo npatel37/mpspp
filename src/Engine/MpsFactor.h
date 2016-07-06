@@ -144,7 +144,7 @@ private:
 		assert(m.n_col() == nonSummed.size());
 		assert(m.n_row() == summed.size());
 
-#if 0
+#if 1
 
 		truncation.setSize(summed.size());
 		for (SizeType i=0;i<summed.partitions()-1;i++) {
@@ -184,7 +184,7 @@ private:
 		//		std::cout<<"final vt\n";
 		//		std::cout<<finalVt;
 		assert(isNormalized(finalU));
-		assert(respectsSymmetry(finalU,summed,nonSummed));
+		assert(respectsSymmetry(finalU,summed));
 //		assert(isCorrectSvd(m,finalU,truncation,finalVt));
 		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? finalU : mtranspose);
 		// debuggin only
@@ -215,8 +215,9 @@ private:
 				   const MatrixType& u) const
 	{
 		// std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
-		SizeType n = std::min(itotal,u.n_col());
-		for (SizeType i=0;i<itotal;i++) {
+		SizeType n = u.n_row(); //std::min(itotal,u.n_col());
+		assert(u.n_row()==u.n_col());
+		for (SizeType i=0;i<n;i++) {
 			for (SizeType j=0;j<n;j++) {
 				if (j+istart>=finalU.n_col()) continue;
 				finalU(i+istart,j+istart) = u(i,j);
@@ -275,27 +276,13 @@ private:
 	}
 
 	bool respectsSymmetry(const MatrixType& m,
-						  const SymmetryComponentType& summed,
-						  const SymmetryComponentType& nonSummed) const
+						  const SymmetryComponentType& summed) const
 	{
 		assert(m.n_row()==summed.size());
-		assert(m.n_col()==nonSummed.size());
-		bool flag = (summed.size() > nonSummed.size());
 		for (SizeType i=0;i<m.n_row();i++) {
 			SizeType qa = summed.qn(i);
-			PairType asigma;
-			if (flag) {
-				asigma = summed.unpack(i);
-				qa = summed.qn(asigma.first);
-			}
-
 			for (SizeType j=0;j<m.n_col();j++) {
-				SizeType qk = nonSummed.qn(j);
-				if(flag) {
-					SizeType k = summed.pack(j, asigma.second);
-					qk = summed.qn(k);
-				}
-
+				SizeType qk = summed.qn(j);
 				if (qa==qk) continue;
 				if (fabs(m(i,j))>1e-6)
 					return false;
