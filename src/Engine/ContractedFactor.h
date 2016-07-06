@@ -151,13 +151,13 @@ public:
 private:
 
 	void moveLeft(SparseMatrixType& m,
-				  const MpsFactorType& AorB,
-				  const SparseMatrixType& Atranspose,
-				  SizeType b,
-				  const MpoFactorType& h,
-				  const DataType* dataPrevPtr,
-				  const SymmetryHelperType& symmHelper,
-				  SizeType currentSite)
+	              const MpsFactorType& AorB,
+	              const SparseMatrixType& Atranspose,
+	              SizeType b,
+	              const MpoFactorType& h,
+	              const DataType* dataPrevPtr,
+	              const SymmetryHelperType& symmHelper,
+	              SizeType currentSite)
 	{
 		SizeType siteForSymm = currentSite;
 
@@ -187,7 +187,7 @@ private:
 					for (int k=l1.getRowPtr(a1);k<l1.getRowPtr(a1+1);k++) {
 						SizeType a1p = l1.getCol(k);
 						ComplexOrRealType tmp= l1.getValue(k)*
-								std::conj(Atranspose.getValue(k3));
+						        std::conj(Atranspose.getValue(k3));
 						for (int kp=w.getRowPtr(sigma2);kp<w.getRowPtr(sigma2+1);kp++) {
 							SizeType sigma2p = w.getCol(kp);
 							SizeType j = symm.left().pack(a1p,sigma2p);
@@ -230,7 +230,7 @@ private:
 			data_.resize(h.n_col());
 		assert(data_.size()==h.n_col());
 		for (SizeType b1=0;b1<data_.size();b1++)
-				moveLeft(data_[b1],A,Atranspose,b1,h,dataPrev,symm,currentSite);
+			moveLeft(data_[b1],A,Atranspose,b1,h,dataPrev,symm,currentSite);
 	}
 
 	void moveRight(const MpsFactorType& B,

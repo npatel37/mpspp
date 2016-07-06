@@ -73,7 +73,7 @@ public:
 	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
 
 	MpsFactor(SizeType aOrB)
-		: rng_(0),aOrB_(aOrB)
+	    : rng_(0),aOrB_(aOrB)
 	{}
 
 	void setRandom(SizeType site,SizeType n)
@@ -86,9 +86,9 @@ public:
 
 	template<typename SomeTruncationType>
 	void move(SomeTruncationType& truncation,
-			  const VectorType& v,
-			  SizeType symmetrySector,
-			  const SymmetryFactorType& symm)
+	          const VectorType& v,
+	          SizeType symmetrySector,
+	          const SymmetryFactorType& symm)
 	{
 		SizeType row = symm.left().size();
 		SizeType col = symm.right().size();
@@ -132,7 +132,7 @@ public:
 
 	template<typename ComplexOrRealType2,typename SymmetryLocalType2>
 	friend std::ostream& operator<<(std::ostream&,
-									const MpsFactor<ComplexOrRealType2,SymmetryLocalType2>&);
+	                                const MpsFactor<ComplexOrRealType2,SymmetryLocalType2>&);
 
 private:
 
@@ -193,7 +193,7 @@ private:
 		//		std::cout<<finalVt;
 		//assert(isNormalized(finalU));
 		assert(respectsSymmetry(finalU,summed));
-//		assert(isCorrectSvd(m,finalU,truncation,finalVt));
+		//		assert(isCorrectSvd(m,finalU,truncation,finalVt));
 		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? finalU : mtranspose);
 		// debuggin only
 		assert(aOrB_ == TYPE_A);
@@ -202,11 +202,11 @@ private:
 	}
 
 	void setThisSector(MatrixType& u,
-					   SizeType istart,
-					   SizeType itotal,
-					   SizeType jstart,
-					   SizeType jtotal,
-					   const MatrixType& m) const
+	                   SizeType istart,
+	                   SizeType itotal,
+	                   SizeType jstart,
+	                   SizeType jtotal,
+	                   const MatrixType& m) const
 	{
 		for (SizeType i=0;i<itotal;i++) {
 			for (SizeType j=0;j<jtotal;j++) {
@@ -216,11 +216,11 @@ private:
 	}
 
 	void setFinalU(MatrixType& finalU,
-				   SizeType istart,
-				   SizeType itotal,
-				   SizeType jstart,
-				   SizeType jtotal,
-				   const MatrixType& u) const
+	               SizeType istart,
+	               SizeType itotal,
+	               SizeType jstart,
+	               SizeType jtotal,
+	               const MatrixType& u) const
 	{
 		// std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
 		SizeType n = u.n_row(); //std::min(itotal,u.n_col());
@@ -235,9 +235,9 @@ private:
 
 	template<typename SomeTruncationType>
 	void setFinalS(SomeTruncationType& truncation,
-				   SizeType jstart,
-				   SizeType jtotal,
-				   const VectorRealType& s) const
+	               SizeType jstart,
+	               SizeType jtotal,
+	               const VectorRealType& s) const
 	{
 		//	std::cout<<"setFinalS from "<<jstart<<" to "<<(jstart+jtotal-1)<<"\n";
 		SizeType n = std::min(jtotal,static_cast<SizeType>(s.size()));
@@ -252,11 +252,11 @@ private:
 	}
 
 	void setFinalVt(MatrixType& finalVt,
-					SizeType istart,
-					SizeType itotal,
-					SizeType jstart,
-					SizeType jtotal,
-					const MatrixType& vt) const
+	                SizeType istart,
+	                SizeType itotal,
+	                SizeType jstart,
+	                SizeType jtotal,
+	                const MatrixType& vt) const
 	{
 		std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
 		for (SizeType i=0;i<jtotal;i++) {
@@ -268,9 +268,9 @@ private:
 
 	template<typename SomeTruncationType>
 	bool isCorrectSvd(const MatrixType& mat,
-					  const MatrixType& u,
-					  SomeTruncationType& truncation,
-					  const MatrixType& vt) const
+	                  const MatrixType& u,
+	                  SomeTruncationType& truncation,
+	                  const MatrixType& vt) const
 	{
 		MatrixType m(u.n_row(),vt.n_col());
 		truncation.recoverSvd(m,u,vt);
@@ -284,7 +284,7 @@ private:
 	}
 
 	bool respectsSymmetry(const MatrixType& m,
-						  const SymmetryComponentType& summed) const
+	                      const SymmetryComponentType& summed) const
 	{
 		assert(m.n_row()==summed.size());
 		for (SizeType i=0;i<m.n_row();i++) {
@@ -346,7 +346,7 @@ private:
 
 template<typename ComplexOrRealType,typename SymmetryLocalType>
 std::ostream& operator<<(std::ostream& os,
-						 const MpsFactor<ComplexOrRealType,SymmetryLocalType>& mps)
+                         const MpsFactor<ComplexOrRealType,SymmetryLocalType>& mps)
 {
 	os<<"type= "<<mps.typeToString();
 	os<<" rows= "<<mps.data_.row()<<" cols="<<mps.data_.col()<<"\n";
