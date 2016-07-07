@@ -71,6 +71,7 @@ public:
 	typedef typename SymmetryComponentType::VectorIntegerType VectorIntegerType;
 	typedef typename PsimagLite::Vector<RealType>::Type VectorRealType;
 	typedef PsimagLite::RandomForTests<RealType> RandomNumberGeneratorType;
+	typedef PsimagLite::Vector<SizeType>::Type VectorSizeType;
 
 	MpsFactor(SizeType aOrB)
 	    : rng_(0),aOrB_(aOrB)
@@ -145,7 +146,7 @@ private:
 		const SymmetryComponentType& summed = (aOrB_==TYPE_A) ? symm.left() : symm.right();
 		const SymmetryComponentType& nonSummed = (aOrB_==TYPE_A) ? symm.right() : symm.left();
 
-		MatrixType finalU(summed.size(),nonSummed.size());
+		MatrixType finalU(summed.size(),summed.size());
 		assert(m.n_col() == nonSummed.size());
 		assert(m.n_row() == summed.size());
 
@@ -160,6 +161,7 @@ private:
 				SizeType jstart = nonSummed.partitionOffset(j);
 				SizeType jtotal = nonSummed.partitionSize(j);
 				SizeType qnj = nonSummed.qn(jstart);
+
 				if (qni + qnj != qt) continue;
 
 				MatrixType u(itotal,jtotal);
@@ -169,7 +171,8 @@ private:
 				MatrixType vt;
 				svd('A',u,s,vt);
 
-				setFinalU(finalU,istart,itotal,jstart,jtotal,u);
+				setFinalU(finalU,istart,itotal,jtotal,u);
+
 				setFinalS(truncation,istart,itotal,s);
 			}
 		}
@@ -182,6 +185,8 @@ private:
 		truncation.set(finalS);
 #endif
 
+		resizeU(finalU,std::min(summed.size(),nonSummed.size()));
+
 		MatrixType mtranspose;
 		if (aOrB_==TYPE_B)
 			transposeConjugate(mtranspose,finalU);
@@ -191,8 +196,8 @@ private:
 		//		truncation.print(std::cout);
 		//		std::cout<<"final vt\n";
 		//		std::cout<<finalVt;
-		//assert(isNormalized(finalU));
-		assert(respectsSymmetry(finalU,summed));
+		assert(isNormalized(finalU));
+		//assert(respectsSymmetry(finalU,summed));
 		//		assert(isCorrectSvd(m,finalU,truncation,finalVt));
 		fullMatrixToCrsMatrix(data_,(aOrB_==TYPE_A) ? finalU : mtranspose);
 		// debuggin only
@@ -218,16 +223,15 @@ private:
 	void setFinalU(MatrixType& finalU,
 	               SizeType istart,
 	               SizeType itotal,
-	               SizeType jstart,
 	               SizeType jtotal,
 	               const MatrixType& u) const
 	{
 		// std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
-		SizeType n = u.n_row(); //std::min(itotal,u.n_col());
+		SizeType n = u.n_row();
+		SizeType min = std::min(itotal,jtotal);
 		assert(u.n_row()==u.n_col());
 		for (SizeType i=0;i<n;i++) {
-			for (SizeType j=0;j<n;j++) {
-				if (j+istart>=finalU.n_col()) continue;
+			for (SizeType j=0;j<min;j++) {
 				finalU(i+istart,j+istart) = u(i,j);
 			}
 		}
@@ -261,7 +265,7 @@ private:
 		std::cout<<"setFinalU from "<<istart<<" to "<<(istart+itotal-1)<<"\n";
 		for (SizeType i=0;i<jtotal;i++) {
 			for (SizeType j=0;j<jtotal;j++) {
-				finalVt(i+jstart,j+jstart) = vt(i,j);
+				finalVt(i+jstart,j+istart) = vt(i,j);
 			}
 		}
 	}
@@ -296,28 +300,70 @@ private:
 					return false;
 			}
 		}
+
 		return true;
 	}
 
 	bool isNormalized(const MatrixType& m) const
 	{
-		//		assert(m.n_row()==m.n_col());
-		for (SizeType i=0;i<m.n_col();i++) {
-			for (SizeType j=0;j<m.n_col();j++) {
+		SizeType rows = m.n_row();
+		SizeType cols = m.n_col();
+		SizeType c = 0;
+		for (SizeType i=0;i<cols;i++) {
+			for (SizeType j=0;j<cols;j++) {
 				ComplexOrRealType sum = 0;
-				for (SizeType k=0;k<m.n_row();k++) {
+				for (SizeType k=0;k<rows;k++) {
 					sum += m(k,i) * std::conj(m(k,j));
 				}
 				if (i==j && fabs(sum-1.0)>1e-5)
-					return false;
+					c++;
 				if (i!=j && fabs(sum)>1e-5)
 					return false;
 			}
 		}
-		return true;
+
+		return (c == 0);
 	}
 
-	void resizeUAndNormalize(MatrixType& finalU, SizeType smallSize, bool flag=false) const
+	void findNonZeroCols(VectorSizeType& vcols,
+	                     const MatrixType& m) const
+	{
+		SizeType rows = m.n_row();
+		SizeType cols = m.n_col();
+		SizeType c = 0;
+		for (SizeType i=0;i<cols;++i) {
+			ComplexOrRealType sum = 0;
+			for (SizeType k=0;k<rows;++k)
+				sum += m(k,i) * std::conj(m(k,i));
+
+			if (fabs(sum)<1e-6) continue;
+			assert(c < vcols.size());
+			vcols[c] = i;
+			c++;
+		}
+
+		assert(c == vcols.size());
+	}
+
+	void resizeU(MatrixType& m,
+	             SizeType smallSize)
+	{
+		if (m.n_col() == smallSize) return;
+		SizeType rows = m.n_row();
+		VectorSizeType vcols(smallSize,0);
+		MatrixType tmp(rows,smallSize);
+		findNonZeroCols(vcols,m);
+		for (SizeType i=0;i<rows;++i) {
+			for (SizeType j=0;j<smallSize;++j)
+				tmp(i,j) = m(i,vcols[j]);
+		}
+
+		m = tmp;
+	}
+
+	void resizeUAndNormalize(MatrixType& finalU,
+	                         SizeType smallSize,
+	                         bool flag=false) const
 	{
 		SizeType m = finalU.n_row();
 		SizeType n = finalU.n_col();
