@@ -48,7 +48,11 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include "ProgramGlobals.h"
 
 namespace Mpspp {
-
+/* PSIDOC FermionSign
+		Used to output the Fermionic Sign which comes from the
+		anticommutation relations of fermions. It is generally needed
+		for the non-interacting part of the Hamiltonian.
+		*/
 template<typename ModelType>
 class FermionSign {
 

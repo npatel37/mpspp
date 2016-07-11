@@ -50,6 +50,15 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
+/* PSIDOC MpoFactor: MPO (Matrix Product Operator)
+		MpoFactor is the templated class which represents the
+		matricies "W" needed to build the hamiltonian. An
+		Example of this can be found on eq. 184-188 of
+		Schollowock-2011. This matricies "W" are similar
+		to the added central site in the DMRG language and are
+		needed for the definition of the full Hamiltonian.
+		*/
+
 template<typename RealType,typename ComplexOrRealType>
 class MpoFactor {
 

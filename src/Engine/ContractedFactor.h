@@ -49,6 +49,12 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
+/* PSIDOC ContractedFactor
+		ContractedFactor are type name of the L_ and R_ (eq. 192 and 193).
+		This also contains the ``guts'' of moving "right" or "left" during
+		the finite/infinite MPS sweep.
+		*/
+
 template<typename MatrixProductOperatorType>
 class ContractedFactor {
 
@@ -71,10 +77,10 @@ class ContractedFactor {
 	typedef typename SymmetryFactorType::SymmetryComponentType SymmetryComponentType;
 
 	enum {TO_THE_RIGHT = ProgramGlobals::TO_THE_RIGHT,
-		  TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
+	      TO_THE_LEFT = ProgramGlobals::TO_THE_LEFT};
 
 	enum {PART_LEFT = ProgramGlobals::PART_LEFT,
-		  PART_RIGHT = ProgramGlobals::PART_RIGHT};
+	      PART_RIGHT = ProgramGlobals::PART_RIGHT};
 
 public:
 
@@ -86,6 +92,7 @@ public:
 		data_[0].makeDiagonal(1,1);
 	}
 
+	//**used - july 11
 	void build(const MpsFactorType& AorB,
 	           const MpoFactorType& h,
 	           const ThisType* prev,

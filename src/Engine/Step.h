@@ -58,6 +58,16 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
+
+/* PSIDOC Step
+		As the name suggests, contains functions required to physically
+		add a site to the system/environment then build the superblock
+		(LWR) and diagonalize using Lanczos to out the eigen-vector and
+		the groun-state energy. Ground state eigen-vector is used to
+		build the "M" matrix on which the SVD will be performed in
+		MpsSolver.
+		*/
+
 template<typename ModelType,
          template<typename,typename> class InternalProductTemplate>
 class Step {

@@ -52,6 +52,20 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
+/* PSIDOC MpsFactor
+		The main job of this class is to find the block of the
+		Eigen-vector (in matrix format - M_{a_{l-1} \sigma_l \a_{l}})
+		corresponding to the tarted quantum number of the superblock
+		and perform singular value decomposition to new "A" or "B"
+		operators, depending on the moveleft or moveright. If moving
+		right, we perform SVD on M = USV^+ to obtain a new-optimised matrix
+		A - which is the "U" of the SVD. Similarly, if moving left,
+		same oparation to obtain a new-optimised result of "B" - which is
+		the V^+ output of SVD. Note that, U and V^+ must be correctly
+		normalized! MpsFactor is also the "typename" of matricies "A" and
+		"B" at each site.
+		*/
+
 template<typename ComplexOrRealType,typename SymmetryFactorType>
 class MpsFactor {
 
@@ -82,7 +96,7 @@ public:
 		data_.resize(n,n);
 		data_.makeDiagonal(n,1.0);
 
-		//assert(isNormalized(data_));
+//		assert(isNormalized(data_));
 	}
 
 	template<typename SomeTruncationType>

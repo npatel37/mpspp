@@ -52,6 +52,11 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
+/* PSIDOC MpsLocal
+		Essentially same as MpoFactor but with little bit
+		more information.
+		*/
+
 template<typename ComplexOrRealType,typename SymmetryLocalType>
 class MpoLocal {
 

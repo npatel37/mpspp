@@ -53,6 +53,12 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <vector>
 #include "ProgressIndicator.h"
 
+/* PSIDOC FermionSign
+		Used to output the Fermionic Sign which comes from the
+		anticommutation relations of fermions. It is generally needed
+		for the non-interacting part of the Hamiltonian.
+		*/
+
 namespace Mpspp {
 template<typename T,typename ModelType>
 class InternalProductStored {

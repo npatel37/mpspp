@@ -53,6 +53,12 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
+/* PSIDOC MpsSolver
+		As the name suggests, MpsSolver cotains the MPS finite/infinite
+		system algorithm - mainly using all the other objects.
+
+		*/
+
 template<typename ModelBaseType,
          template<typename,typename> class InternalProductTemplate>
 class MpsSolver {

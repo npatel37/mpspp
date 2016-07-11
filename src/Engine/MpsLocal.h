@@ -55,6 +55,15 @@ class MpsLocal {
 
 	// FIXME: IDEA: PULL SYMMETRY OUT, PASS THROUGH FUNCTIONS
 
+	/* PSIDOC MpsLocal
+			Contains the Vector of MpsFactor, which are A_ and B_
+			operators obtained from the SVD of the ground-state of the
+			full system. Here, the index of the vector corresponds to
+			the "site". It also intializes the size of A_ and B_ -
+			containing the "triangular" size structure of each, and later
+			randomly set elements of the operator.
+			*/
+
 public:
 
 	typedef SymmetryLocalType_ SymmetryLocalType;
@@ -83,18 +92,19 @@ public:
 	}
 
 	void initialGuess(SizeType currentSite,const SymmetryLocalType&,SizeType)
-	{
-		center_ = currentSite;
-		SizeType d = 2;
-		SizeType middle = static_cast<SizeType>(nsites_/2);
-		SizeType x = nsites_ - currentSite;
-		SizeType n = (currentSite<middle) ? pow(d,currentSite+1) : pow(d,x);
+		{
+			center_ = currentSite;
+			SizeType d = 2;
+			SizeType middle = static_cast<SizeType>(nsites_/2);
+			SizeType x = nsites_ - currentSite;
+			SizeType n = (currentSite<middle) ? pow(d,currentSite+1) : pow(d,x);
 
-		MpsFactorType* mpsFactor = new MpsFactorType(MpsFactorType::TYPE_B);
-		std::cout << "currentSite=" << currentSite << ", n=" << n << "\n";
-		mpsFactor->setRandom(currentSite,n);
-		B_.push_back(mpsFactor);
-	}
+			MpsFactorType* mpsFactor = new MpsFactorType(MpsFactorType::TYPE_B);
+			std::cout << "currentSite=" << currentSite << ", n=" << n << "\n";
+			mpsFactor->setRandom(currentSite,n);
+			B_.push_back(mpsFactor);
+		}
+
 
 	void grow(SizeType currentSite,const SymmetryLocalType& symm,SizeType nk)
 	{

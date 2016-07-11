@@ -50,6 +50,16 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 namespace Mpspp {
 
+/* PSIDOC ContractedLocal
+		ContractedLocal contains the two ContractedFactors L_ and R_, which
+		can be seen as the wavefunction of left section of the lattice and
+		right section of the lattice. They are calculated using a recursive
+		relation found in equation 192 and 193 of Schollwock-2011. This
+		templated class is used to direct the algorithm to ContractedFactor
+		where the "guts" of move left/right of the finite/infite sweeps
+		exists.
+		*/
+
 template<typename MatrixProductOperatorType_>
 class ContractedLocal {
 
