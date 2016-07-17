@@ -92,7 +92,7 @@ public:
 		data_[0].makeDiagonal(1,1);
 	}
 
-	//**used - july 11
+	//! NEEDED
 	void build(const MpsFactorType& AorB,
 	           const MpoFactorType& h,
 	           const ThisType* prev,
@@ -115,6 +115,7 @@ public:
 	}
 
 	//! From As (or Bs) and Ws reconstruct *this
+	//! NEEDED
 	void move(const MpsFactorType& AorB,
 	          const MpoFactorType& h,
 	          const ThisType& dataPrev,
@@ -130,6 +131,8 @@ public:
 		}
 	}
 
+
+	//!NEEDED
 	template<typename SomeTruncationType>
 	void truncate(SizeType cutoff,const SomeTruncationType& trunc)
 	{
@@ -137,6 +140,7 @@ public:
 			trunc.matrixRowCol(data_[i],cutoff);
 	}
 
+	//!NEEDED
 	const SparseMatrixType& operator()(SizeType b1) const
 	{
 		assert(b1<data_.size());
@@ -151,12 +155,9 @@ public:
 		return data_[0].row();
 	}
 
-	template<typename MatrixProductOperatorType_>
-	friend std::ostream& operator<<(std::ostream&,
-	                                const ContractedFactor<MatrixProductOperatorType_>&);
-
 private:
 
+	/* MOVE LEFT WILL BE NEEDED LATER ------------------------- */
 	void moveLeft(SparseMatrixType& m,
 	              const MpsFactorType& AorB,
 	              const SparseMatrixType& Atranspose,
@@ -227,8 +228,6 @@ private:
 	              const SymmetryHelperType& symm,
 	              SizeType currentSite)
 	{
-		//SizeType nsites = symm.symmLocal().size();
-		//SizeType middle = static_cast<SizeType>(nsites/2);
 		assert(leftOrRight_ == PART_LEFT);
 		assert(A.type()==MpsFactorType::TYPE_A);
 		SparseMatrixType Atranspose;
@@ -334,6 +333,7 @@ private:
 		m.checkValidity();
 	}
 
+
 	void moveRight(VectorType& values,
 	               VectorIntegerType& cols,
 	               SizeType alm2,
@@ -391,6 +391,7 @@ private:
 		} // kb
 	}
 
+	//! NEEDED
 	void moveRightRight(VectorType& values,
 	                    VectorIntegerType& cols,
 	                    SizeType alm2,
@@ -451,6 +452,11 @@ private:
 		} // kb
 	}
 
+
+	/* PSIDOC ContractedFactor - moveRightFirst
+			First step of moving right. It is done if "previous" mps step is not defined.
+	*/
+	//! NEEDED
 	void moveRightFirst(VectorType& values,
 	                    VectorIntegerType& cols,
 	                    SizeType alm2,
@@ -494,30 +500,10 @@ private:
 		} // kb
 	}
 
-	PsimagLite::String partToString() const
-	{
-		return (leftOrRight_==PART_LEFT) ? "left" : "right";
-	}
-
 	DataType data_;
 	SizeType leftOrRight_;
 
 }; // ContractedFactor
-
-template<typename MatrixProductOperatorType>
-std::ostream& operator<<(std::ostream& os,
-                         const ContractedFactor<MatrixProductOperatorType>& cf)
-{
-	os<<"SparseMatrices= "<<cf.data_.size()<<"\n";
-	for (SizeType i=0;i<cf.data_.size();i++) {
-		typename MatrixProductOperatorType::MpsLocalType::MatrixType m;
-		crsMatrixToFullMatrix(m,cf.data_[i]);
-		std::cout<<m;
-	}
-
-	os<<"\n";
-	return os;
-}
 
 } // namespace Mpspp
 

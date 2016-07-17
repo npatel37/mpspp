@@ -42,25 +42,16 @@ typedef ModelBaseType::MpoLocalType MpoLocalType;
 typedef MpoLocalType::MpsLocalType MpsLocalType;
 
 // FIXME: make configurable at runtime:
-
 template<typename ModelBaseType,
-         template<typename,typename> class InternalProductTemplate>
+		 template<typename,typename> class InternalProductTemplate>
 void mainLoop(const typename ModelBaseType::ParametersSolverType& mpsSolverParams,
-              const ModelBaseType& model,
-              InputValidatorType& io)
+			  const ModelBaseType& model,
+			  InputValidatorType& io)
 {
 	Mpspp::MpsSolver<ModelBaseType,InternalProductTemplate> mpsSolver(mpsSolverParams,
-	                                                                  model,
-	                                                                  io);
-
+																	  model,
+																	  io);
 	mpsSolver.computeGroundState();
-
-	//	const MpoLocalType& H = model.hamiltonian();
-
-	//	MpsLocalType hpsi = H*psi;
-
-	//	std::cout<<"Energy="<<scalarProduct(psi,hpsi)<<"\n";
-
 	std::cout<<"That's all folks!\n";
 }
 
@@ -123,15 +114,8 @@ int main(int argc,char *argv[])
 
 	const ModelBaseType& model = modelSelector(mpsSolverParams,io,geometry);
 
-	//typename MpsLocalType::IoInputType ioForMps(mpsSolverParams.initialMps);
-
-	//MpsLocalType psi(ioForMps);
-
 	if (mpsSolverParams.options.find("InternalProductStored")!=PsimagLite::String::npos) {
 		mainLoop<ModelBaseType,Mpspp::InternalProductStored>(mpsSolverParams,model,io);
-		//} else if (mpsSolverParams.options.find("InternalProductKron") !=
-		// PsimagLite::String::npos) {
-		//	mainLoop<ModelBaseType,Mpspp::InternalProductKron>(psi,mpsSolverParams,model);
 	} else {
 		mainLoop<ModelBaseType,Mpspp::InternalProductOnTheFly>(mpsSolverParams,model,io);
 	}
